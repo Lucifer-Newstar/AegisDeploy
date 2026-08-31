@@ -24,7 +24,7 @@
 | 5 | Component | Structural | [component-diagram.md](component-diagram.md) | ✅ |
 | 6 | Composite Structure | Structural | [composite-structure-diagram.md](composite-structure-diagram.md) | ✅ |
 | 7 | Deployment | Structural | [deployment-diagram.md](deployment-diagram.md) | ✅ |
-| 8 | Profile | Structural | `profile-diagram.md` | ⏳ planned |
+| 8 | Profile | Structural | [profile-diagram.md](profile-diagram.md) | ✅ |
 | 9 | Activity | Behavioral | `activity-diagram.md` | ⏳ planned |
 | 10 | State Machine | Behavioral | `state-machine-diagram.md` | ⏳ planned |
 | 11 | Sequence | Behavioral | `sequence-diagram.md` | ⏳ planned |
