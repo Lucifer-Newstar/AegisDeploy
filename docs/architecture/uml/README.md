@@ -19,7 +19,7 @@
 |---|---------|------|---------|--------|
 | 1 | Use Case | Behavioral | [use-case-platform.md](use-case-platform.md) · [use-case-aegisshop.md](use-case-aegisshop.md) | ✅ |
 | 2 | Class | Structural | [class-diagram-platform.md](class-diagram-platform.md) · [class-diagram-aegisshop.md](class-diagram-aegisshop.md) | ✅ |
-| 3 | Object | Structural | `object-diagram.md` | ⏳ planned |
+| 3 | Object | Structural | [object-diagram.md](object-diagram.md) | ✅ |
 | 4 | Package | Structural | `package-diagram.md` | ⏳ planned |
 | 5 | Component | Structural | `component-diagram.md` | ⏳ planned |
 | 6 | Composite Structure | Structural | `composite-structure-diagram.md` | ⏳ planned |
