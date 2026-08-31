@@ -6,7 +6,7 @@ when the evaluation cluster is chosen. Until then:
 - Keep this directory as the designated IaC home.
 - Do NOT commit `.tfstate` files (gitignored).
 - Provider choice (GCP/EKS/Azure/k3s bare-metal) is a deferred decision
-  (see docs/tech-stack.md §3).
+  (see docs/development/tech-stack.md §3).
 
 ## Planned layout
 

@@ -17,7 +17,7 @@ everywhere, and keeps the project feasible for one engineer.
 Backend services are written in **Python 3.12 + FastAPI**, with:
 
 - **Pydantic v2** models as the single source of truth for API schemas and the
-  telemetry envelope (`docs/telemetry-model.md`).
+  telemetry envelope (`docs/architecture/telemetry-model.md`).
 - **Uvicorn** as the ASGI server; each service is its own deployable unit in
   `backend/services/<name>/` sharing `backend/libs/` for common code.
 - **Async SQLAlchemy 2** for PostgreSQL access; **redis-py** for Redis/Streams.

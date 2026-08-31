@@ -45,7 +45,7 @@ Demo subject ................... our own microservices demo application ("AegisS
 ### Tier A — Core platform (P0)
 
 #### A1 — Observability pipeline
-- **What:** OpenTelemetry collector receives OTLP from the demo app; metrics → Prometheus, logs → Loki, traces → Tempo; Kubernetes events and deployment events become first-class signals on the Event Layer. All signals use the telemetry envelope (see `docs/architecture/telemetry-model.md` — currently `docs/telemetry-model.md` pending reorg).
+- **What:** OpenTelemetry collector receives OTLP from the demo app; metrics → Prometheus, logs → Loki, traces → Tempo; Kubernetes events and deployment events become first-class signals on the Event Layer. All signals use the telemetry envelope (see `docs/architecture/telemetry-model.md`).
 - **Owner:** Gokul J (design: Navin J). **Dependencies:** M1 infra stack (done).
 - **Acceptance criteria:** demo-app metrics visible in Grafana within 60 s of startup; logs queryable in Loki; traces joinable via `trace_id`; k8s + deployment events present on the event layer.
 

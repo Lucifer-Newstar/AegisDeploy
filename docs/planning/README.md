@@ -17,8 +17,8 @@
 | [product-vision.md](product-vision.md) | How the final product should look and behave — console concept, pages, design language, demo story. |
 | [timeline.md](timeline.md) | The 8–10 month development calendar, member assignments per phase, milestones, risks. |
 
-Related: [docs/roadmap.md](../roadmap.md) is the milestone-level roadmap (kept in sync with
-these documents); [docs/team/](../team/) defines who is on the team.
+Related: [docs/project/roadmap.md](../project/roadmap.md) is the milestone-level roadmap
+(kept in sync with these documents); [docs/team/](../team/) defines who is on the team.
 
 ---
 

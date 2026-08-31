@@ -3,7 +3,7 @@
 #
 # Runs the platform's data + observability dependencies. Application services
 # (backend, frontend, ml, ai) are added as they are implemented — see
-# docs/architecture.md and docs/roadmap.md (docs/roadmap.md → README §6).
+# docs/architecture/system-architecture.md and docs/project/roadmap.md.
 #
 # Design posture: "Compose now, Kubernetes-ready later." Every service here has
 # a corresponding Kustomize base in infra/k8s/base/ that is deployed the same

@@ -3,7 +3,7 @@
 This document describes the component architecture of AegisSRE, the responsibilities of
 each component, and the data flows between them. It is the source of truth that
 implementation must conform to; deviations should be recorded as ADRs
-(see [docs/adr/](adr/)).
+(see [adr/](adr/)).
 
 ## 1. Design Principles
 

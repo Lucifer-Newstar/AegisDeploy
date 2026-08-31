@@ -1,8 +1,9 @@
 # Contributing
 
-> **Read first:** [docs/team/team-structure.md](team/team-structure.md) — who owns what.
-> [docs/team/working-rules.md](team/working-rules.md) — the project rules and the git
+> **Read first:** [docs/team/team-structure.md](../team/team-structure.md) — who owns what.
+> [docs/team/working-rules.md](../team/working-rules.md) — the project rules and the git
 > conventions (Conventional Commits, branch + PR workflow, Definition of Done).
+> New here? Start with the [docs reading order](../README.md#3-reading-order-for-a-new-member).
 
 ## Workflow Summary
 
@@ -25,6 +26,8 @@
 - **Secrets:** never commit; use `.env` locally, secrets managers in K8s.
 - **Telemetry:** all events conform to the envelope in
   `docs/architecture/telemetry-model.md` — no bespoke event shapes.
+- **Docs:** every change that affects docs updates the right sub-folder and the
+  [docs index](../README.md) if the structure changed (rule 2).
 
 ## Definition of Done
 

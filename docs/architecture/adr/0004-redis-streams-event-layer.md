@@ -15,7 +15,7 @@ business events. It should add zero new infrastructure during development.
 
 **Redis Streams** is the initial event layer, with one stream per event type
 (`st:metric`, `st:anomaly`, `st:incident`, ...), consumer groups per logical consumer,
-and per-stream retention TTLs. See `docs/telemetry-model.md` §5 for semantics.
+and per-stream retention TTLs. See `docs/architecture/telemetry-model.md` §5 for semantics.
 
 Re-evaluate when one of the following triggers is hit:
 

@@ -36,7 +36,7 @@
 **Coordination responsibilities:**
 
 - Owns the overall technical architecture and its documentation
-  (`docs/architecture/`, `docs/adr/`)
+  (`docs/architecture/`, `docs/architecture/adr/`)
 - Coordinates technical decisions between the four members (frontend ↔ backend ↔
   DevOps ↔ AI/ML) so components integrate cleanly
 - Reviews architecture-impacting changes (ADRs) before merge
@@ -59,7 +59,7 @@ Ownership = primary author/maintainer. "Review" = must approve changes before me
 | `backend/` | Member 2 | Member 4 |
 | `infra/` (docker, k8s), `iac/`, `.github/workflows/` | Member 3 | Member 4 |
 | `ml/`, `ai/`, `chaoslab/` | Member 4 | Member 2 (integration) |
-| `docs/architecture/`, `docs/adr/` | Member 4 | All (by area) |
+| `docs/architecture/`, `docs/architecture/adr/` | Member 4 | All (by area) |
 | `docs/team/` | Member 4 (maintainer) | All |
 | `README.md`, root configs | Member 4 | All |
 

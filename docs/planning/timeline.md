@@ -2,7 +2,7 @@
 
 > The 8–10 month development plan for AegisSRE (started **Aug 2026**; delivery window
 > **Apr–Jun 2027**). Four members: Navin (lead), Gokul, Jegatheesan, Dhanush.
-> Scope reference: [features.md](features.md). Milestone-level view: [docs/roadmap.md](../roadmap.md).
+> Scope reference: [features.md](features.md). Milestone-level view: [docs/project/roadmap.md](../project/roadmap.md).
 
 ---
 

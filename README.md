@@ -109,8 +109,14 @@ AegisSRE/
 ├── ai/                   AI reasoning layer (LLM, RAG, tool-calling, runbooks)
 ├── backend/              Platform & incident services (Python / FastAPI)
 ├── chaoslab/             Controlled failure laboratory (chaos experiments)
-├── docs/                 Architecture, ADRs, telemetry model, evaluation
-│   ├── adr/              Architecture Decision Records
+├── docs/                 Documentation hub (index: docs/README.md)
+│   ├── project/          Proposal & roadmap
+│   ├── planning/         Features, product vision, phases, timeline
+│   ├── team/             Team structure & working rules
+│   ├── members/          Per-member role & phase plans
+│   ├── architecture/     System design + ADRs
+│   ├── development/      Contributing & tech stack
+│   └── operations/       Evaluation methodology
 ├── frontend/             SRE console / web dashboard (Next.js / TypeScript)
 ├── iac/                  Infrastructure as Code (Terraform, future)
 ├── infra/                Docker, Compose, Kubernetes, Prometheus/Grafana/Loki/Tempo configs
@@ -152,15 +158,14 @@ implemented; the observability foundation above is version-pinned and fully func
 
 | Document | Purpose |
 |---|---|
-| [docs/team/](docs/team/) | **Team structure** (roles, ownership) and **working rules** (project rules, git conventions). |
-| [docs/planning/](docs/planning/) | **Planning** — locked feature scope, product vision, 8–10 month timeline, decision log. |
-| [docs/proposal.md](docs/proposal.md) | The original project proposal (full text). |
-| [docs/architecture.md](docs/architecture.md) | Component architecture, responsibilities, data flows. |
-| [docs/tech-stack.md](docs/tech-stack.md) | Selected technology stack and rationale. |
-| [docs/autonomy-model.md](docs/autonomy-model.md) | Levels 1–5 autonomy, policy engine, approval matrix. |
-| [docs/telemetry-model.md](docs/telemetry-model.md) | Unified telemetry/event envelope contract. |
-| [docs/evaluation.md](docs/evaluation.md) | SRE, ML, and automation evaluation metrics. |
-| [docs/adr/](docs/adr/) | Architecture Decision Records. |
+| [docs/README.md](docs/README.md) | **Documentation index** — navigation hub & reading order. |
+| [docs/project/](docs/project/) | **Project** — proposal & roadmap. |
+| [docs/planning/](docs/planning/) | **Planning** — locked feature scope, product vision, phases & gates, timeline, decision log. |
+| [docs/team/](docs/team/) | **Team** — structure, ownership, working rules. |
+| [docs/members/](docs/members/) | **Member folders** — each member's role & phase plan. |
+| [docs/architecture/](docs/architecture/) | **Architecture** — system architecture, autonomy model, telemetry model, ADRs. |
+| [docs/development/](docs/development/) | **Development** — contributing guide & tech stack. |
+| [docs/operations/](docs/operations/) | **Operations** — evaluation metrics & protocol. |
 
 ## 6. Roadmap
 
@@ -195,5 +200,5 @@ infrastructure. Autonomy is constrained by:
 
 ## 9. Contributing & License
 
-See [CONTRIBUTING](docs/contributing.md) for development conventions. Licensed under the
-[MIT License](LICENSE). Copyright © 2026 Navin Jairam (Lucifer-Newstar).
+See [CONTRIBUTING](docs/development/contributing.md) for development conventions.
+Licensed under the [MIT License](LICENSE). Copyright © 2026 Navin Jairam (Lucifer-Newstar).

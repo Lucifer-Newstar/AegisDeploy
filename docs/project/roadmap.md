@@ -1,10 +1,11 @@
 # Roadmap
 
 Milestone plan for AegisSRE. **Scope locked 2026-08-31** — see
-[docs/planning/features.md](planning/features.md) for the full feature specification,
-[docs/planning/product-vision.md](planning/product-vision.md) for the product target, and
-[docs/planning/timeline.md](planning/timeline.md) for the member-level calendar.
-Each milestone ends with a commit-able, demonstrable increment on `main` and updated docs.
+[../planning/features.md](../planning/features.md) for the full feature specification,
+[../planning/product-vision.md](../planning/product-vision.md) for the product target, and
+[../planning/timeline.md](../planning/timeline.md) for the member-level calendar.
+Each phase ends with a ready-and-working increment and an integration checkpoint
+([../planning/phases.md](../planning/phases.md)).
 
 ## M1 — Foundation ✅ (2026-08-31)
 - Repository layout, project docs, ADRs 0001–0005
