@@ -10,16 +10,16 @@
 
 ## 1. Members and Roles
 
-| # | Role | Primary responsibilities |
-|---|------|--------------------------|
-| 1 | **Frontend Developer** | Frontend application, dashboard, UI/UX, system visualization, incident visualization, AI interaction interfaces |
-| 2 | **Backend Developer** | Backend services, APIs, database, authentication/authorization, application business logic, backend integrations |
-| 3 | **DevOps / Cloud Engineer** | Docker, CI/CD, cloud infrastructure, Kubernetes, infrastructure automation, deployment, supporting observability infrastructure |
-| 4 | **Team Lead — SRE / DevOps / Architecture** | See §2 below |
+| # | Member | Role | Primary responsibilities |
+|---|--------|------|--------------------------|
+| 1 | **Dhanush Kumar S** | Frontend Developer | Frontend application, dashboard, UI/UX, system visualization, incident visualization, AI interaction interfaces |
+| 2 | **Jegatheesan K** | Backend Developer | Backend services, APIs, database, authentication/authorization, application business logic, backend integrations |
+| 3 | **Gokul J** | DevOps / Cloud Engineer | Docker, CI/CD, cloud infrastructure, Kubernetes, infrastructure automation, deployment, supporting observability infrastructure — works closely with the Team Lead on SRE/monitoring |
+| 4 | **Navin Jairam M** | **Team Lead** — SRE / DevOps / Architecture | See §2 below |
 
 ---
 
-## 2. Team Lead (Member 4) — Expanded Role
+## 2. Team Lead (Navin Jairam M — Member 4) — Expanded Role
 
 **Primary technical focus:**
 
