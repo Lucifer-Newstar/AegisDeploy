@@ -30,5 +30,6 @@ these documents); [docs/team/](../team/) defines who is on the team.
 | 2026-08-31 | Runway: **8–10 months** (started Aug 2026 → delivery window Apr–Jun 2027). | Navin Jairam | [timeline.md](timeline.md) |
 | 2026-08-31 | **Scope locked:** All Tier A (core loop) + B1 RAG + B2 Ask Aegis + C1/C3/C4/C5 + D1/D5/D6 + E2/E4. Explicit cuts: B3, B4, B6, C2, C6, D2, D3, D4, E3, E5 (B3 = optional buffer stretch). | Navin Jairam (on recommendation) | [features.md](features.md) |
 | 2026-08-31 | **Demo subject:** build our **own demo microservices application** (fully controlled faults) rather than adapting an existing one. | Navin Jairam (on recommendation) | [features.md](features.md) §5 |
+| 2026-08-31 | **Micro-decisions locked:** demo app named **AegisShop**; demo stack = Python/FastAPI + OTel + Postgres/Redis; B3 fine-tuning kept as gated buffer stretch; D1 cluster = **kind** (fallback k3s). | Navin Jairam (on agent recommendation) | [features.md](features.md) §4 |
 
 *New decisions are appended; nothing is silently edited.*

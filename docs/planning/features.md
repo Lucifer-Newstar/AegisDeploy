@@ -164,11 +164,14 @@ A1 ──▶ D6     all ──▶ D1, D5     E4 (ongoing)
 
 ---
 
-## 4. Open Micro-Decisions
+## 4. Micro-Decisions (decided 2026-08-31)
 
-| # | Decision | Default if not decided | Decided by |
+| # | Decision | Chosen | Rationale |
 |---|---|---|---|
-| 1 | Demo app name (working title "AegisShop") | keep AegisShop | Navin |
-| 2 | Demo app tech (suggestion: Python/FastAPI microservices, OTel-instrumented, Postgres + Redis) | as suggested | Navin |
-| 3 | B3 fine-tuning experiment in buffer month (Apr–May 2027) | skip unless core is ahead | Navin |
-| 4 | Cluster for D1 (kind vs k3s vs minikube) | kind (fast, CI-friendly) | Gokul + Navin |
+| 1 | Demo app name | **AegisShop** | Brand-consistent; retail microservices is the industry-standard SRE demo pattern (evaluators recognize it instantly). |
+| 2 | Demo app tech | **Python/FastAPI microservices, OTel-instrumented, Postgres + Redis** | One language across the whole repo; first-class Python OTel; Postgres/Redis already in the compose stack (zero new infra). |
+| 3 | B3 LoRA/QLoRA fine-tuning | **Keep as gated buffer stretch** (Apr–May 2027) | Free optional upside (MLOps depth for the thesis). Gate: core milestones M1–M8 on schedule; otherwise dropped. Never on the critical path. |
+| 4 | Cluster for D1 (Kubernetes) | **kind** | Fastest startup, offline-capable, CI-friendly, native Kustomize support. Fallback: k3s on constrained machines. |
+
+> Decider: Navin Jairam (Team Lead), on agent recommendation, 2026-08-31.
+> Re-opening any decision requires a Team Lead call + Decision Log entry.
