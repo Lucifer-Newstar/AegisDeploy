@@ -18,7 +18,7 @@
 | # | Diagram | Type | File(s) | Status |
 |---|---------|------|---------|--------|
 | 1 | Use Case | Behavioral | [use-case-platform.md](use-case-platform.md) · [use-case-aegisshop.md](use-case-aegisshop.md) | ✅ |
-| 2 | Class | Structural | `class-diagram.md` | ⏳ planned |
+| 2 | Class | Structural | [class-diagram-platform.md](class-diagram-platform.md) · [class-diagram-aegisshop.md](class-diagram-aegisshop.md) | ✅ |
 | 3 | Object | Structural | `object-diagram.md` | ⏳ planned |
 | 4 | Package | Structural | `package-diagram.md` | ⏳ planned |
 | 5 | Component | Structural | `component-diagram.md` | ⏳ planned |
