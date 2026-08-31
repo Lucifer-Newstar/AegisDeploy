@@ -15,6 +15,7 @@
 |---|---|
 | [features.md](features.md) | The locked feature scope — what is in, what is out, who owns what, acceptance criteria. |
 | [product-vision.md](product-vision.md) | How the final product should look and behave — console concept, pages, design language, demo story. |
+| [phases.md](phases.md) | The phase plan — gates ("ready & working" per phase), non-disruption design, integration checkpoints. |
 | [timeline.md](timeline.md) | The 8–10 month development calendar, member assignments per phase, milestones, risks. |
 
 Related: [docs/project/roadmap.md](../project/roadmap.md) is the milestone-level roadmap
@@ -31,5 +32,7 @@ Related: [docs/project/roadmap.md](../project/roadmap.md) is the milestone-level
 | 2026-08-31 | **Scope locked:** All Tier A (core loop) + B1 RAG + B2 Ask Aegis + C1/C3/C4/C5 + D1/D5/D6 + E2/E4. Explicit cuts: B3, B4, B6, C2, C6, D2, D3, D4, E3, E5 (B3 = optional buffer stretch). | Navin Jairam (on recommendation) | [features.md](features.md) |
 | 2026-08-31 | **Demo subject:** build our **own demo microservices application** (fully controlled faults) rather than adapting an existing one. | Navin Jairam (on recommendation) | [features.md](features.md) §5 |
 | 2026-08-31 | **Micro-decisions locked:** demo app named **AegisShop**; demo stack = Python/FastAPI + OTel + Postgres/Redis; B3 fine-tuning kept as gated buffer stretch; D1 cluster = **kind** (fallback k3s). | Navin Jairam (on agent recommendation) | [features.md](features.md) §4 |
+| 2026-08-31 | **Phase-gated development:** project split into phases P1–P8; each phase ends with a **ready-and-working increment** (gate) + integration checkpoint; tracks designed to be **non-blocking** (contracts-first, mocks); moving on requires a Team Lead gate review. | Navin Jairam (Team Lead) | [phases.md](phases.md) |
+| 2026-08-31 | **Per-member planning folders:** each member gets a designated folder under `docs/members/<member>/` containing their role and their own view of phases + deliverables. | Navin Jairam (Team Lead) | [docs/members/](../members/) |
 
 *New decisions are appended; nothing is silently edited.*
