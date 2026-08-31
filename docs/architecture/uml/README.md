@@ -28,7 +28,7 @@
 | 9 | Activity | Behavioral | [activity-diagram.md](activity-diagram.md) | ✅ |
 | 10 | State Machine | Behavioral | [state-machine-diagram.md](state-machine-diagram.md) | ✅ |
 | 11 | Sequence | Behavioral | [sequence-diagram.md](sequence-diagram.md) | ✅ |
-| 12 | Communication | Behavioral | `communication-diagram.md` | ⏳ planned |
+| 12 | Communication | Behavioral | [communication-diagram.md](communication-diagram.md) | ✅ |
 | 13 | Timing | Behavioral | `timing-diagram.md` | ⏳ planned |
 | 14 | Interaction Overview | Behavioral | `interaction-overview-diagram.md` | ⏳ planned |
 
