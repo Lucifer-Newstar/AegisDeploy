@@ -34,5 +34,6 @@ Related: [docs/project/roadmap.md](../project/roadmap.md) is the milestone-level
 | 2026-08-31 | **Micro-decisions locked:** demo app named **AegisShop**; demo stack = Python/FastAPI + OTel + Postgres/Redis; B3 fine-tuning kept as gated buffer stretch; D1 cluster = **kind** (fallback k3s). | Navin Jairam (on agent recommendation) | [features.md](features.md) §4 |
 | 2026-08-31 | **Phase-gated development:** project split into phases P1–P8; each phase ends with a **ready-and-working increment** (gate) + integration checkpoint; tracks designed to be **non-blocking** (contracts-first, mocks); moving on requires a Team Lead gate review. | Navin Jairam (Team Lead) | [phases.md](phases.md) |
 | 2026-08-31 | **Per-member planning folders:** each member gets a designated folder under `docs/members/<member>/` containing their role and their own view of phases + deliverables. | Navin Jairam (Team Lead) | [docs/members/](../members/) |
+| 2026-08-31 | **UML documentation set:** all 14 UML 2.5 diagram types, authored in **Mermaid** under `docs/architecture/uml/` (GitHub-rendered), one diagram per reviewed exchange; Use Case split into platform + AegisShop files. | Navin Jairam (on agent recommendation) | [docs/architecture/uml/](../architecture/uml/) |
 
 *New decisions are appended; nothing is silently edited.*

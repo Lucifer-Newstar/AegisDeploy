@@ -40,6 +40,7 @@ docs/
 │   ├── system-architecture.md   ← components, responsibilities, data flows
 │   ├── autonomy-model.md        ← Levels 1–5 autonomy, policy engine, safety
 │   ├── telemetry-model.md       ← unified telemetry/event envelope contract
+│   ├── uml/                     ← the 14-diagram UML set (Mermaid, GitHub-rendered)
 │   └── adr/                     ← Architecture Decision Records (ADRs)
 │
 ├── development/                 ← HOW TO BUILD (engineering conventions)
