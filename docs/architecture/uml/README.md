@@ -30,7 +30,7 @@
 | 11 | Sequence | Behavioral | [sequence-diagram.md](sequence-diagram.md) | ✅ |
 | 12 | Communication | Behavioral | [communication-diagram.md](communication-diagram.md) | ✅ |
 | 13 | Timing | Behavioral | [timing-diagram.md](timing-diagram.md) | ✅ |
-| 14 | Interaction Overview | Behavioral | `interaction-overview-diagram.md` | ⏳ planned |
+| 14 | Interaction Overview | Behavioral | [interaction-overview-diagram.md](interaction-overview-diagram.md) | ✅ |
 
 > Note: diagram #1 (Use Case) is split into two files — one for the AegisSRE platform
 > and one for the AegisShop demo application (decision 2026-08-31).
