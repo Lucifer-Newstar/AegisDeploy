@@ -152,7 +152,7 @@ implemented; the observability foundation above is version-pinned and fully func
 
 | Document | Purpose |
 |---|---|
-| [docs/team/](docs/team/) | **Team structure** (roles, ownership) and **working rules** (8 rules, git conventions). |
+| [docs/team/](docs/team/) | **Team structure** (roles, ownership) and **working rules** (project rules, git conventions). |
 | [docs/proposal.md](docs/proposal.md) | The original project proposal (full text). |
 | [docs/architecture.md](docs/architecture.md) | Component architecture, responsibilities, data flows. |
 | [docs/tech-stack.md](docs/tech-stack.md) | Selected technology stack and rationale. |

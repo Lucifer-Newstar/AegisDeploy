@@ -1,8 +1,8 @@
 # Contributing
 
 > **Read first:** [docs/team/team-structure.md](team/team-structure.md) — who owns what.
-> [docs/team/working-rules.md](team/working-rules.md) — the eight project rules and the
-> git conventions (Conventional Commits, branch + PR workflow, Definition of Done).
+> [docs/team/working-rules.md](team/working-rules.md) — the project rules and the git
+> conventions (Conventional Commits, branch + PR workflow, Definition of Done).
 
 ## Workflow Summary
 
