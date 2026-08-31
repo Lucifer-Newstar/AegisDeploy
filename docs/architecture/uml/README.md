@@ -21,7 +21,7 @@
 | 2 | Class | Structural | [class-diagram-platform.md](class-diagram-platform.md) · [class-diagram-aegisshop.md](class-diagram-aegisshop.md) | ✅ |
 | 3 | Object | Structural | [object-diagram.md](object-diagram.md) | ✅ |
 | 4 | Package | Structural | [package-diagram-platform.md](package-diagram-platform.md) · [package-diagram-aegisshop.md](package-diagram-aegisshop.md) · [package-diagram-infraops.md](package-diagram-infraops.md) | ✅ |
-| 5 | Component | Structural | `component-diagram.md` | ⏳ planned |
+| 5 | Component | Structural | [component-diagram.md](component-diagram.md) | ✅ |
 | 6 | Composite Structure | Structural | `composite-structure-diagram.md` | ⏳ planned |
 | 7 | Deployment | Structural | `deployment-diagram.md` | ⏳ planned |
 | 8 | Profile | Structural | `profile-diagram.md` | ⏳ planned |
