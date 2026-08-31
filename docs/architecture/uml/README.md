@@ -29,7 +29,7 @@
 | 10 | State Machine | Behavioral | [state-machine-diagram.md](state-machine-diagram.md) | ✅ |
 | 11 | Sequence | Behavioral | [sequence-diagram.md](sequence-diagram.md) | ✅ |
 | 12 | Communication | Behavioral | [communication-diagram.md](communication-diagram.md) | ✅ |
-| 13 | Timing | Behavioral | `timing-diagram.md` | ⏳ planned |
+| 13 | Timing | Behavioral | [timing-diagram.md](timing-diagram.md) | ✅ |
 | 14 | Interaction Overview | Behavioral | `interaction-overview-diagram.md` | ⏳ planned |
 
 > Note: diagram #1 (Use Case) is split into two files — one for the AegisSRE platform
