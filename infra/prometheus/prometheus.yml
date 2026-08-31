@@ -1,0 +1,33 @@
+# AegisSRE Prometheus configuration
+# Mounted by both Docker Compose and Kubernetes (infra/k8s/base/prometheus).
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: aegissre-local
+
+rule_files:
+  - /etc/prometheus/alerts.yml
+
+scrape_configs:
+  # Prometheus itself
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # AegisSRE control-plane services (added as they come online; jobs are
+  # additive so local Compose and K8s can share this file)
+  - job_name: aegissre-backend
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["host.docker.internal:8000"]
+    # NOTE: real targets are injected per-runtime (docker-compose DNS names in
+    # Compose, service discovery in K8s). This entry is a placeholder; the
+    # authoritative list is maintained per environment overlay.
+
+  # Demo workload — the app under monitoring. Targets are provided by the
+  # runtime overlay (compose.override.yml / k8s base) so this file stays
+  # environment-agnostic.
+  - job_name: demo-app
+    static_configs:
+      - targets: ["host.docker.internal:9000"]

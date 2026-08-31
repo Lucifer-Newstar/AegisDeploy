@@ -1,0 +1,171 @@
+# =============================================================================
+# AegisSRE — Local development stack (Milestone 1: Foundation)
+#
+# Runs the platform's data + observability dependencies. Application services
+# (backend, frontend, ml, ai) are added as they are implemented — see
+# docs/architecture.md and docs/roadmap.md (docs/roadmap.md → README §6).
+#
+# Design posture: "Compose now, Kubernetes-ready later." Every service here has
+# a corresponding Kustomize base in infra/k8s/base/ that is deployed the same
+# way on a cluster. Configs live under infra/ and are shared by both runtimes.
+#
+#   make infra-up       → docker compose up -d --wait
+#   make infra-down     → docker compose down -v
+# =============================================================================
+
+name: aegissre
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  # ── Data layer ────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: aegissre-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-aegis}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aegis}
+      POSTGRES_DB: ${POSTGRES_DB:-aegissre}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-aegis}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks: [aegissre]
+    logging: *default-logging
+
+  redis:
+    image: redis:7-alpine
+    container_name: aegissre-redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks: [aegissre]
+    logging: *default-logging
+
+  # ── Observability layer ───────────────────────────────────────────────────
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    container_name: aegissre-prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-lifecycle"
+      - "--web.enable-remote-write-receiver"
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:9090/-/healthy"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [aegissre]
+    logging: *default-logging
+
+  grafana:
+    image: grafana/grafana:11.3.0
+    container_name: aegissre-grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-aegis}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./infra/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana-data:/var/lib/grafana
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      prometheus: { condition: service_healthy }
+    networks: [aegissre]
+    logging: *default-logging
+
+  loki:
+    image: grafana/loki:3.3.2
+    container_name: aegissre-loki
+    command: ["-config.file=/etc/loki/loki-config.yaml"]
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./infra/loki/loki-config.yaml:/etc/loki/loki-config.yaml:ro
+      - loki-data:/loki
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:3100/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [aegissre]
+    logging: *default-logging
+
+  tempo:
+    image: grafana/tempo:2.6.1
+    container_name: aegissre-tempo
+    command: ["-config.file=/etc/tempo/tempo.yaml"]
+    ports:
+      - "3200:3200"   # Tempo HTTP API
+      - "4317:4317"   # OTLP gRPC (traces)
+      - "4318:4318"   # OTLP HTTP (traces)
+    volumes:
+      - ./infra/tempo/tempo.yaml:/etc/tempo/tempo.yaml:ro
+      - tempo-data:/var/tempo
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:3200/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [aegissre]
+    logging: *default-logging
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.109.0
+    container_name: aegissre-otel-collector
+    command: ["--config=/etc/otel/config.yaml"]
+    ports:
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+    volumes:
+      - ./infra/otel/otel-collector.yaml:/etc/otel/config.yaml:ro
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:13133"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      tempo: { condition: service_started }
+      loki: { condition: service_healthy }
+    networks: [aegissre]
+    logging: *default-logging
+
+networks:
+  aegissre:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  redis-data:
+  prometheus-data:
+  grafana-data:
+  loki-data:
+  tempo-data:

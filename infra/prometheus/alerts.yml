@@ -1,0 +1,22 @@
+# AegisSRE alerting rules — M1 baseline set.
+# These rules become the *ground truth signals* that the anomaly pipeline and
+# incident manager consume; keep them minimal and deterministic for now.
+groups:
+  - name: aegissre-baseline
+    interval: 30s
+    rules:
+      - alert: AegisSREBackendDown
+        expr: up{job="aegissre-backend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "AegisSRE backend is unreachable"
+
+      - alert: AegisSREPrometheusTargetDown
+        expr: up == 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Scrape target {{ $labels.job }} is down"

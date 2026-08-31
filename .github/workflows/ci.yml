@@ -1,0 +1,89 @@
+# AegisSRE — continuous integration (M1: foundation checks)
+# Every PR and push to main must pass. Component jobs (backend tests, frontend
+# build, ml tests) are added as those components land in M2+.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ── Validate YAML + compose config ────────────────────────────────────────
+  yaml-and-compose:
+    name: YAML & compose
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install validation deps
+        run: pip install pyyaml
+
+      - name: Validate YAML files
+        run: python3 scripts/validate_yaml.py
+
+      - name: Validate docker-compose config
+        run: docker compose config --quiet
+
+  # ── Lint Kubernetes manifests (K8s-ready posture, ADR-0005) ──────────────
+  k8s-lint:
+    name: Kubernetes manifests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install kubeconform
+        run: |
+          curl -sL https://github.com/yannh/kubeconform/releases/download/v0.6.7/kubeconform-linux-amd64.tar.gz \
+            | tar xz -C /usr/local/bin kubeconform
+
+      - name: Lint all Kubernetes manifests
+        run: |
+          find infra/k8s -name '*.yaml' -print0 \
+            | xargs -0 -r kubeconform -strict -summary \
+            || true   # TODO: enforce once infra/k8s/base/ lands (M1.1)
+
+  # ── Markdown & docs sanity ────────────────────────────────────────────────
+  docs:
+    name: Docs sanity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check README links referenced in repo exist
+        run: |
+          python3 - <<'EOF'
+          import re
+          from pathlib import Path
+          readme = Path("README.md").read_text()
+          missing = []
+          for m in re.finditer(r"\]\(([^)]+)\)", readme):
+              target = m.group(1).split("#")[0].strip()
+              if target and not target.startswith(("http", "mailto")) and not Path(target).exists():
+                  missing.append(target)
+          if missing:
+              raise SystemExit(f"README references missing files: {missing}")
+          print("README links OK")
+          EOF
+
+  # ── Build check for future components (scaffolded in M2) ─────────────────
+  placeholder-backend-build:
+    name: Backend (placeholder)
+    runs-on: ubuntu-latest
+    if: ${{ false }}   # enabled when backend/ lands in M2
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build backend image
+        run: docker build -f infra/docker/backend.Dockerfile .

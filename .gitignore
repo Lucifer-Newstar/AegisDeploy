@@ -1,0 +1,55 @@
+# ── Secrets & local env ─────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# ── Python ──────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+.mlflow/
+
+# ── Node / frontend ─────────────────────────────────────────────────
+node_modules/
+.next/
+out/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.tsbuildinfo
+
+# ── Terraform / IaC ─────────────────────────────────────────────────
+*.tfstate
+*.tfstate.*
+.terraform/
+*.tfvars
+!*.tfvars.example
+
+# ── Kubernetes ──────────────────────────────────────────────────────
+kubeconfig
+*.kubeconfig
+
+# ── Data & runtime artifacts ────────────────────────────────────────
+data/
+*.log
+*.pid
+*.sqlite3
+*.db
+
+# ── IDE / OS ────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db

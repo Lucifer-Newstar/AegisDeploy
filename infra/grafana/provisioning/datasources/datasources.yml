@@ -1,0 +1,38 @@
+# AegisSRE Grafana provisioning — automatic datasource setup.
+# Mounted read-only into the Grafana container.
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    uid: prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true
+    jsonData:
+      timeInterval: 15s
+
+  - name: Loki
+    uid: loki
+    type: loki
+    access: proxy
+    url: http://loki:3100
+    editable: true
+    jsonData:
+      maxLines: 1000
+
+  - name: Tempo
+    uid: tempo
+    type: tempo
+    access: proxy
+    url: http://tempo:3200
+    editable: true
+    jsonData:
+      tracesToLogs:
+        datasourceUid: loki
+        tags: ["trace_id"]
+        mappedTags: [{ key: "service.name", value: "service_name" }]
+        mapTagNamesEnabled: true
+        spanStartTimeShift: "1h"
+        spanEndTimeShift: "-1h"

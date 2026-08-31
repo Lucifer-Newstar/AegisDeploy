@@ -1,0 +1,54 @@
+# AegisSRE OpenTelemetry Collector (contrib) — single ingestion point.
+# Receives OTLP (grpc/http) and fans out:
+#   metrics → Prometheus (remote write)  |  logs → Loki  |  traces → Tempo
+# Shared by Docker Compose and Kubernetes runtimes.
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    timeout: 5s
+    send_batch_size: 1024
+  memory_limiter:
+    check_interval: 5s
+    limit_mib: 512
+    spike_limit_mib: 128
+  resource:
+    attributes:
+      - key: service.namespace
+        value: aegissre
+        action: upsert
+
+exporters:
+  prometheusremotewrite:
+    endpoint: http://prometheus:9090/api/v1/write
+    # Note: Prometheus remote write requires --enable-feature=remote-write-receiver
+  otlphttp/traces:
+    endpoint: http://tempo:4318
+  otlphttp/logs:
+    endpoint: http://loki:3100/otlp
+
+service:
+  extensions: [health_check]
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, resource, batch]
+      exporters: [prometheusremotewrite]
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, resource, batch]
+      exporters: [otlphttp/traces]
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, resource, batch]
+      exporters: [otlphttp/logs]
