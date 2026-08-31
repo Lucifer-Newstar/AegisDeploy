@@ -10,6 +10,9 @@
 
 ## 1. Members and Roles
 
+> Each member has a **designated planning folder** — see
+> [docs/members/](../members/) for per-member phase plans and deliverables.
+
 | # | Member | Role | Primary responsibilities |
 |---|--------|------|--------------------------|
 | 1 | **Dhanush Kumar S** | Frontend Developer | Frontend application, dashboard, UI/UX, system visualization, incident visualization, AI interaction interfaces |
