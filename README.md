@@ -153,6 +153,7 @@ implemented; the observability foundation above is version-pinned and fully func
 | Document | Purpose |
 |---|---|
 | [docs/team/](docs/team/) | **Team structure** (roles, ownership) and **working rules** (project rules, git conventions). |
+| [docs/planning/](docs/planning/) | **Planning** — locked feature scope, product vision, 8–10 month timeline, decision log. |
 | [docs/proposal.md](docs/proposal.md) | The original project proposal (full text). |
 | [docs/architecture.md](docs/architecture.md) | Component architecture, responsibilities, data flows. |
 | [docs/tech-stack.md](docs/tech-stack.md) | Selected technology stack and rationale. |
