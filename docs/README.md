@@ -19,10 +19,14 @@ docs/
 │   └── roadmap.md               ← milestone-level roadmap
 │
 ├── contracts/                   ← P2 API contracts (OpenAPI, freeze 2026-09-08)
-│   ├── README.md                ← conventions + mock-server + CORS policy
+│   ├── README.md                ← conventions + mock-server + CORS + drift guard
+│   ├── manifest.json            ← service → contract mapping (drift check)
 │   ├── registry-service.yaml    ← A2 registry + health (:8101)
 │   ├── deployments-service.yaml ← DI-1 deploy tracker (:8701)
-│   └── aegisshop-v1.yaml        ← catalog/cart/order/payment (9001–9004)
+│   ├── catalog-service.yaml     ← catalog (:9001, LIVE slice)
+│   ├── cart-service.yaml        ← cart (:9002*, P2)
+│   ├── order-service.yaml       ← order (:9003*, P2)
+│   └── payment-service.yaml     ← payment (:9004*, P2)
 │
 ├── planning/                    ← HOW WE DECIDE (development-phase planning)
 │   ├── README.md                ← planning index + decision log

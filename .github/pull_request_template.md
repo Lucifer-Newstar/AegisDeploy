@@ -20,6 +20,7 @@
 - [ ] Uses the shared libs (`telemetry`, `eventbus`) — **no bespoke event shapes**
 - [ ] New event type? → **event catalogue updated** (`docs/architecture/telemetry-model.md` §3.5)
 - [ ] New/changed API? → **OpenAPI contract in `docs/contracts/`** (or contract PR first — freeze exceptions only via contract PR)
+- [ ] New service? → **row added to `docs/contracts/manifest.json`** (drift check)
 - [ ] Envelope changes? → additive-only; defaults for new fields
 - [ ] Env vars via `config.py` + compose/K8s **parity** (ADR-0005) — same names in both runtimes
 - [ ] New service? → compose service + Kustomize base + `python-quality` CI entry + **port register** updated

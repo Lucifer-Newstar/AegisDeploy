@@ -1,0 +1,35 @@
+{
+  "comment": "Service → contract mapping for the contract-drift check (scripts/check_contract_drift.py). Add a row when a service lands (PR template checklist).",
+  "services": [
+    {
+      "id": "catalog-service",
+      "module": "catalog_service.main",
+      "contract": "catalog-service.yaml"
+    },
+    {
+      "id": "registry-service",
+      "module": "registry_service.main",
+      "contract": "registry-service.yaml"
+    },
+    {
+      "id": "deployments-service",
+      "module": "deployments_service.main",
+      "contract": "deployments-service.yaml"
+    },
+    {
+      "id": "cart-service",
+      "module": "cart_service.main",
+      "contract": "cart-service.yaml"
+    },
+    {
+      "id": "order-service",
+      "module": "order_service.main",
+      "contract": "order-service.yaml"
+    },
+    {
+      "id": "payment-service",
+      "module": "payment_service.main",
+      "contract": "payment-service.yaml"
+    }
+  ]
+}

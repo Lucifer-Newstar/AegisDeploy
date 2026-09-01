@@ -1,0 +1,96 @@
+# AegisDeploy — payment-service contract (AegisShop v1)
+# Port: 9004 (proposed — confirm at kickoff sync) · Version: 1.0.0 · Status: PENDING (P2, Jega)
+#
+# Changelog:
+#  1.0.0  initial contract (P2 kickoff)
+openapi: 3.1.0
+info:
+  title: AegisShop Payment Service
+  version: 1.0.0
+  description: Payment processing for orders.
+servers:
+  - url: http://localhost:9004
+    description: local compose
+
+paths:
+  /health:
+    get:
+      summary: Liveness probe
+      responses:
+        "200":
+          description: process is up
+
+  /ready:
+    get:
+      summary: Readiness probe (needs Postgres)
+      responses:
+        "200":
+          description: ready
+        "503":
+          description: Postgres unreachable
+
+  /payments:
+    post:
+      summary: Charge an order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [order_id, amount]
+              properties:
+                order_id:
+                  type: string
+                amount:
+                  type: number
+                  exclusiveMinimum: 0
+      responses:
+        "201":
+          description: payment processed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+        "402":
+          description: payment declined
+        "404":
+          description: unknown order
+
+  /payments/{payment_id}:
+    get:
+      summary: Get a payment
+      parameters:
+        - name: payment_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: payment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+        "404":
+          description: unknown payment
+
+components:
+  schemas:
+    Payment:
+      type: object
+      required: [id, order_id, status, amount]
+      properties:
+        id:
+          type: string
+        order_id:
+          type: string
+        status:
+          type: string
+          enum: [succeeded, declined, refunded]
+        amount:
+          type: number
+        paid_at:
+          type: string
+          format: date-time

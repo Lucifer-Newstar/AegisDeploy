@@ -122,7 +122,8 @@ jobs:
 
       - name: Install packages (editable, with dev extras)
         run: |
-          pip install -e backend/libs/telemetry[dev] \
+          pip install pyyaml \
+                      -e backend/libs/telemetry[dev] \
                       -e backend/libs/eventbus[dev] \
                       -e backend/services/_template[dev] \
                       -e demoapp/aegisshop/catalog-service[dev]
@@ -139,6 +140,9 @@ jobs:
         run: >
           pytest backend/libs/telemetry backend/libs/eventbus
           backend/services/_template demoapp/aegisshop/catalog-service
+
+      - name: Contract drift (surface check, edge case #8)
+        run: python3 scripts/check_contract_drift.py
 
   # ── Container build (AegisShop + platform images as they land) ───────────
   # Currently the one real app image (catalog-service). Each new service

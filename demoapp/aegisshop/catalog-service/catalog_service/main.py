@@ -143,7 +143,7 @@ def list_products() -> list[Product]:
     return list(CATALOG.values())
 
 
-@app.get("/products/{product_id}", response_model=Product)
+@app.get("/products/{product_id}", response_model=Product, responses={404: {"description": "unknown product"}})
 def get_product(product_id: str) -> Product:
     """Fetch a single product by id; 404 when unknown."""
     product = CATALOG.get(product_id)
