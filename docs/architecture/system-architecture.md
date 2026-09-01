@@ -1,6 +1,6 @@
 # Architecture
 
-This document describes the component architecture of AegisSRE, the responsibilities of
+This document describes the component architecture of AegisDeploy, the responsibilities of
 each component, and the data flows between them. It is the source of truth that
 implementation must conform to; deviations should be recorded as ADRs
 (see [adr/](adr/)).
@@ -172,6 +172,15 @@ A controlled failure-injection environment (CPU saturation, memory exhaustion, c
 crashes, DB unavailability, network latency, 5xx errors, dependency failures, config
 errors, faulty deployments, traffic spikes) used to generate the SRE telemetry/incident
 dataset and to evaluate the platform objectively.
+
+### 3.11 Deployment Intelligence (DI tier — upgrade 2026-09-01)
+A first-class module that turns every software deployment into a monitored, scored, and
+learnable event: deployment tracking (DI-1), ML-based deployment risk scoring (DI-2),
+change-incident correlation in RCA (DI-3), bad-rollout detection (DI-4), policy-gated
+rollback intelligence with safe auto-rollback (DI-5), canary/progressive delivery
+analysis (DI-6), and change-failure analytics (DI-7). It reuses the platform's event
+layer, ML pipeline, policy engine, executor layer, and evaluation framework — see
+[deployment-intelligence.md](deployment-intelligence.md) for the full design.
 
 ## 4. Data Flows
 

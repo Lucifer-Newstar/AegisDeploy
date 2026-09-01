@@ -558,3 +558,48 @@ This boundary makes the system safer, more realistic, and technically defensible
 **Verify the result.**
 
 The objective is not to replace the SRE. It is to build a system that allows the SRE to move from **reactive firefighting toward intelligent, evidence-driven and increasingly autonomous reliability engineering.**
+
+---
+
+# Addendum 1 — Project Upgrade: Software Deployment Incident Intelligence
+
+- **Date:** 2026-09-01
+- **Decision:** Navin Jairam (Team Lead), on agent recommendation
+- **Scope:** full capability set (DI-1…DI-7), integrated into existing phases P2–P8
+
+## 1. What Changed
+
+The project (renamed **AegisSRE → AegisDeploy**) is upgraded with a first-class
+**Deployment Intelligence (DI) tier** on top of the autonomous SRE platform described
+above. Every software deployment becomes a monitored, scored, and learnable event:
+
+| ID | Capability |
+|---|---|
+| DI-1 | Deployment tracking & registry (deploy events, history API, deploy timeline) |
+| DI-2 | Deployment risk scoring (ML) — predict risky deployments before/after they ship |
+| DI-3 | Change-incident correlation — RCA attributes incidents to the causing deployment |
+| DI-4 | Bad-rollout detection — deploy-window anomaly evaluation (< 3 min) |
+| DI-5 | Rollback intelligence — recommend rollbacks; policy-gated execution incl. safe auto-rollback |
+| DI-6 | Canary / progressive delivery analysis |
+| DI-7 | Change-failure analytics — CFR dashboards, deployment postmortems, CFR evaluation metric |
+
+## 2. What Did NOT Change
+
+- The core research question (MTTD/MTTR reduction, RCA accuracy, safe autonomous
+  remediation) remains the center of the project.
+- The scope boundary (predefined tools, least privilege, human approval for
+  high-risk operations, audit, verification) still governs the DI tier: rollback
+  actions pass through the same policy engine and executor layer.
+- The 8–10 month timeline and phase structure stay intact — DI is integrated into
+  the existing phases P2–P8, not added as a new phase.
+
+## 3. Design Reference
+
+Full design: `docs/architecture/deployment-intelligence.md`.
+Feature specification: `docs/planning/features.md` (Tier DI).
+Phase integration: `docs/planning/phases.md`, `docs/planning/timeline.md`.
+
+---
+
+*Original proposal text above is preserved unmodified (except the project-name
+update).*

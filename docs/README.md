@@ -1,7 +1,7 @@
-# AegisSRE — Documentation
+# AegisDeploy — Documentation
 
 > **The navigation hub for all project documentation.**
-> If you are looking for *anything* about AegisSRE, start here.
+> If you are looking for *anything* about AegisDeploy, start here.
 >
 > Maintainer: Navin Jairam M (Team Lead). Updated whenever the structure changes
 > (rule 2: the docs folder stays clean).
@@ -38,6 +38,7 @@ docs/
 │
 ├── architecture/                ← SYSTEM DESIGN (how the platform works)
 │   ├── system-architecture.md   ← components, responsibilities, data flows
+│   ├── deployment-intelligence.md ← DI tier: deployment risk, correlation, rollback, CFR
 │   ├── autonomy-model.md        ← Levels 1–5 autonomy, policy engine, safety
 │   ├── telemetry-model.md       ← unified telemetry/event envelope contract
 │   ├── uml/                     ← the 14-diagram UML set (Mermaid, GitHub-rendered)
