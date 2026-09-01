@@ -46,6 +46,7 @@ docs/
 │
 ├── development/                 ← HOW TO BUILD (engineering conventions)
 │   ├── contributing.md          ← contribution workflow + conventions
+│   ├── local-setup.md           ← one-time machine setup + env variables
 │   └── tech-stack.md            ← selected technology stack & rationale
 │
 └── operations/                  ← HOW TO RUN & MEASURE
@@ -68,6 +69,7 @@ docs/
 | The telemetry/event contract | [architecture/telemetry-model.md](architecture/telemetry-model.md) |
 | Why we chose the stack | [development/tech-stack.md](development/tech-stack.md) |
 | How to contribute | [development/contributing.md](development/contributing.md) |
+| Machine setup + env vars | [development/local-setup.md](development/local-setup.md) |
 | How we evaluate success | [operations/evaluation.md](operations/evaluation.md) |
 | Decision history | [planning/README.md](planning/README.md) §2 · [architecture/adr/](architecture/adr/) |
 
