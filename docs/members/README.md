@@ -17,7 +17,7 @@
 
 | Member | Role | Folder | Primary tracks |
 |---|---|---|---|
-| **Dhanush Kumar S** | Frontend Developer | [dhanush-frontend/](dhanush-frontend/) | Console (7 pages), design system, visualization, AI/approval UIs, demo video |
+| **Dhanush Kumar S** | Frontend Developer | [dhanush-frontend/](dhanush-frontend/) | Console (8 pages incl. deployments), design system, visualization, AI/approval UIs, demo video |
 | **Jegatheesan K** | Backend Developer | [jegatheesan-backend/](jegatheesan-backend/) | APIs, AegisShop backend, incident manager, approvals/verification services, DB |
 | **Gokul J** | DevOps / Cloud Engineer | [gokul-devops/](gokul-devops/) | Observability infra, Docker/CI-CD, Kubernetes, chaoslab, executors infra |
 | **Navin Jairam M** | Team Lead — SRE / DevOps / Architecture | [navin-lead/](navin-lead/) | Architecture, contracts, AI-SRE (anomaly, RCA, RAG, policy), evaluation, integration |

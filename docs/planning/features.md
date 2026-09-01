@@ -1,6 +1,6 @@
 # Feature Specification
 
-> The **locked scope** of AegisSRE, decided 2026-08-31 (see [README.md](README.md) §2).
+> The **locked scope** of AegisDeploy, decided 2026-08-31 (see [README.md](README.md) §2).
 > This is the contract between the four members: what gets built, who owns it, and
 > what "done" means for each feature.
 >
@@ -18,6 +18,8 @@ Tier B — AI depth .............. B1 RAG knowledge base, B2 "Ask Aegis" assista
 Tier C — Product/UX ............ C1 full console, C3 runbooks, C4 postmortems, C5 audit viewer
 Tier D — DevOps/Cloud .......... D1 Kubernetes, D5 CI/CD, D6 SLO dashboards & burn-rate alerts
 Tier E — Academic .............. E2 comparison study, E4 thesis-ready documentation
+Tier DI — Deployment Intelligence DI-1…DI-7 (upgrade 2026-09-01; see
+           docs/architecture/deployment-intelligence.md)
 Demo subject ................... our own microservices demo application ("AegisShop", name TBC)
 ```
 
@@ -120,7 +122,7 @@ Demo subject ................... our own microservices demo application ("AegisS
 
 | ID | Feature | Owner | Depends on | Acceptance criteria |
 |---|---|---|---|---|
-| C1 | Full console — 7 pages (command center, service, incident, approvals, postmortem, runbooks, Ask Aegis) | Dhanush K | A10, B2 | Pages match [product-vision.md](product-vision.md); demo-ready at M7 |
+| C1 | Full console — 8 pages (command center, service, incident, approvals, postmortem, runbooks, Ask Aegis, **deployments**) | Dhanush K | A10, B2 | Pages match [product-vision.md](product-vision.md); demo-ready at M7 |
 | C3 | Runbook repository UI (list + viewer, linked to incidents) | Dhanush K | B1 | runbook opens in console; incident links to runbook |
 | C4 | Postmortem viewer | Dhanush K | A5 | rendered AI postmortem with timeline + metrics |
 | C5 | Audit log viewer | Dhanush K | audit store | filterable audit trail rendered |
@@ -139,6 +141,23 @@ Demo subject ................... our own microservices demo application ("AegisS
 |---|---|---|---|---|
 | E2 | Comparison study: conventional vs AI-assisted workflow (MTTD/MTTR, correctness) | Navin J | A12 | report with statistics, committed to repo |
 | E4 | Thesis-ready documentation at every milestone | Navin J | all | docs complete + indexed at each M-milestone |
+
+---
+
+### Tier DI — Deployment Intelligence (upgrade 2026-09-01)
+
+> Design: [docs/architecture/deployment-intelligence.md](../architecture/deployment-intelligence.md).
+> Full set of 7 capabilities, integrated into existing phases (no timeline change).
+
+| ID | Capability | Owner | Depends on | Acceptance criteria |
+|---|---|---|---|---|
+| DI-1 | Deployment tracking & registry (deploy events, history API, per-service deploy timeline) | Jegatheesan K (API) + Gokul J (pipeline hook) | A1, envelope | every deploy/rollback recorded; history API live by P2 gate |
+| DI-2 | Deployment risk scoring (ML: pre-deploy prediction + post-deploy risk) | Navin J | DI-1, A3 | risk score for every deploy; prediction recall ≥ 0.7 on faulty-deploy faults |
+| DI-3 | Change-incident correlation (RCA attributes incidents to deployments) | Navin J | A5, DI-1 | top-1 correlation accuracy ≥ 0.8 on faulty-deploy faults |
+| DI-4 | Bad-rollout detection (deploy-window anomaly evaluation) | Navin J + Gokul J | DI-1, A3 | rollout.bad flagged < 3 min on faulty-deploy faults |
+| DI-5 | Rollback intelligence (recommend + policy-gated execution, safe auto-rollback for low-risk) | Navin J (design) + Gokul J (executor) | A6, A8, DI-4 | rollback restores health in ≥ 80% of faulty-deploy runs; safety violations = 0 |
+| DI-6 | Canary / progressive delivery analysis (canary vs stable metric comparison) | Gokul J | D1, DI-4 | canary deployment in demo; analysis visible in console |
+| DI-7 | Change-failure analytics (CFR dashboards, deployment postmortems, CFR evaluation metric) | Navin J + Gokul J (dashboards), Jegatheesan K (backend), Dhanush K (UI) | A12, DI-1 | CFR panel live; CFR included in evaluation report |
 
 ---
 

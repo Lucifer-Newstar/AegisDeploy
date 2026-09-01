@@ -1,6 +1,6 @@
 # Product Vision
 
-> How the final AegisSRE product should look and behave. This is the target for the
+> How the final AegisDeploy product should look and behave. This is the target for the
 > frontend (Dhanush) and the contract for what the backend/AI must expose. Decided
 > 2026-08-31; visual details are refined with Member 1 during design, but the
 > concepts below are locked.
@@ -9,7 +9,7 @@
 
 ## 1. One-Liner
 
-> **AegisSRE Console** — the AI-powered SRE control plane: *observe everything,
+> **AegisDeploy Console** — the AI-powered SRE control plane: *observe everything,
 > trust evidence, reason over context, act within boundaries, verify the result.*
 
 ## 2. Who It Is For
@@ -30,7 +30,7 @@ act.
 | Evidence | Every AI claim is a clickable card linking to the raw telemetry (Prometheus query, Loki log line, Tempo trace, k8s event). |
 | Status | Incident states use the canonical state machine: open → investigating → remediating → verifying → closed/escalated. |
 
-## 4. Pages (7)
+## 4. Pages (8)
 
 ### 4.1 Command Center (overview)
 - Service health grid (live, from A2)
@@ -66,7 +66,17 @@ act.
 ### 4.7 Ask Aegis
 - Chat panel; assistant answers with **read-only tools**, showing each tool call
   ("get_metrics('api-gateway', 'p95', 15m) → 1.42 s") and cited evidence
-- Disclaimer bar: "Aegis can only read — it cannot change anything without your approval"
+- Disclaimer bar: "AegisDeploy can only read — it cannot change anything without your approval"
+
+### 4.8 Deployments (Deployment Intelligence)
+- **Deploy timeline** per service: every deploy/rollback/scale as a visual event on the
+  service's metric charts (DI-1)
+- **Risk panel:** deployment risk score + risk factors (DI-2) — "this deploy is risky: large diff, db-migration"
+- **Change-correlation card** on incidents: "caused by deploy `abc1234`" with evidence (DI-3)
+- **Bad-rollout banner:** deploy window flagged `rollout.bad` with detected metrics (DI-4)
+- **Rollback view:** recommended rollback target + impact summary; Approve / auto-executed stamp (DI-5)
+- **Canary view:** canary vs stable metric comparison (DI-6)
+- **Change-failure analytics:** CFR trend panel + deployment postmortems (DI-7)
 
 ## 5. The Final Demo Story (product-level)
 
@@ -81,6 +91,20 @@ act.
 6. Recovery verification: health restored, error rate 0, SLO budget safe → incident closed
 7. MTTD/MTTR stats update on the Command Center; AI postmortem generated
 8. Audience can type "what happened at 10:14?" in Ask Aegis and get the cited answer
+
+### 5.2 Deployment Incident Scenario (DI — the second demo story)
+
+```text
+1. AegisShop `order-service` v2.4.0 is deployed (bad revision, hidden fault)
+2. Deploy event recorded → risk score shown (DI-1/DI-2)
+3. Deploy-window monitoring starts (DI-4) → error rate climbs after 60 s
+4. `rollout.bad` flagged < 3 min → incident auto-created (sev2, "change-caused")
+5. RCA attributes it to the deploy: "caused by deploy abc1234 at 10:14" (DI-3)
+6. Rollback recommended: "roll back to v2.3.1 (low risk, reversible)" (DI-5)
+7. Auto-rollback executes (SAFE-AUTO) or waits for one-click approval (L4)
+8. Recovery verified → incident closed → CFR updated on the analytics panel (DI-7)
+9. Deployment postmortem generated: what shipped, what broke, what we learned
+```
 ```
 
 ## 6. Non-Goals (visual/product)

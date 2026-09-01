@@ -9,9 +9,9 @@
 
 | Phase | My deliverables | Depends on | Integration output | Done when |
 |---|---|---|---|---|
-| **P2** | Backend service skeleton (API gateway, service registry, health); AegisShop v1 backend services (catalog, cart, order, payment + DB models); shared envelope lib; OpenAPI contracts committed | Envelope v0.1 + event lib (Navin, P2 start) | AegisShop APIs run; registry lists services; OpenAPI published | Registry + health API pass acceptance (A2); AegisShop services healthy |
+| **P2** | Backend service skeleton (API gateway, service registry, health); AegisShop v1 backend services (catalog, cart, order, payment + DB models); shared envelope lib; OpenAPI contracts committed; **DI-1 deploy tracker API** | Envelope v0.1 + event lib (Navin, P2 start) | AegisShop APIs run; registry lists services; OpenAPI published; **deploy events recorded** | Registry + health API pass acceptance (A2); AegisShop services healthy; DI-1 API live |
 | **P3** | A4 incident manager (state machine, severity, timeline API); evidence store; incident APIs; fault hooks in AegisShop | Anomaly events (Navin) or test producer | Incident created from injected fault; timeline API live | Fault-to-incident integration demo passes |
-| **P4** | Evidence collection APIs for AI tools; incident APIs for the reasoning layer; AegisShop hardening | — | RCA engine consumes my APIs; incident page data live | P4 checkpoint demo passes |
+| **P4** | Evidence collection APIs for AI tools; incident APIs for the reasoning layer; **deploy history API (DI-3 support)**; AegisShop hardening | — | RCA engine consumes my APIs; incident page data live; **correlation API live** | P4 checkpoint demo passes |
 | **P5** | A6 remediation planner implementation; A7 approval workflow API; A9 verification API; audit logging | Policy design (Navin), executors (Gokul) | Approve → execute → verify → close works end-to-end | Full-loop demo passes |
 | **P6** | API polish, OpenAPI client regeneration, integration fixes; authN/authZ baseline | — | Frontend fully live on my APIs | Product walkthrough passes |
 | **P7** | Fault hooks finalization; backend manifests for K8s (with Gokul); DB migration hardening | Cluster (Gokul) | Backend + AegisShop run on kind | Cluster demo clean |

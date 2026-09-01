@@ -13,7 +13,7 @@
 | **P3** | Service detail page w/ anomaly bands; incident list page | Incident APIs (P3 end) | Incident list renders live incidents | Fault-to-incident demo shows in UI |
 | **P4** | Incident detail (timeline + AI reasoning panel + evidence cards); Ask Aegis UI | RCA APIs, Ask engine API | AI reasoning visible on live incident; chat answers with citations | P4 checkpoint demo passes |
 | **P5** | Approvals queue UI (approve/reject/defer), autonomy-mode indicator, audit viewer (C5) | Approval APIs | Approval + auto-execution visible live | Full-loop demo passes |
-| **P6** | Remaining C1 pages (postmortem C4, runbooks C3), polish, empty states | Postmortem + runbook APIs | 7/7 pages live from real APIs | Product walkthrough passes |
+| **P6** | Remaining C1 pages (postmortem C4, runbooks C3, **deployments DI page**), polish, empty states | Postmortem + runbook APIs, deploy APIs | 8/8 pages live from real APIs | Product walkthrough passes |
 | **P7** | Final UX pass on the cluster; support chaos demos | Cluster (Gokul) | Console fully functional on kind | Cluster demo clean |
 | **P8** | Demo video, screenshots for the report | Evaluation runs | Submission-ready demo materials | Video + report assets done |
 

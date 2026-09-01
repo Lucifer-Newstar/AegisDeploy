@@ -4,7 +4,7 @@
 
 ## Role
 
-Build the AegisSRE Console: the SRE team's single pane of glass and the face of the
+Build the AegisDeploy Console: the SRE team's single pane of glass and the face of the
 final-year demonstration.
 
 ## Primary responsibilities

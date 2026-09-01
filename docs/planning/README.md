@@ -1,6 +1,6 @@
 # Planning
 
-> Home of the **development-phase planning** documents for AegisSRE.
+> Home of the **development-phase planning** documents for AegisDeploy.
 > Everything here is the *decision record* of the project: what we build, how the
 > final product should look, and when we build it.
 >
@@ -35,5 +35,6 @@ Related: [docs/project/roadmap.md](../project/roadmap.md) is the milestone-level
 | 2026-08-31 | **Phase-gated development:** project split into phases P1–P8; each phase ends with a **ready-and-working increment** (gate) + integration checkpoint; tracks designed to be **non-blocking** (contracts-first, mocks); moving on requires a Team Lead gate review. | Navin Jairam (Team Lead) | [phases.md](phases.md) |
 | 2026-08-31 | **Per-member planning folders:** each member gets a designated folder under `docs/members/<member>/` containing their role and their own view of phases + deliverables. | Navin Jairam (Team Lead) | [docs/members/](../members/) |
 | 2026-08-31 | **UML documentation set:** all 14 UML 2.5 diagram types, authored in **Mermaid** under `docs/architecture/uml/` (GitHub-rendered), one diagram per reviewed exchange; Use Case split into platform + AegisShop files. | Navin Jairam (on agent recommendation) | [docs/architecture/uml/](../architecture/uml/) |
+| 2026-09-01 | **Project upgrade — Deployment Intelligence:** project renamed **AegisSRE → AegisDeploy**; added a first-class **Deployment Intelligence tier** (DI-1…DI-7: deployment tracking, risk scoring, change-incident correlation, bad-rollout detection, rollback intelligence, canary analysis, change-failure analytics) integrated into existing phases P2–P8 (no timeline change). Full capability set chosen. | Navin Jairam (on agent recommendation) | [features.md](features.md) · [deployment-intelligence.md](../architecture/deployment-intelligence.md) |
 
 *New decisions are appended; nothing is silently edited.*
