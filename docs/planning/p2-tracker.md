@@ -31,7 +31,7 @@
 
 ## C. Navin's lead track (P2)
 
-- [ ] C1 — **Port/naming register** consolidation (only open buildable item — small; ready to build on command)
+- [x] C1 — **Port/naming register** consolidation (`docs/architecture/port-register.md` — done 2026-09-01)
 - [ ] C2 — Contract freeze review with Jega (D1–D9 incl. D8/D9 coupling decisions, edge case #15)
 - [ ] C3 — Weekly syncs (Mon, 30 min) through Oct: status round → register walk → demo-of-week → decisions
 - [ ] C4 — Integration checkpoint rehearsal **2026-10-15** (one command: Grafana + console)

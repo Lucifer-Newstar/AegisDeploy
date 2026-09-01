@@ -43,6 +43,8 @@ cp -r backend/services/_template backend/services/<name>
 
 ## Ports
 
-Choose the next free port in the platform range (see component diagram):
-registry 8101 · incidents 8201 · evidence 8202 · remediation 8301 · policy 8302 ·
-audit 8401 · autonomy 8402 · ml 8501 · ai 8601 · **deployments 8701**.
+The authoritative list is the [port & naming register](../../docs/architecture/port-register.md)
+— pick the next free port in the platform range (8xxx) or demo range (9xxx)
+and add a row there in the same PR. Current platform services: registry 8101 ·
+incidents 8201 · evidence 8202 · remediation 8301 · policy 8302 · audit 8401 ·
+autonomy 8402 · ml 8501 · ai 8601 · **deployments 8701**.

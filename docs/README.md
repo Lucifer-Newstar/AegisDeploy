@@ -51,6 +51,7 @@ docs/
 │
 ├── architecture/                ← SYSTEM DESIGN (how the platform works)
 │   ├── system-architecture.md   ← components, responsibilities, data flows
+│   ├── port-register.md         ← services, ports, DNS, metric/label rules
 │   ├── deployment-intelligence.md ← DI tier: deployment risk, correlation, rollback, CFR
 │   ├── autonomy-model.md        ← Levels 1–5 autonomy, policy engine, safety
 │   ├── telemetry-model.md       ← unified telemetry/event envelope contract
