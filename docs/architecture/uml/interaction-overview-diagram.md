@@ -95,3 +95,60 @@ interaction overview #14 → THE MAP (this diagram)
 > Reading order for the behavioral set: **14 → 9 → 10 → 11/12 → 13** — start at the
 > map, drill into the workflow, then the states, then the two interaction views, and
 > finally the timing evidence.
+
+---
+
+## 4. Interaction Overview — Deployment Intelligence (DI)
+
+The map of DI interactions: frames reference the DI blocks added to the behavioral
+diagrams (activity #9, sequence #11, communication #12, timing #13, state machine #10).
+
+```mermaid
+---
+title: "Interaction Overview — Deployment Intelligence (DI)"
+---
+flowchart TB
+    START2((start)) --> G1
+
+    G1["«interaction» Deploy & Track (DI-1)<br/>ref: activity #9 (DI) · sequence #11 (DI)"]
+    G2["«interaction» Risk Scoring (DI-2)<br/>ref: class #2a (DeployRiskModel)"]
+    DG1{"risk ≥ 0.8 ?"}
+    G3["«interaction» Deploy-Window Monitoring (DI-4)<br/>ref: timing #13 (DI) · state machine #10 (rollout)"]
+    DG2{"rollout.bad ?"}
+    G4["«interaction» Change Correlation (DI-3)<br/>ref: sequence #11 (DI) · communication #12 (DI)"]
+    G5["«interaction» Rollback (DI-5)<br/>ref: state machine #10 (rollout) · sequence #11 (DI)"]
+    DG3{"recovered ?"}
+    G6["«interaction» CFR Analytics & Postmortem (DI-7)<br/>ref: timing #13 (DI)"]
+    END2((end))
+
+    START2 --> G1
+    G1 --> G2
+    G2 --> DG1
+    DG1 -->|"no"| G3
+    DG1 -->|"yes (warn/gate)"| G3
+    G3 --> DG2
+    DG2 -->|"no (healthy)"| G6
+    DG2 -->|"yes"| G4
+    G4 --> G5
+    G5 --> DG3
+    DG3 -->|"yes"| G6
+    DG3 -->|"no"| END2
+    G6 --> END2
+
+    classDef di fill:#d1fae5,stroke:#0d9488,color:#115e59;
+    class G1,G2,G3,G4,G5,G6 di;
+```
+
+### Frame → Diagram Mapping (DI)
+
+| Frame | Expands to | Feature |
+|---|---|---|
+| G1 Deploy & Track | activity #9 (DI block), sequence #11 (DI block) | DI-1 |
+| G2 Risk Scoring | class #2a (`DeployRiskModel`) | DI-2 |
+| G3 Window Monitoring | timing #13 (DI), state machine #10 (rollout) | DI-4 |
+| G4 Change Correlation | sequence #11 (DI), communication #12 (DI) | DI-3 |
+| G5 Rollback | state machine #10 (rollout), sequence #11 (DI) | DI-5 |
+| G6 CFR & Postmortem | timing #13 (DI) | DI-7 |
+
+> The full set now covers **both** evaluation scenarios: the runtime incident
+> (Sections 1–3 above) and the deployment incident (this section).

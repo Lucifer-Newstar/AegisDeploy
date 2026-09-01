@@ -90,3 +90,45 @@ stateDiagram-v2
 | Verification | `A9` class note | `DEC6` guard | — | VERIFYING → CLOSED/ESCALATED |
 
 > One source of truth: if a status changes anywhere, it changes here first.
+
+---
+
+## 4. Deployment / Rollout State Machine (DI)
+
+Third machine: the **deployment lifecycle** — from queued release to healthy, rolled
+back, or escalated. Uses the `«rollout»` stereotype (Diagram 8) and the DI-1…DI-7
+capabilities.
+
+```mermaid
+---
+title: "State Machine — Deployment / Rollout (DI)"
+---
+stateDiagram-v2
+    [*] --> PENDING : deploy queued by CI/CD
+    PENDING --> DEPLOYING : release starts<br/>/ record deployment (DI-1)
+    DEPLOYING --> MONITORING : deployed<br/>/ start deploy window (DI-4)
+    MONITORING --> HEALTHY : window passed clean<br/>[no anomalies]<br/>/ close window · CFR ok (DI-7)
+    HEALTHY --> [*]
+    MONITORING --> ROLLOUT_BAD : anomaly in window<br/>[error rate ↑ · latency ↑ · SLO burn]<br/>/ flag rollout.bad (DI-4)
+    ROLLOUT_BAD --> ROLLING_BACK : rollback triggered<br/>[policy auto (L5) or human approval (L4)]<br/>/ recommend rollback (DI-5)
+    ROLLOUT_BAD --> ESCALATED : no rollback possible<br/>[policy forbids]<br/>/ notify on-call
+    ROLLING_BACK --> ROLLED_BACK : rollback succeeded<br/>[health verified]<br/>/ record rollback (DI-5)
+    ROLLING_BACK --> ESCALATED : rollback failed<br/>[N attempts]<br/>/ escalate
+    ROLLED_BACK --> [*] : CFR recorded (DI-7)
+
+    state "PENDING<br/>entry: compute risk score (DI-2)" as PENDING
+    state "DEPLOYING<br/>entry: attach revision + version" as DEPLOYING
+    state "MONITORING<br/>entry: start window timer" as MONITORING
+    state "ROLLOUT_BAD<br/>entry: emit rollout.bad event" as ROLLOUT_BAD
+    state "ROLLING_BACK<br/>entry: audit rollback start" as ROLLING_BACK
+    state "ROLLED_BACK<br/>entry: verify health" as ROLLED_BACK
+    state "ESCALATED<br/>entry: notify on-call" as ESCALATED
+```
+
+### Consistency Map (DI)
+
+| Concept | Diagram 2a | Diagram 9 (DI) | This diagram |
+|---|---|---|---|
+| Rollout states | `RolloutHealth.status` | DR2 guard | MONITORING → ROLLOUT_BAD → ROLLING_BACK → ROLLED_BACK |
+| Rollback execution | `RollbackRecord` | DR3/DR4 | ROLLING_BACK → ROLLED_BACK / ESCALATED |
+| CFR | `RollbackRecord` + analytics | CFR update | ROLLED_BACK → [*] (CFR recorded) |

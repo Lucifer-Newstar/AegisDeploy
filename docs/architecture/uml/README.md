@@ -4,10 +4,8 @@
 > All diagrams are authored in **Mermaid** and render natively on GitHub — edit the
 > text, view the diagram, review via PR.
 >
-> Process: one diagram per reviewed exchange — the Team Lead (or the agent on his
-> behalf) asks the questions needed for the diagram, the lead answers, the diagram is
-> created and committed. Every diagram carries comments (`%%`) and an explanation
-> section below it.
+> **Updated 2026-09-01:** the full set was extended for the **Deployment Intelligence
+> tier** (DI-1…DI-7). Each diagram now carries DI elements — see §4 for the coverage map.
 >
 > Maintainer: Navin Jairam M (Team Lead).
 
@@ -64,3 +62,20 @@
 12. **Communication** — same as sequence, structure-focused
 13. **Timing** — time constraints
 14. **Interaction Overview** — the big picture of interactions
+
+## 4. Deployment Intelligence (DI) Coverage
+
+| DI capability | Where it appears in the set |
+|---|---|
+| DI-1 Deployment tracking | UC 19 (platform) + 12–14 (shop) · class (DeploymentRecord, DeploymentEvent) · package (deployments svc, ci.deploy) · component (Deployment Tracker :8701) · deployment (pod + webhook) · activity §4 · sequence §4 · communication §4 |
+| DI-2 Risk scoring | class (DeploymentRiskScore, DeployRiskModel, GetDeployRiskTool) · activity §4 (DR1) · sequence §4 · interaction overview (G2) |
+| DI-3 Change correlation | UC 22 · class (ChangeCorrelation, Incident.change_correlation) · composite (ChangeCorrelator) · activity §4 · sequence §4 · communication §4 |
+| DI-4 Bad-rollout detection | class (RolloutHealth) · state machine §4 (MONITORING→ROLLOUT_BAD) · timing §4 · activity §4 (DR2) |
+| DI-5 Rollback intelligence | UC 20 · class (RollbackRecord, ActionType.ROLLBACK) · state machine §4 (ROLLING_BACK) · activity §4 (DR3/DR4) · sequence §4 (alt) |
+| DI-6 Canary analysis | UC 14 (shop) · package (canary-experiments) · deployment (chaoslab node) |
+| DI-7 Change-failure analytics | UC 21 · class (PostmortemGenerator.generate_deploy_postmortem) · activity §4 (CFR) · timing §4 (metrics) · interaction overview (G6) |
+
+> Two evaluation scenarios are now visible across the set: the **runtime incident**
+> (db-down: object #3, activity §1, sequence §1, timing §1) and the **deployment
+> incident** (faulty deploy: activity §4, sequence §4, communication §4, timing §4,
+> state machine §4).

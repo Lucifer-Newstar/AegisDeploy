@@ -78,3 +78,59 @@ gantt
 - The same chart, generated per experiment run, becomes the evidence base for the
   baseline-vs-platform comparison in the evaluation report
   ([docs/operations/evaluation.md](../../operations/evaluation.md)).
+
+---
+
+## 4. Deployment Incident Timing (DI)
+
+The faulty-deploy scenario over time: rollout status, service version, error rate, and
+the DI evaluation windows (detection latency, recovery time).
+
+```mermaid
+---
+title: "Timing Diagram — deployment incident (DI demo, 2026-09-01 09:58 → 10:04)"
+---
+gantt
+    dateFormat YYYY-MM-DD HH:mm:ss
+    axisFormat %H:%M
+    title Deployment lifecycle timing (faulty deploy at 10:00:00)
+
+    section Rollout status
+    DEPLOYING       : d1, 2026-09-01 10:00:00, 30s
+    MONITORING      : m1, 2026-09-01 10:00:30, 90s
+    ROLLOUT_BAD     : b1, 2026-09-01 10:01:30, 30s
+    ROLLING_BACK    : r1, 2026-09-01 10:02:00, 30s
+    ROLLED_BACK     : r2, 2026-09-01 10:02:30, 90s
+
+    section order-service version
+    v2.3.1 (stable)     : v0, 2026-09-01 09:58:00, 120s
+    v2.4.0 (faulty)     : v1, 2026-09-01 10:00:00, 150s
+    v2.3.1 (rolled back): v2, 2026-09-01 10:02:30, 90s
+
+    section Error rate (order-service)
+    low (baseline)   : e0, 2026-09-01 09:58:00, 120s
+    high (climbing)  : e1, 2026-09-01 10:00:30, 120s
+    low (recovered)  : e2, 2026-09-01 10:02:30, 90s
+
+    section Metrics (DI evaluation)
+    detection latency (90 s) : mttd2, 2026-09-01 10:00:00, 90s
+    recovery time (2 m 30 s) : mttr2, 2026-09-01 10:00:00, 150s
+
+    section Key events
+    deploy v2.4.0   : milestone, k1, 2026-09-01 10:00:00, 0s
+    rollout.bad     : milestone, k2, 2026-09-01 10:01:30, 0s
+    rollback start  : milestone, k3, 2026-09-01 10:02:00, 0s
+    recovered       : milestone, k4, 2026-09-01 10:02:30, 0s
+```
+
+### DI Timeline Semantics
+
+| Lane | What it shows |
+|---|---|
+| Rollout status | The DI state machine (#10) over real time |
+| order-service version | Which revision is live (DI-1) |
+| Error rate | The signal that drove `rollout.bad` (DI-4) |
+| Metrics | **Detection latency** (deploy → bad flag) and **recovery time** (deploy → rolled back) — the DI evaluation metrics from `deployment-intelligence.md` §6 |
+
+> Same shape as Section 1, but measured around *deployments* — the two timing views
+> together cover both evaluation scenarios (A12).

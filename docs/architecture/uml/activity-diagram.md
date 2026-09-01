@@ -161,3 +161,114 @@ flowchart LR
 Each boxed status (OPEN, INVESTIGATING, REMEDIATING, VERIFYING, CLOSED, ESCALATED)
 matches the incident **state machine** (Diagram 10) and the `IncidentStatus` enum
 (Diagram 2a) — one source of truth for statuses across all diagrams and the code.
+
+---
+
+## 4. Deployment Lifecycle Activity (DI tier)
+
+The second core workflow: **deploy → risk → monitor → detect bad rollout → correlate →
+rollback → verify → CFR**. Lanes and guards match the DI design
+(`docs/architecture/deployment-intelligence.md`).
+
+```mermaid
+---
+title: "Activity Diagram — Deployment lifecycle (DI tier)"
+---
+flowchart LR
+    START((deploy pushed)) --> REC
+
+    subgraph L_CD["CI/CD"]
+        direction TB
+        REC["Record deployment event (DI-1)"]
+    end
+
+    subgraph L_TRK["Deployment Tracker / ML"]
+        direction TB
+        RISK["Score deployment risk (DI-2)"]
+        DR1{"risk ≥ 0.8 ?"}
+        WARN["Warn / pre-deploy gate"]
+        MON["Monitor deploy window (DI-4)"]
+        DR2{"error rate ↑ · latency ↑<br/>· SLO burn ?"}
+        OK["Close window · healthy"]
+        BAD["Flag rollout.bad"]
+    end
+
+    subgraph L_INC["Incident / RCA"]
+        direction TB
+        INC2["Create change-caused incident (sev2)"]
+        CORR["Correlate to deployment (DI-3)"]
+    end
+
+    subgraph L_POL["Policy / Executor"]
+        direction TB
+        RB["Recommend rollback (DI-5)"]
+        DR3{"low risk & reversible<br/>& policy allows auto ?"}
+        ARB["Auto rollback (L5)"]
+        ERB["Rollback after approval (L4)"]
+        VER["Verify recovery (A9)"]
+        DR4{"recovered ?"}
+        ESC["Escalate to on-call"]
+    end
+
+    subgraph L_HUM["Human (SRE)"]
+        direction TB
+        APPR["Approve / reject rollback"]
+    end
+
+    subgraph L_ANA["Analytics"]
+        direction TB
+        CFR["Update change-failure analytics (DI-7)"]
+        PM["Deployment postmortem"]
+    end
+
+    REC --> RISK
+    RISK --> DR1
+    DR1 -->|"no"| MON
+    DR1 -->|"yes"| WARN
+    WARN --> MON
+    MON --> DR2
+    DR2 -->|"no (healthy)"| OK
+    OK --> CFR
+    DR2 -->|"yes"| BAD
+    BAD --> INC2
+    INC2 --> CORR
+    CORR --> RB
+    RB --> DR3
+    DR3 -->|"yes"| ARB
+    DR3 -->|"no"| APPR
+    APPR -->|"approve"| ERB
+    APPR -->|"reject"| RB
+    ARB --> VER
+    ERB --> VER
+    VER --> DR4
+    DR4 -->|"yes"| CFR
+    DR4 -->|"no"| ESC
+    ESC --> CFR
+    CFR --> PM
+    PM --> END((end))
+
+    classDef cd fill:#f3f4f6,stroke:#6b7280,color:#374151;
+    classDef trk fill:#ffedd5,stroke:#ea580c,color:#7c2d12;
+    classDef inc fill:#ecfdf5,stroke:#059669,color:#064e3b;
+    classDef pol fill:#ede9fe,stroke:#7c3aed,color:#4c1d95;
+    classDef hum fill:#fef9c3,stroke:#ca8a04,color:#713f12;
+    classDef ana fill:#d1fae5,stroke:#0d9488,color:#115e59;
+    class REC cd;
+    class RISK,DR1,WARN,MON,DR2,OK,BAD trk;
+    class INC2,CORR inc;
+    class RB,DR3,ARB,ERB,VER,DR4,ESC pol;
+    class APPR hum;
+    class CFR,PM ana;
+```
+
+### DI Flow Guards (map to features)
+
+| Decision | Guard | Feature |
+|---|---|---|
+| `DR1` risk gate | risk ≥ 0.8 (tuned in P4) | DI-2 |
+| `DR2` window health | error rate ↑ ∧ latency ↑ ∧ SLO burn | DI-4 |
+| `DR3` auto rollback | low risk ∧ reversible ∧ policy match ∧ SAFE_AUTO | DI-5 / A8 |
+| `DR4` recovery | health OK ∧ error ↓ ∧ latency ↓ ∧ SLO safe | A9 |
+
+> The incident-created path (Section 1) and this DI path share the same
+> `incident → RCA → policy → verify` machinery — DI adds the *deployment context*.

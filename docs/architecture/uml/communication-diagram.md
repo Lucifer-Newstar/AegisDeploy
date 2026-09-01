@@ -107,3 +107,59 @@ flowchart LR
 
 > Rule of thumb: use #11 to see *when*, use #12 to see *who talks to whom* — the
 > message names are identical by design, so the two diagrams can be cross-checked.
+
+---
+
+## 4. Deployment Incident Communication (DI)
+
+The faulty-deploy scenario as a communication diagram — numbered messages show the
+call structure of the DI flow.
+
+```mermaid
+---
+title: "Communication Diagram — deployment incident (DI)"
+---
+flowchart LR
+    CI["🚀 CI/CD"] -->|"1 · deployment event (order-service v2.4.0)"| TRK["🗂️ Deployment Tracker"]
+    TRK -->|"2 · score risk (DI-2)"| ML2["🧠 ML Risk/Window"]
+    ML2 -->|"2.1 · risk 0.72"| TRK
+    TRK -->|"3 · start deploy window (DI-4)"| ML2
+    ML2 -->|"4 · rollout.bad (error rate ↑)"| TRK
+    TRK -->|"5 · incident event (sev2)"| IM2["📋 Incident Manager"]
+    IM2 -->|"6 · incident.created"| AI2["🤖 AI Correlation"]
+    AI2 -->|"7 · get_deployment_history (DI-3)"| TRK
+    TRK -->|"7.1 · revision abc1234"| AI2
+    AI2 -->|"8 · correlated: deploy abc1234 (conf 0.9)"| IM2
+    AI2 -->|"9 · evaluate rollback (DI-5)"| POL2["⚖️ Policy Engine"]
+    POL2 -->|"9.1 · SAFE_AUTO decision"| AI2
+    IM2 -->|"10 · auto rollback (L5) / approval (L4)"| EXEC2["⚙️ Executor"]
+    EXEC2 -->|"10.1 · result ok"| IM2
+    IM2 -->|"11 · verify recovery (A9)"| IM2
+    IM2 -->|"12 · deployment outcome (DI-7)"| CFR["📊 Analytics"]
+    CFR -->|"13 · CFR updated · incident closed"| SRE2["🧑‍💻 SRE Engineer"]
+
+    classDef trk fill:#ffedd5,stroke:#ea580c,color:#7c2d12;
+    classDef inc fill:#ecfdf5,stroke:#059669,color:#064e3b;
+    classDef ai fill:#fce7f3,stroke:#db2777,color:#831843;
+    classDef pol fill:#ede9fe,stroke:#7c3aed,color:#4c1d95;
+    classDef ana fill:#d1fae5,stroke:#0d9488,color:#115e59;
+    classDef hum fill:#fef9c3,stroke:#ca8a04,color:#713f12;
+    class TRK,ML2 trk;
+    class IM2,EXEC2 inc;
+    class AI2 ai;
+    class POL2 pol;
+    class CFR ana;
+    class CI,SRE2 hum;
+```
+
+### Message Hierarchy
+
+| Number | Message | Feature |
+|---|---|---|
+| 1 | deployment event | DI-1 |
+| 2 / 2.1 | risk scoring | DI-2 |
+| 3–4 | window monitoring → bad | DI-4 |
+| 5–8 | incident → correlation | DI-3 |
+| 9 / 9.1 | rollback evaluation | DI-5 |
+| 10 / 10.1 | execution | DI-5 |
+| 11–13 | verification → CFR | A9, DI-7 |

@@ -115,3 +115,66 @@ sequenceDiagram
 | Participants | Activity swimlanes (#9) + component interfaces (#5) |
 | Policy decision | Policy engine = only decision point (autonomy-model.md §2) |
 | Guard values | anomaly ≥ 0.9 (A3), confidence ≥ 0.7 (A5), N attempts (A9) |
+
+---
+
+## 4. Deployment Incident Sequence (DI — the second demo story)
+
+The same lifecycle as the first block, but driven by a **faulty deployment** (DI-4/DI-5):
+the deployment incident scenario from the product vision (§5.2).
+
+```mermaid
+---
+title: "Sequence Diagram — deployment incident (faulty deploy — DI)"
+---
+sequenceDiagram
+    autonumber
+    participant CI as 🚀 CI/CD
+    participant TRK as 🗂️ Deployment Tracker (DI-1)
+    participant ML2 as 🧠 ML (risk + window DI-2/DI-4)
+    participant IM2 as 📋 Incident Manager
+    participant AI2 as 🤖 AI (correlation DI-3)
+    participant POL2 as ⚖️ Policy Engine
+    participant EXEC2 as ⚙️ Executor (rollback DI-5)
+    participant CFR as 📊 Analytics (DI-7)
+    participant SRE2 as 🧑‍💻 SRE Engineer
+
+    CI->>TRK: deployment event (order-service v2.4.0)
+    TRK->>ML2: score risk (DI-2)
+    ML2-->>TRK: risk 0.72 (factors: large diff, db-migration)
+    TRK->>TRK: start deploy window (DI-4)
+    loop window (60 s)
+        TRK->>ML2: stream metrics
+    end
+    ML2-->>TRK: rollout.bad (error rate ↑ after 60 s)
+    TRK-->>IM2: incident event (sev2 · change-caused)
+    IM2-->>AI2: incident.created
+    AI2->>TRK: get_deployment_history (DI-3)
+    TRK-->>AI2: revision abc1234 at 10:14
+    AI2-->>IM2: correlated: caused by deploy abc1234 (conf 0.9)
+    AI2->>POL2: evaluate rollback (DI-5)
+    POL2-->>AI2: decision: low risk · reversible · SAFE_AUTO
+    alt auto rollback (L5)
+        IM2-->>EXEC2: auto rollback to v2.3.1
+    else approval (L4)
+        IM2-->>SRE2: rollback approval requested
+        SRE2-->>IM2: approve
+        IM2-->>EXEC2: rollback to v2.3.1
+    end
+    EXEC2-->>IM2: result ok
+    IM2->>IM2: verify recovery (A9)
+    IM2-->>CFR: deployment outcome (DI-7)
+    CFR-->>SRE2: CFR updated · incident closed · postmortem
+```
+
+### DI Interaction Summary
+
+| Stage | Messages | Feature |
+|---|---|---|
+| Deploy recorded | CI → Tracker | DI-1 |
+| Risk scored | Tracker → ML | DI-2 |
+| Window monitoring | Tracker ⇄ ML | DI-4 |
+| Bad rollout flagged | ML → Tracker → Incident | DI-4 |
+| Correlation | AI → Tracker (history) | DI-3 |
+| Rollback decision | AI → Policy → Executor | DI-5 |
+| Outcome analytics | Tracker/IM → CFR | DI-7 |
