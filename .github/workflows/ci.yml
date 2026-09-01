@@ -1,12 +1,15 @@
-# AegisDeploy — continuous integration
-# Every PR and push to main must pass. Jobs cover everything that exists
-# today: backend libs + service template + catalog slice (python-quality),
-# the catalog container (docker-build), Kubernetes manifests (k8s-lint),
-# compose/YAML (yaml-and-compose) and docs.
+# AegisDeploy — CI: what runs on every push/PR to main
 #
-# Component jobs land with their components:
-#   frontend-build → enabled when frontend/ lands (P2, Dhanush)
-#   ml / ai jobs   → added in P3 (detectors) and P4 (reasoning)
+# Six jobs, each one = ONE kind of check. All must pass before merge.
+#
+#   config-yaml-compose  → YAML files parse + docker-compose.yml is valid
+#   k8s-manifests        → K8s manifests match real schemas + kustomize bases assemble
+#   docs-links           → every link inside docs/** points to a real file
+#   python-quality       → ruff (style) + mypy (types) + pytest (tests) + contract drift
+#   docker-build         → the catalog-service container image actually builds
+#   frontend-build       → disabled until the console lands (P2, Dhanush)
+#
+# New jobs are added when their component lands (ml in P3, ai in P4).
 
 name: CI
 
@@ -24,9 +27,9 @@ permissions:
   contents: read
 
 jobs:
-  # ── Validate YAML + compose config ────────────────────────────────────────
-  yaml-and-compose:
-    name: YAML & compose
+  # 1 ── YAML files parse + compose config is valid ───────────────────────────
+  config-yaml-compose:
+    name: Config (YAML + compose)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -38,28 +41,24 @@ jobs:
           python-version: "3.12"
           cache: pip
 
-      - name: Install validation deps
+      - name: Install validator
         run: pip install pyyaml
 
-      - name: Validate YAML files
+      - name: All *.yml/*.yaml parse cleanly
         run: python3 scripts/validate_yaml.py
 
-      - name: Validate docker-compose config
+      - name: docker-compose.yml is valid
         run: docker compose config --quiet
 
-  # ── Lint Kubernetes manifests (K8s-ready posture, ADR-0005) ──────────────
-  # Enforced since the walking skeleton (catalog-service base). Two checks:
-  # kubeconform validates each manifest against the k8s schema; kustomize
-  # build proves the kustomization assembles (and would fail on missing
-  # referenced files).
-  k8s-lint:
-    name: Kubernetes manifests
+  # 2 ── K8s manifests are real (ADR-0005: compose ⇄ K8s parity) ─────────────
+  k8s-manifests:
+    name: K8s manifests (kubeconform + kustomize)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install kubeconform
+      - name: Install kubeconform (schema validator)
         run: |
           curl -sL https://github.com/yannh/kubeconform/releases/download/v0.6.7/kubeconform-linux-amd64.tar.gz \
             | tar xz -C /usr/local/bin kubeconform
@@ -69,24 +68,24 @@ jobs:
           curl -sL https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv5.4.3/kustomize_v5.4.3_linux_amd64.tar.gz \
             | tar xz -C /usr/local/bin kustomize
 
-      - name: Schema-validate manifests (kubeconform)
+      - name: Validate manifests against k8s schemas
         run: |
-          # kustomization.yaml is not a k8s schema — validated by kustomize build below
+          # kustomization.yaml is not a k8s schema — it is validated by `kustomize build` below
           find infra/k8s -name '*.yaml' ! -name 'kustomization.yaml' -print0 \
             | xargs -0 -r kubeconform -strict -summary
 
-      - name: Validate kustomize bases assemble
+      - name: Kustomize bases assemble
         run: kustomize build infra/k8s/base > /dev/null
 
-  # ── Markdown & docs sanity ────────────────────────────────────────────────
-  docs:
-    name: Docs sanity
+  # 3 ── Docs: every markdown link resolves ──────────────────────────────────
+  docs-links:
+    name: Docs (links resolve)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check all markdown links resolve
+      - name: All docs/** links point at existing files
         run: |
           python3 - <<'EOF'
           import re
@@ -104,11 +103,9 @@ jobs:
           print("All docs links: OK")
           EOF
 
-  # ── Python quality: lint · type check · tests ────────────────────────────
-  # Covers the walking-skeleton packages. New backend packages are added to
-  # this job (and to root pyproject testpaths) as they land in P2+.
+  # 4 ── Backend: style, types, tests, and contract drift ────────────────────
   python-quality:
-    name: Python quality (ruff · mypy · pytest)
+    name: Backend (ruff · mypy · pytest · contracts)
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -128,10 +125,10 @@ jobs:
                       -e backend/services/_template[dev] \
                       -e demoapp/aegisshop/catalog-service[dev]
 
-      - name: Lint (ruff)
+      - name: Style (ruff)
         run: ruff check backend demoapp
 
-      - name: Type check (mypy --strict)
+      - name: Types (mypy --strict)
         run: >
           mypy backend/libs/telemetry backend/libs/eventbus
           backend/services/_template demoapp/aegisshop/catalog-service
@@ -141,14 +138,12 @@ jobs:
           pytest backend/libs/telemetry backend/libs/eventbus
           backend/services/_template demoapp/aegisshop/catalog-service
 
-      - name: Contract drift (surface check, edge case #8)
+      - name: Contract drift (docs/contracts vs live APIs)
         run: python3 scripts/check_contract_drift.py
 
-  # ── Container build (AegisShop + platform images as they land) ───────────
-  # Currently the one real app image (catalog-service). Each new service
-  # image joins this job in its PR (PR template checklist).
+  # 5 ── Containers: images actually build ───────────────────────────────────
   docker-build:
-    name: Container build
+    name: Container (catalog-service image)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -157,7 +152,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build catalog-service image
+      - name: Build the catalog-service image
         uses: docker/build-push-action@v6
         with:
           context: ./demoapp/aegisshop/catalog-service
@@ -167,11 +162,11 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  # ── Frontend (placeholder — enabled when frontend/ lands, P2) ────────────
+  # 6 ── Frontend: enabled when the console lands (P2) ───────────────────────
   frontend-build:
-    name: Frontend (placeholder)
+    name: Frontend (starts in P2)
     runs-on: ubuntu-latest
-    if: ${{ false }}   # enable when Dhanush lands the console scaffold (P2)
+    if: ${{ false }}   # remove `if` when Dhanush's console scaffold lands
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

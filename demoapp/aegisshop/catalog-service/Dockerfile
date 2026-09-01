@@ -17,7 +17,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 \
 WORKDIR /app
 # Copy the installed site-packages from the builder stage
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
-COPY app ./app
+# Copy the service package (renamed from 'app' → 'catalog_service', monorepo rule)
+COPY catalog_service ./catalog_service
 EXPOSE 9001
 HEALTHCHECK --interval=10s --timeout=3s --retries=5 \
     CMD python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:9001/health', timeout=3).status==200 else 1)"
