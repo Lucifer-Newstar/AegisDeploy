@@ -1,4 +1,4 @@
-# AegisSRE — continuous integration (M1: foundation checks)
+# AegisDeploy — continuous integration (M1: foundation checks)
 # Every PR and push to main must pass. Component jobs (backend tests, frontend
 # build, ml tests) are added as those components land in M2+.
 

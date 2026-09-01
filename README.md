@@ -1,12 +1,17 @@
-# AegisSRE
+# AegisDeploy
 
-**AI-Powered Autonomous Site Reliability Engineering Platform**
+**AI-Powered Autonomous Site Reliability & Software Deployment Incident Intelligence Platform**
 
-*Intelligent monitoring · Incident detection · Root-cause analysis · Controlled autonomous remediation*
+*Intelligent monitoring · Deployment risk intelligence · Incident detection · Root-cause analysis · Controlled autonomous remediation*
+
+> ⚠️ **Renamed:** formerly **AegisSRE** (decision 2026-09-01 — the project was upgraded
+> with a first-class **Deployment Intelligence** tier; see
+> [docs/architecture/deployment-intelligence.md](docs/architecture/deployment-intelligence.md)).
+> The GitHub repository may keep its old name until renamed in repository settings.
 
 ![Status](https://img.shields.io/badge/status-foundation--phase-0f766e) ![CI](https://img.shields.io/badge/CI-github--actions-blue)
 
-AegisSRE is a full-stack platform that continuously observes a deployed cloud-native
+AegisDeploy is a full-stack platform that continuously observes a deployed cloud-native
 application, analyzes its telemetry, detects abnormal behavior, identifies and correlates
 incidents, determines probable root causes, recommends evidence-backed remediation actions,
 and verifies system recovery — while keeping **humans in control** of higher-risk operations.
@@ -104,7 +109,7 @@ Autonomy pipeline: **Detect → Investigate → Explain → Recommend → Approv
 ## 3. Repository Layout
 
 ```
-AegisSRE/
+AegisDeploy/
 ├── .github/workflows/    CI/CD pipelines (GitHub Actions)
 ├── ai/                   AI reasoning layer (LLM, RAG, tool-calling, runbooks)
 ├── backend/              Platform & incident services (Python / FastAPI)
@@ -188,7 +193,7 @@ implemented; the observability foundation above is version-pinned and fully func
 
 ## 8. Scope Boundary
 
-AegisSRE is **not** a general-purpose autonomous agent administering arbitrary production
+AegisDeploy is **not** a general-purpose autonomous agent administering arbitrary production
 infrastructure. Autonomy is constrained by:
 
 - predefined tools (read-only telemetry access; scoped execution actions);

@@ -1,5 +1,5 @@
 # =============================================================================
-# AegisSRE — Local development stack (Milestone 1: Foundation)
+# AegisDeploy — Local development stack (Milestone 1: Foundation)
 #
 # Runs the platform's data + observability dependencies. Application services
 # (backend, frontend, ml, ai) are added as they are implemented — see
@@ -13,7 +13,7 @@
 #   make infra-down     → docker compose down -v
 # =============================================================================
 
-name: aegissre
+name: aegisdeploy
 
 x-logging: &default-logging
   driver: json-file
@@ -25,11 +25,11 @@ services:
   # ── Data layer ────────────────────────────────────────────────────────────
   postgres:
     image: postgres:16-alpine
-    container_name: aegissre-postgres
+    container_name: aegisdeploy-postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-aegis}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aegis}
-      POSTGRES_DB: ${POSTGRES_DB:-aegissre}
+      POSTGRES_DB: ${POSTGRES_DB:-aegisdeploy}
     ports:
       - "5432:5432"
     volumes:
@@ -39,12 +39,12 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
-    networks: [aegissre]
+    networks: [aegisdeploy]
     logging: *default-logging
 
   redis:
     image: redis:7-alpine
-    container_name: aegissre-redis
+    container_name: aegisdeploy-redis
     command: ["redis-server", "--appendonly", "yes"]
     ports:
       - "6379:6379"
@@ -55,13 +55,13 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
-    networks: [aegissre]
+    networks: [aegisdeploy]
     logging: *default-logging
 
   # ── Observability layer ───────────────────────────────────────────────────
   prometheus:
     image: prom/prometheus:v2.53.0
-    container_name: aegissre-prometheus
+    container_name: aegisdeploy-prometheus
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
@@ -77,12 +77,12 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    networks: [aegissre]
+    networks: [aegisdeploy]
     logging: *default-logging
 
   grafana:
     image: grafana/grafana:11.3.0
-    container_name: aegissre-grafana
+    container_name: aegisdeploy-grafana
     environment:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-aegis}
@@ -99,12 +99,12 @@ services:
       retries: 5
     depends_on:
       prometheus: { condition: service_healthy }
-    networks: [aegissre]
+    networks: [aegisdeploy]
     logging: *default-logging
 
   loki:
     image: grafana/loki:3.3.2
-    container_name: aegissre-loki
+    container_name: aegisdeploy-loki
     command: ["-config.file=/etc/loki/loki-config.yaml"]
     ports:
       - "3100:3100"
@@ -116,12 +116,12 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    networks: [aegissre]
+    networks: [aegisdeploy]
     logging: *default-logging
 
   tempo:
     image: grafana/tempo:2.6.1
-    container_name: aegissre-tempo
+    container_name: aegisdeploy-tempo
     command: ["-config.file=/etc/tempo/tempo.yaml"]
     ports:
       - "3200:3200"   # Tempo HTTP API
@@ -135,12 +135,12 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    networks: [aegissre]
+    networks: [aegisdeploy]
     logging: *default-logging
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.109.0
-    container_name: aegissre-otel-collector
+    container_name: aegisdeploy-otel-collector
     command: ["--config=/etc/otel/config.yaml"]
     ports:
       - "4317:4317"   # OTLP gRPC
@@ -155,11 +155,11 @@ services:
     depends_on:
       tempo: { condition: service_started }
       loki: { condition: service_healthy }
-    networks: [aegissre]
+    networks: [aegisdeploy]
     logging: *default-logging
 
 networks:
-  aegissre:
+  aegisdeploy:
     driver: bridge
 
 volumes:

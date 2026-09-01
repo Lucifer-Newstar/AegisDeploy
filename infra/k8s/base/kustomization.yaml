@@ -1,4 +1,4 @@
-# AegisSRE Kubernetes base (Kustomize)
+# AegisDeploy Kubernetes base (Kustomize)
 # ADR-0005: every Compose service has a 1:1 Kustomize base here, using the same
 # image tags, env names, and config mounts. Landed incrementally — this file is
 # the anchor for CI linting (see .github/workflows/ci.yml).

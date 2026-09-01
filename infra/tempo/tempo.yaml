@@ -1,4 +1,4 @@
-# AegisSRE Tempo configuration (single-binary, local dev)
+# AegisDeploy Tempo configuration (single-binary, local dev)
 # Docs: https://grafana.com/docs/tempo/latest/configuration/
 server:
   http_listen_port: 3200

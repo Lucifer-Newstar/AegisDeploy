@@ -1,4 +1,4 @@
-# AegisSRE Loki configuration (single-binary, local dev)
+# AegisDeploy Loki configuration (single-binary, local dev)
 # Docs: https://grafana.com/docs/loki/latest/configure/
 auth_enabled: false
 
