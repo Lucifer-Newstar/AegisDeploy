@@ -32,5 +32,7 @@ storage:
       path: /var/tempo/wal
     block:
       bloom_filter_false_positive: 0.05
-      index_downsample_bytes: 1000
-      encoding: zstd
+      # Tempo 2.6 removed `index_downsample_bytes`/`encoding` from the block
+      # config (vParquet blocks dropped the index; encoding is now `version`).
+      # Defaults (vParquet3) are fine for local dev — keep this minimal.
+      version: vParquet3

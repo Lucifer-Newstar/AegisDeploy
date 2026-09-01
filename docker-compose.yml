@@ -148,11 +148,10 @@ services:
       - "4318:4318"   # OTLP HTTP
     volumes:
       - ./infra/otel/otel-collector.yaml:/etc/otel/config.yaml:ro
-    healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:13133"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    # No healthcheck: the otel/opentelemetry-collector-contrib image is
+    # distroless (no wget/curl/shell), so a container-side healthcheck is
+    # impossible. Nothing depends on collector *health* — catalog waits on
+    # service_started only.
     depends_on:
       tempo: { condition: service_started }
       loki: { condition: service_healthy }
