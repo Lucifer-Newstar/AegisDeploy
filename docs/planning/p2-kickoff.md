@@ -94,7 +94,7 @@ Grafana AND the console."
 | When | What |
 |---|---|
 | 2026-09-08 | Contracts freeze + first branches cut |
-| Weekly (Mon) | 30-min sync per the [team sync pack](p2-sync-pack.md): status round, edge-case register walk, demo-of-week, decisions recorded |
+| Weekly (Mon) | 30-min sync per the [team kickoff guide](../members/navin-lead/kickoff-guide.md): status round, edge-case register walk, demo-of-week, decisions recorded |
 | 2026-10-15 | Integration checkpoint rehearsal (one command, Grafana + console) |
 | 2026-10-31 | **Gate review** — criteria below |
 

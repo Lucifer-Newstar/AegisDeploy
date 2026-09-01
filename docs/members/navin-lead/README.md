@@ -25,6 +25,10 @@ four members' work; drive the research question to an evidence-backed answer.
 - `docs/architecture/`, `docs/planning/`, `docs/team/`, `docs/members/navin-lead/`
 - `ml/`, `ai/` (+ design of `chaoslab/`); integration across `backend/`, `frontend/`, `infra/`
 
+## Team-facing guides
+
+- **[kickoff-guide.md](kickoff-guide.md)** — run the P2 kickoff sync: agenda, live demo script, D1–D9 decisions + decision-log rows, weekly sync rhythm, demo-of-week format, gate checklist.
+
 ## Personal learning goal
 
 Build strong practical knowledge in **SRE + DevOps + Cloud + Architecture** while

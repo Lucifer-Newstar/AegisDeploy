@@ -23,7 +23,7 @@
 
 ## B. Getting it to the team
 
-- [ ] B1 — Send `p2-sync-pack.md` pre-reads to members
+- [ ] B1 — Send kickoff-guide pre-reads to members (`docs/members/navin-lead/kickoff-guide.md` §1)
 - [ ] B2 — **Kickoff sync** (~60 min): skeleton demo → contracts walk → close D1–D9 → track commitments + branch names
 - [ ] B3 — Record D1–D9 in the planning decision log (same day — "no decision leaves the room unrecorded")
 - [ ] B4 — **Freeze contracts 2026-09-08** (after: changes only via contract PR)
@@ -48,7 +48,7 @@
 - [x] D7 — Sync pack (kickoff agenda, D1–D9, weekly format, demo-of-week)
 - [x] D8 — Local setup guide + env var reference
 - [x] D9 — Handover zip removed (folder with `.git/` is the deliverable)
-- [x] D10 — Sync prep: D1–D9 decision-log draft (`decision-log-draft-p2-sync.md`) + kickoff demo script (`sync-demo-script.md`) — prepped 2026-09-01
+- [x] D10 — Sync prep: team kickoff guide consolidated in `docs/members/navin-lead/kickoff-guide.md` (agenda + demo script + D1–D9 draft + weekly rhythm) — prepped 2026-09-01
 
 ## Calendar (this stage)
 
