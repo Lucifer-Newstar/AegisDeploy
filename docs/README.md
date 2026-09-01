@@ -36,6 +36,9 @@ docs/
 │   ├── timeline.md              ← 8–10 month calendar, member assignments
 │   ├── p2-kickoff.md            ← P2 kickoff: tracks, contracts-first, gate
 │   ├── p2-sync-pack.md          ← team sync agenda + operating rhythm
+│   ├── p2-tracker.md            ← 24-item status board through the P2 gate
+│   ├── sync-demo-script.md      ← 10-min skeleton demo for the kickoff sync
+│   ├── decision-log-draft-p2-sync.md ← pre-filled D1–D9 rows for the log
 │   └── integration-edge-cases.md← cross-member risk register (Team Lead)
 │
 ├── team/                        ← WHO & HOW WE WORK
