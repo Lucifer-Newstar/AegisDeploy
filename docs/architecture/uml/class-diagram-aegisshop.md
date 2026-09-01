@@ -2,7 +2,8 @@
 
 > **Diagram 2b (UML 2.5 — Structural).** Static structure of the **AegisShop** demo
 > microservices application — the monitored subject. Full detail with multiplicity,
-> inheritance, composition, and the chaos fault-hook interface. Decided 2026-08-31.
+> inheritance, composition, and the chaos fault-hook interface. Decided 2026-08-31,
+> updated 2026-09-01 (DI: deployment/canary relevance).
 
 ```mermaid
 classDiagram
@@ -174,5 +175,7 @@ chaos-ready (A11).
   telemetry consumed by A1 (Gokul's pipeline).
 - `FaultHook.inject()` is called by the chaos lab only; it is a **demo-only** interface
   and must never be reachable from the public API in a real deployment.
+- DI relevance: `OrderService` is the **faulty-deployment** target (DI-4/DI-5) and the
+  **canary** subject (DI-6); version is tracked per deploy (DI-1).
 - Postgres/Redis clients are injected (dependency injection) so fault hooks can
   simulate outages of the real dependencies.

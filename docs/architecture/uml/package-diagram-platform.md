@@ -24,6 +24,7 @@ flowchart TB
             POLICY["policy"]
             AUDIT["audit"]
             AUTONOMY["autonomy"]
+            DEPLOY["deployments (DI-1 tracker)"]
         end
         subgraph LIBS["libs"]
             TELEMETRY["telemetry (envelope)"]
@@ -40,6 +41,7 @@ flowchart TB
             FEATURES["feature-pipeline"]
             STAT["statistical-detector"]
             ISO["isolation-forest-detector"]
+            RISK["deploy-risk (DI-2)"]
         end
     end
 
@@ -52,6 +54,7 @@ flowchart TB
         RAG["rag"]
         TOOLS["tools"]
         POSTMORTEM["postmortem"]
+        CORR["change-correlation (DI-3)"]
     end
 
     %% ═══════════════════════════════════════════════════════
@@ -61,6 +64,7 @@ flowchart TB
     GATEWAY -->|routes to| INCIDENTS
     GATEWAY -->|routes to| REMEDIATION
     GATEWAY -->|routes to| AUDIT
+    GATEWAY -->|routes to| DEPLOY
 
     REGISTRY -->|uses| TELEMETRY
     INCIDENTS -->|uses| TELEMETRY
@@ -71,16 +75,22 @@ flowchart TB
     POLICY -->|uses| TELEMETRY
     AUTONOMY -->|controls mode of| REMEDIATION
     AUTONOMY -->|uses| TELEMETRY
+    DEPLOY -->|publishes deployment events| EVENTBUS
+    DEPLOY -->|uses| TELEMETRY
 
     STAT -->|implements| FEATURES
     ISO -->|implements| FEATURES
+    RISK -->|implements| FEATURES
     FEATURES -->|consumes metric events| EVENTBUS
     FEATURES -->|emits anomaly events| EVENTBUS
+    RISK -->|consumes deploy events| EVENTBUS
 
     REASON -->|consumes incidents| EVENTBUS
     REASON -->|invokes| TOOLS
     REASON -->|retrieves context from| RAG
     REASON -->|collects evidence via| EVIDENCE
+    REASON -->|correlates via| CORR
+    CORR -->|uses deploy history| DEPLOY
     TOOLS -->|queries stores| TELEMETRY
     POSTMORTEM -->|uses| REASON
 
@@ -94,9 +104,9 @@ flowchart TB
     classDef ai fill:#fce7f3,stroke:#db2777,color:#831843;
     class TELEMETRY telemetry;
     class EVENTBUS eventlayer;
-    class GATEWAY,REGISTRY,INCIDENTS,EVIDENCE,REMEDIATION,POLICY,AUDIT,AUTONOMY domain;
-    class FEATURES,STAT,ISO ml;
-    class REASON,RAG,TOOLS,POSTMORTEM ai;
+    class GATEWAY,REGISTRY,INCIDENTS,EVIDENCE,REMEDIATION,POLICY,AUDIT,AUTONOMY,DEPLOY domain;
+    class FEATURES,STAT,ISO,RISK ml;
+    class REASON,RAG,TOOLS,POSTMORTEM,CORR ai;
 ```
 
 ---
@@ -113,6 +123,9 @@ flowchart TB
 | `backend.services.policy` | Policy engine (decision point) | Domain |
 | `backend.services.audit` | Audit log | Domain |
 | `backend.services.autonomy` | Autonomy mode controller (kill switch) | Domain |
+| `backend.services.deployments` | Deployment tracker (DI-1): deploy history API | Domain |
+| `ml.detection.deploy-risk` | Deployment risk scoring model (DI-2) | ML |
+| `ai.reasoning.change-correlation` | Change-incident correlation (DI-3) | AI |
 | `backend.libs.telemetry` | Event envelope + payload schemas (Pydantic) | Telemetry |
 | `backend.libs.eventbus` | Redis Streams producer/consumer (ADR-0004) | Event layer |
 | `ml.detection.*` | Feature pipeline + detectors | ML |

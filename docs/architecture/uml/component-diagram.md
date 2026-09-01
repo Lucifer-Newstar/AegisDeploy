@@ -24,15 +24,17 @@ flowchart TB
     POLICY["«component» Policy Engine<br/>provides: REST :8302<br/>requires: SQL :5432 (policies)"]
     AUDIT["«component» Audit Service<br/>provides: REST :8401<br/>requires: SQL :5432"]
     AUTONOMY["«component» Autonomy Controller<br/>provides: REST :8402<br/>requires: policy mode flag"]
+    DEPLOYTRK["«component» Deployment Tracker (DI-1)<br/>provides: REST :8701 · deployment events<br/>requires: SQL :5432 · Streams :6379"]
 
-    ML["«component» ML Service (detection)<br/>provides: REST :8501 · anomaly events<br/>requires: Streams :6379 · PromQL :9090"]
+    ML["«component» ML Service (detection · deploy risk DI-2)<br/>provides: REST :8501 · anomaly events · risk scores<br/>requires: Streams :6379 · PromQL :9090"]
 
-    AI["«component» AI Service (reasoning · RAG · tools · postmortem)<br/>provides: REST :8601<br/>requires: Streams :6379 · evidence REST · PromQL :9090 · LogQL :3100 · traces :3200 · LLM :11434 · SQL :5432 (pgvector)"]
+    AI["«component» AI Service (reasoning · RAG · tools · postmortem · correlation DI-3)<br/>provides: REST :8601<br/>requires: Streams :6379 · evidence REST · PromQL :9090 · LogQL :3100 · traces :3200 · LLM :11434 · SQL :5432 (pgvector) · deploy REST :8701"]
 
     %% ═══════════════════════════════════════════════════════
     %% EXTERNAL COMPONENTS
     %% ═══════════════════════════════════════════════════════
     SHOP["«external» AegisShop (5 services)<br/>provides: OTLP :4317 · health HTTP :9000-9004"]
+    CI["«external» CI/CD (GitHub Actions)<br/>provides: deploy events (webhook) · canary releases"]
     OTEL["«infra» OTel Collector<br/>provides: OTLP :4317/4318"]
     PROM["«infra» Prometheus<br/>provides: PromQL :9090"]
     LOKI["«infra» Loki<br/>provides: LogQL :3100"]
@@ -52,6 +54,8 @@ flowchart TB
     GATEWAY -->|REST| EVIDENCE
     GATEWAY -->|REST| AUDIT
     GATEWAY -->|REST| AI
+    GATEWAY -->|REST :8701| DEPLOYTRK
+    CI -->|deploy events (webhook)| DEPLOYTRK
 
     REGISTRY -->|SQL :5432| PG
     REGISTRY -->|HTTP health| SHOP
@@ -64,11 +68,14 @@ flowchart TB
     POLICY -->|SQL :5432| PG
     AUDIT -->|SQL :5432| PG
     AUTONOMY -->|mode flag| POLICY
+    DEPLOYTRK -->|SQL :5432| PG
+    DEPLOYTRK <-->|Streams :6379| REDIS
 
     ML -->|Streams :6379 (sub metric / pub anomaly)| REDIS
     ML -->|PromQL :9090| PROM
 
     AI -->|Streams :6379| REDIS
+    AI -->|REST :8701 (correlation)| DEPLOYTRK
     AI -->|REST :8202| EVIDENCE
     AI -->|PromQL :9090| PROM
     AI -->|LogQL :3100| LOKI
@@ -90,11 +97,11 @@ flowchart TB
     classDef ai fill:#fce7f3,stroke:#db2777,color:#831843;
     classDef telemetry fill:#dbeafe,stroke:#2563eb,color:#1e3a8a;
     classDef ext fill:#f3f4f6,stroke:#6b7280,color:#374151;
-    class DASH,GATEWAY,REGISTRY,INCIDENTS,EVIDENCE,REMEDIATION,POLICY,AUDIT,AUTONOMY domain;
+    class DASH,GATEWAY,REGISTRY,INCIDENTS,EVIDENCE,REMEDIATION,POLICY,AUDIT,AUTONOMY,DEPLOYTRK domain;
     class ML ml;
     class AI ai;
     class OTEL,PROM,LOKI,TEMPO telemetry;
-    class SHOP,PG,REDIS,OLLAMA ext;
+    class SHOP,PG,REDIS,OLLAMA,CI ext;
 ```
 
 ---
@@ -112,8 +119,9 @@ flowchart TB
 | Policy Engine | REST :8302 | SQL (policies) | Domain |
 | Audit Service | REST :8401 | SQL | Domain |
 | Autonomy Controller | REST :8402 | policy mode flag | Domain |
-| ML Service | REST :8501, anomaly events | Streams, PromQL | ML |
-| AI Service | REST :8601 | Streams, evidence, PromQL/LogQL/traces, LLM, pgvector | AI |
+| **Deployment Tracker** | REST :8701, deployment events | SQL, Streams | Domain (DI) |
+| ML Service | REST :8501, anomaly events, **risk scores** | Streams, PromQL | ML |
+| AI Service | REST :8601 | Streams, evidence, PromQL/LogQL/traces, LLM, pgvector, **deploy REST :8701** | AI |
 
 ## 2. Interface Inventory
 
@@ -121,6 +129,7 @@ flowchart TB
 |---|---|---|---|
 | Public API | REST/JSON (OpenAPI) | 8000 | Dashboard |
 | Service APIs | REST/JSON | 8101–8402 | Gateway |
+| Deploy API | REST/JSON | 8701 | Gateway, AI (DI-1/DI-3) |
 | Event Bus | Redis Streams | 6379 | Incidents, ML, AI |
 | Metrics query | PromQL | 9090 | ML, AI tools |
 | Logs query | LogQL | 3100 | AI tools |
@@ -128,6 +137,7 @@ flowchart TB
 | LLM | OpenAI-compatible | 11434 | AI reasoning, postmortem |
 | Vector store | SQL + pgvector | 5432 | AI RAG |
 | Telemetry ingress | OTLP gRPC/HTTP | 4317/4318 | AegisShop → Collector |
+| Deploy events | webhook | — | CI/CD → Deployment Tracker (DI-1) |
 
 ## 3. Security Boundaries (consistent with autonomy-model.md)
 

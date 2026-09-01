@@ -2,8 +2,9 @@
 
 > **Diagram 1a (UML 2.5 — Behavioral).** Shows what the AegisDeploy platform does *for
 > whom*. The AegisShop demo application is an **external system** (the monitored
-> subject), not part of the platform. Medium detail (~18 use cases) with
-> include/extend relationships. Decided 2026-08-31.
+> subject), not part of the platform. Medium detail (~22 use cases) with
+> include/extend relationships, extended for the **Deployment Intelligence tier**
+> (DI-1…DI-7). Decided 2026-08-31, updated 2026-09-01.
 
 ```mermaid
 ---
@@ -48,6 +49,12 @@ flowchart LR
         UC17("Execute safe autonomous action")
         UC18("Notify on incident")
 
+        %% ── Deployment Intelligence (DI-1…DI-7) ───────────
+        UC19("View deployment history & risk")
+        UC20("Review rollback recommendation")
+        UC21("View change-failure analytics")
+        UC22("Correlate incident to deployment")
+
         %% ── Included / extended helper use cases ─────────
         AUTH("Authenticate")
         EVID("Collect evidence")
@@ -56,9 +63,9 @@ flowchart LR
     end
 
     %% ═══ ACTOR → USE CASE ASSOCIATIONS ═══════════════════
-    SRE --- UC1 & UC2 & UC3 & UC4 & UC5 & UC6 & UC7 & UC8 & UC9 & UC10
+    SRE --- UC1 & UC2 & UC3 & UC4 & UC5 & UC6 & UC7 & UC8 & UC9 & UC10 & UC19 & UC20 & UC21
     ADMIN --- UC10 & UC11 & UC12 & UC13
-    DEVOPS --- UC14 & UC15 & UC16
+    DEVOPS --- UC14 & UC15 & UC16 & UC21
     SHOP -.->|observes| UC1
     SHOP -.->|telemetry| UC2
     K8S -.->|executes on| UC16
@@ -68,7 +75,9 @@ flowchart LR
     %% ═══ INCLUDE / EXTEND RELATIONSHIPS ══════════════════
     UC4 -.->|«include»| EVID
     UC7 -.->|«include»| EVID
+    UC22 -.->|«include»| EVID
     UC5 -.->|«include»| IMPACT
+    UC20 -.->|«include»| IMPACT
     UC5 -.->|«extend»| VERIFY
     UC17 -.->|«extend»| VERIFY
     UC11 -.->|«include»| AUTH
@@ -80,7 +89,7 @@ flowchart LR
     classDef uc fill:#ecfdf5,stroke:#059669,stroke-width:1px,color:#064e3b;
     classDef helper fill:#fef3c7,stroke:#d97706,stroke-width:1px,color:#78350f;
     class SRE,ADMIN,DEVOPS,SHOP,K8S,NOTIF actor;
-    class UC1,UC2,UC3,UC4,UC5,UC6,UC7,UC8,UC9,UC10,UC11,UC12,UC13,UC14,UC15,UC16,UC17,UC18 uc;
+    class UC1,UC2,UC3,UC4,UC5,UC6,UC7,UC8,UC9,UC10,UC11,UC12,UC13,UC14,UC15,UC16,UC17,UC18,UC19,UC20,UC21,UC22 uc;
     class AUTH,EVID,IMPACT,VERIFY helper;
 ```
 
@@ -126,6 +135,10 @@ phase plan (P2–P8) refine.
 | 16 | Trigger chaos experiment | DevOps | P7 | fault injection (A11) |
 | 17 | Execute safe autonomous action | System | P5 | Level 5 low-risk actions (A8) |
 | 18 | Notify on incident | System | P2+ | notification hook (C6 cut — optional) |
+| 19 | View deployment history & risk | SRE | P2/P4 | DI-1, DI-2 |
+| 20 | Review rollback recommendation | SRE | P5 | DI-5 |
+| 21 | View change-failure analytics | SRE, DevOps | P6 | DI-7 |
+| 22 | Correlate incident to deployment | System (AI) | P4 | DI-3 |
 
 ## 4. Include / Extend Semantics
 

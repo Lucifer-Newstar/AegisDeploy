@@ -2,9 +2,10 @@
 
 > **Diagram 2a (UML 2.5 — Structural).** Static structure of the AegisDeploy platform:
 > all layers — telemetry envelope, event layer, core domain (services, incidents,
-> remediation, policy, audit), ML detection, and AI reasoning/RAG/tools.
-> Full detail: attributes with types, methods, multiplicity, inheritance,
-> composition/aggregation, and interface realization. Decided 2026-08-31.
+> remediation, policy, audit), **deployment intelligence (DI)**, ML detection, and AI
+> reasoning/RAG/tools. Full detail: attributes with types, methods, multiplicity,
+> inheritance, composition/aggregation, and interface realization. Decided 2026-08-31,
+> updated 2026-09-01 (DI tier).
 
 ```mermaid
 classDiagram
@@ -53,6 +54,8 @@ classDiagram
         +str previous_revision
         +str triggered_by
         +str status
+        +float risk_score
+        +dict rollout
     }
 
     EventEnvelope --> DeploymentContext : references
@@ -116,6 +119,7 @@ classDiagram
         +list~Evidence~ evidence
         +list~TimelineEvent~ timeline
         +RootCauseHypothesis root_cause
+        +ChangeCorrelation change_correlation
         +create(anomalies) Incident
         +transition(status) void
         +attach_evidence(evidence) void
@@ -278,6 +282,69 @@ classDiagram
     AutonomyController "1" --> "1" AutonomyMode
 
     %% ═══════════════════════════════════════════════════════
+    %% LAYER 3.5 — DEPLOYMENT INTELLIGENCE (DI-1…DI-7)
+    %% ═══════════════════════════════════════════════════════
+    class DeploymentRecord {
+        +str id
+        +str service_id
+        +str revision
+        +str previous_revision
+        +str version
+        +str triggered_by
+        +str status
+        +float risk_score
+        +datetime started_at
+        +datetime finished_at
+        +record() void
+        +get_history(service_id) list
+        +rollback(to_revision) void
+    }
+    class DeploymentRiskScore {
+        +str service_id
+        +str revision
+        +float score
+        +list~str~ factors
+        +str model
+        +datetime computed_at
+        +predict(attrs) float
+    }
+    class ChangeCorrelation {
+        +str incident_id
+        +str deployment_id
+        +str revision
+        +float confidence
+        +list~Evidence~ evidence
+        +attribute() void
+    }
+    class RolloutHealth {
+        +str deployment_id
+        +str status
+        +Window window
+        +dict metrics
+        +evaluate() str
+    }
+    class RollbackRecord {
+        +str id
+        +str incident_id
+        +str from_revision
+        +str to_revision
+        +str mode
+        +str status
+        +ExecutionRecord execution
+    }
+
+    %% ── DI relationships ──────────────────────────────────
+    Service "1" --> "0..*" DeploymentRecord : has
+    DeploymentRecord "1" --> "0..1" DeploymentRiskScore : scored by
+    DeploymentRecord "1" --> "0..1" RolloutHealth : monitored by
+    Incident "1" --> "0..1" ChangeCorrelation : attributed via
+    ChangeCorrelation "1" --> "1" DeploymentRecord : points to
+    RollbackRecord "1" --> "1" DeploymentRecord : reverts
+    RollbackRecord "1" --> "1" RemediationAction : executed as
+    DeploymentRecord ..> AuditLogEntry : logged
+    DeploymentRecord ..> DeploymentEvent : emits
+
+    %% ═══════════════════════════════════════════════════════
     %% LAYER 4 — ML ANOMALY DETECTION (ml/)
     %% ═══════════════════════════════════════════════════════
     class AnomalyDetector {
@@ -309,6 +376,12 @@ classDiagram
         +evaluate(service, metric) list~Anomaly~
         +publish(anomaly) void
     }
+    class DeployRiskModel {
+        -object model
+        +train(history) void
+        +predict(attrs) float
+        +explain(attrs) list~str~
+    }
 
     StatisticalDetector <|-- AnomalyDetector
     IsolationForestDetector <|-- AnomalyDetector
@@ -316,6 +389,7 @@ classDiagram
     AnomalyService --> FeaturePipeline
     AnomalyService --> EventBus : publishes
     AnomalyService ..> AnomalyEvent : emits
+    DeployRiskModel ..> DeploymentRiskScore : produces
 
     %% ═══════════════════════════════════════════════════════
     %% LAYER 5 — AI REASONING, RAG & TOOLS (ai/)
@@ -327,6 +401,7 @@ classDiagram
         +collect_evidence(incident) list~Evidence~
         +generate_hypotheses(incident) list~RootCauseHypothesis~
         +recommend_remediation(hypothesis) list~RemediationAction~
+        +correlate_change(incident) ChangeCorrelation
     }
     class RootCauseHypothesis {
         +str summary
@@ -376,6 +451,11 @@ classDiagram
         +name() str
         +invoke(params) dict
     }
+    class GetDeployRiskTool {
+        -DeploymentsClient client
+        +name() str
+        +invoke(params) dict
+    }
     class RAGRetriever {
         -VectorStore store
         -Embedder embedder
@@ -406,6 +486,7 @@ classDiagram
     class PostmortemGenerator {
         -LLMClient llm
         +generate(incident) str
+        +generate_deploy_postmortem(deployment) str
     }
 
     ReasoningEngine "1" o-- "0..*" Tool
@@ -418,6 +499,7 @@ classDiagram
     GetDeploymentHistoryTool ..|> Tool
     GetKubernetesEventsTool ..|> Tool
     GetRunbookTool ..|> Tool
+    GetDeployRiskTool ..|> Tool
     AskAegisService "1" o-- "0..*" Tool
     AskAegisService --> ReasoningEngine
     Answer "1" o-- "0..*" ToolCall
@@ -431,22 +513,25 @@ classDiagram
     classDef telemetry fill:#dbeafe,stroke:#2563eb,color:#1e3a8a;
     classDef eventlayer fill:#ede9fe,stroke:#7c3aed,color:#4c1d95;
     classDef domain fill:#ecfdf5,stroke:#059669,color:#064e3b;
+    classDef di fill:#d1fae5,stroke:#0d9488,color:#115e59;
     classDef ml fill:#ffedd5,stroke:#ea580c,color:#7c2d12;
     classDef ai fill:#fce7f3,stroke:#db2777,color:#831843;
     class EventEnvelope,DeploymentContext,MetricEvent,AnomalyEvent,DeploymentEvent telemetry;
     class EventBus,RedisEventBus,EventConsumer eventlayer;
     class Service,SLO,Incident,IncidentStatus,TimelineEvent,Evidence,Anomaly,Window,Baseline,RemediationAction,ActionType,RiskClass,ExecutionRecord,Policy,PolicyCondition,Decision,ApprovalRequest,AuditLogEntry,AutonomyController,AutonomyMode domain;
-    class AnomalyDetector,StatisticalDetector,IsolationForestDetector,FeaturePipeline,AnomalyService ml;
-    class ReasoningEngine,RootCauseHypothesis,Tool,GetMetricsTool,GetLogsTool,GetTracesTool,GetServiceHealthTool,GetDeploymentHistoryTool,GetKubernetesEventsTool,GetRunbookTool,RAGRetriever,Document,AskAegisService,Answer,ToolCall,PostmortemGenerator ai;
+    class DeploymentRecord,DeploymentRiskScore,ChangeCorrelation,RolloutHealth,RollbackRecord di;
+    class AnomalyDetector,StatisticalDetector,IsolationForestDetector,FeaturePipeline,AnomalyService,DeployRiskModel ml;
+    class ReasoningEngine,RootCauseHypothesis,Tool,GetMetricsTool,GetLogsTool,GetTracesTool,GetServiceHealthTool,GetDeploymentHistoryTool,GetKubernetesEventsTool,GetRunbookTool,GetDeployRiskTool,RAGRetriever,Document,AskAegisService,Answer,ToolCall,PostmortemGenerator ai;
 ```
 
 ---
 
 ## 1. Purpose
 
-Static model of the platform's classes, organized in five layers. This is the
-implementation blueprint for the backend (Jegatheesan), ML (Navin), AI (Navin), and
-event layer (Gokul/Navin) — every class maps to a feature in `features.md`.
+Static model of the platform's classes, organized in **six layers** (telemetry, event
+layer, core domain, **deployment intelligence**, ML, AI). This is the implementation
+blueprint for the backend (Jegatheesan), ML (Navin), AI (Navin), and event layer
+(Gokul/Navin) — every class maps to a feature in `features.md`.
 
 ## 2. Layer Legend
 
@@ -455,6 +540,7 @@ event layer (Gokul/Navin) — every class maps to a feature in `features.md`.
 | 🔵 Blue | Telemetry & Envelope | `backend/libs/telemetry` | Navin (design) |
 | 🟣 Purple | Event Layer | `backend/libs/eventbus` | Navin + Gokul |
 | 🟢 Green | Core Domain | `backend/services/*` | Jegatheesan (impl), Navin (design) |
+| 🩵 Teal | **Deployment Intelligence** | `backend/services/deployments` + `ml/detection` + `ai/reasoning` | Navin (design), Jega/Gokul (impl) |
 | 🟠 Orange | ML Detection | `ml/` | Navin |
 | 🩷 Pink | AI Reasoning / RAG / Tools | `ai/` | Navin |
 
@@ -466,13 +552,22 @@ event layer (Gokul/Navin) — every class maps to a feature in `features.md`.
 | `Incident o-- Anomaly` | Aggregation: anomalies exist independently (from the ML layer) |
 | `Service "1" --> "0..*" Incident` | One service can be affected by many incidents |
 | `RemediationAction --> Policy` | Every action is evaluated by exactly one policy (policy engine is the only decision point) |
-| `* ..|> Tool` | Tool realization — the seven read-only tools the AI may invoke (no write tools exist) |
-| `AnomalyService ..> AnomalyEvent` | ML emits anomaly events onto the event bus (decoupled from the incident manager) |
+| `Service "1" --> "0..*" DeploymentRecord` | Every deploy of a service is tracked (DI-1) |
+| `Incident "1" --> "0..1" ChangeCorrelation` | Optional attribution of an incident to a deployment (DI-3) |
+| `RollbackRecord --> RemediationAction` | A rollback is executed as a ROLLBACK remediation action (DI-5) |
+| `* ..|> Tool` | Tool realization — now **eight** read-only tools (added `GetDeployRiskTool`) |
+| `AnomalyService ..> AnomalyEvent` | ML emits anomaly events onto the event bus (decoupled) |
+| `DeploymentRecord ..> DeploymentEvent` | Deploys emit envelope-compliant deployment events (DI-1) |
 | `StatisticalDetector <|-- AnomalyDetector` | Abstract detector; two concrete strategies (strategy pattern) |
 
 ## 4. Notes for Implementers
 
-- Nullability (e.g., `root_cause` may be absent) is modeled via `0..1` multiplicity, not types.
+- Nullability (e.g., `root_cause`, `change_correlation` may be absent) is modeled via
+  `0..1` multiplicity, not types.
 - Enum classes become Python `enum.Enum` / database check constraints.
-- The `Tool` interface is the **security boundary**: only these seven tools are compiled into the runtime — the AI cannot invent new tools (autonomy-model.md §3).
+- The `Tool` interface is the **security boundary**: only these eight tools are
+  compiled into the runtime — the AI cannot invent new tools (autonomy-model.md §3).
+- The DI classes are **additive** to the existing model (schema v0.2) — no existing
+  class was changed destructively; `Incident` and `PostmortemGenerator` gained one
+  optional member each.
 - Full attribute/method lists here are the contract; deviations need a PR + ADR note.

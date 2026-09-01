@@ -30,6 +30,7 @@ flowchart TB
 
     subgraph CI["infra.ci"]
         GH["github-actions workflows"]
+        DEPLOY["ci.deploy (CD pipeline)"]
     end
 
     subgraph IAC["iac"]
@@ -39,6 +40,7 @@ flowchart TB
     subgraph CHAOS["chaoslab"]
         EXP["experiment-manifests"]
         RUNNER["fault-runner"]
+        CANARY["canary-experiments (DI-6)"]
     end
 
     subgraph OPS["ops"]
@@ -65,11 +67,15 @@ flowchart TB
     GH -->|validates + builds| COMPOSE
     GH -->|lints| K8S
     GH -->|deploys (P7)| K8S
+    DEPLOY -->|deploys to| K8S
+    DEPLOY -.->|records deployment events (DI-1)| K8S
 
     TF -.->|provisions (future)| K8S
 
     RUNNER -->|executes manifests| EXP
     EXP -->|injects faults into| K8S
+    RUNNER -->|executes| CANARY
+    CANARY -->|analyzed in| K8S
     POLICIES -->|referenced by| RUNNER
     SCRIPTS -->|helpers for| GH
 
@@ -96,14 +102,18 @@ flowchart TB
 | `infra.orchestration.compose` | Local dev stack (docker-compose.yml) | Gokul |
 | `infra.orchestration.k8s` | Kustomize bases (ADR-0005: 1:1 with Compose) | Gokul |
 | `infra.ci.github-actions` | CI/CD workflows | Gokul |
+| `infra.ci.deploy` | CD pipeline — deploys apps and **records deployment events (DI-1)** | Gokul |
 | `iac.terraform` | Cloud IaC (reserved, M7/M8) | Gokul |
 | `chaoslab.*` | Fault manifests + runner (ground truth) | Gokul + Navin |
+| `chaoslab.canary` | Canary/progressive-delivery experiments (DI-6) | Gokul + Navin |
 | `ops.policies` | Declarative remediation policies (A6) | Navin |
 
 ## 2. Key Dependency Rules
 
 - **Config parity:** `k8s` mounts the *same* config files as `compose` — no drift
   (ADR-0005).
+- **DI hook:** the CD pipeline (`ci.deploy`) records every deployment event to the
+  platform's deployment tracker (DI-1); canary experiments feed DI-6 analysis.
 - **CI lints K8s** (kubeconform) even before the cluster exists — manifests stay green
   from day one.
 - **Chaos lab targets the cluster** (or compose in dev) via the AegisShop `fault-hooks`

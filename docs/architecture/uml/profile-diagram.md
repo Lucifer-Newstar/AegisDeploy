@@ -94,6 +94,11 @@ classDiagram
         +str base
         +list~str~ tagged_values
     }
+    class RollS {
+        <<stereotype>>
+        +str revision
+        +str status
+    }
 
     %% ═══════════════════════════════════════════════════════
     %% «extend» RELATIONSHIPS (stereotype → metaclass)
@@ -109,6 +114,7 @@ classDiagram
     AbsS ..>|«extend»| ClassMC
     MetaS ..>|«extend»| ClassMC
     SterS ..>|«extend»| ClassMC
+    RollS ..>|«extend»| ClassMC
 
     %% ═══════════════════════════════════════════════════════
     %% CONSTRAINTS (notes)
@@ -117,6 +123,7 @@ classDiagram
     note for ExtS "constraint: read-only — never holds write tools (AI boundary)"
     note for ArtS "constraint: image tags are always pinned"
     note for EnumS "constraint: values are DB-checked at ingestion"
+    note for RollS "constraint: rollout.bad must be followed by rollback or escalation (DI-4/DI-5)"
 
     %% ═══════════════════════════════════════════════════════
     %% COLOR CODING
@@ -124,7 +131,7 @@ classDiagram
     classDef meta fill:#f3f4f6,stroke:#6b7280,color:#374151;
     classDef stereo fill:#ede9fe,stroke:#7c3aed,color:#4c1d95;
     class CompMC,NodeMC,ClassMC,ArtMC,DevMC,EnumMC,IfMC meta;
-    class CompS,ExtS,InfraS,DevS,NodeS,ArtS,EnumS,IfS,AbsS,MetaS,SterS stereo;
+    class CompS,ExtS,InfraS,DevS,NodeS,ArtS,EnumS,IfS,AbsS,MetaS,SterS,RollS stereo;
 ```
 
 ---
@@ -144,6 +151,7 @@ classDiagram
 | `«abstract»` | Class | — | 2a, 2b |
 | `«metaclass»` | Class | — | this profile |
 | `«stereotype»` | Class | `base`, `tagged_values` | this profile |
+| `«rollout»` | Class | `revision`, `status` | 10 (rollout state machine), 14 (DI) |
 
 ## 2. Constraints (enforced by convention)
 

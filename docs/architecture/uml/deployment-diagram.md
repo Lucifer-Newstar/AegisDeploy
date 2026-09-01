@@ -14,8 +14,9 @@ flowchart TB
     %% EXTERNAL NODES
     %% ═══════════════════════════════════════════════════════
     DEV["«device» Developer Workstation<br/>kubectl · docker · git<br/>«artifact» Kustomize overlays"]
-    GH["«node» GitHub Actions<br/>«artifact» CI/CD workflows"]
+    GH["«node» GitHub Actions<br/>«artifact» CI/CD workflows · CD pipeline (DI-1 webhook)"]
     REG["«node» Container Registry<br/>«artifact» images: aegisdeploy/* , aegisshop/*"]
+    CHAOS["chaoslab (workstation / CI)<br/>«artifact» chaos manifests · canary experiments (DI-6)"]
 
     %% ═══════════════════════════════════════════════════════
     %% KIND CLUSTER
@@ -36,6 +37,7 @@ flowchart TB
             AUT["autonomy"]
             ML["ml-service<br/>«artifact» aegisdeploy/ml:0.1"]
             AI["ai-service<br/>«artifact» aegisdeploy/ai:0.1"]
+            DPL["deployments (DI-1 tracker)<br/>«artifact» aegisdeploy/deployments:0.1"]
         end
 
         subgraph NS_SHOP["namespace: aegisshop"]
@@ -71,6 +73,10 @@ flowchart TB
     GH -->|push images| REG
     KIND -->|pull images| REG
     GH -->|deploy workflow (P7)| KIND
+    GH -->|deploy events (DI-1 webhook)| KIND
+    CHAOS -->|injects faults (A11) · canary (DI-6)| KIND
+    GH -->|deploy events (DI-1 webhook)| KIND
+    CHAOS -->|injects faults (A11) · canary (DI-6)| KIND
 
     %% ── platform wiring ────────────────────────────────────
     FE -->|REST :8000| GW
@@ -80,11 +86,15 @@ flowchart TB
     GW -->|REST| EV
     GW -->|REST| AUD
     GW -->|REST| AI
+    GW -->|REST :8701| DPL
     INC -->|SQL :5432| PG
     EV -->|SQL :5432| PG
     POL -->|SQL :5432| PG
     AUD -->|SQL :5432| PG
     AI -->|SQL :5432 pgvector| PG
+    AI -->|REST :8701| DPL
+    DPL -->|SQL :5432| PG
+    DPL <-->|Streams :6379| REDIS
     INC <-->|Streams :6379| REDIS
     ML <-->|Streams :6379| REDIS
     AI <-->|Streams :6379| REDIS
@@ -121,13 +131,13 @@ flowchart TB
     classDef obs fill:#e0e7ff,stroke:#4f46e5,color:#312e81;
     classDef data fill:#f3f4f6,stroke:#6b7280,color:#374151;
     classDef node fill:#f8fafc,stroke:#475569,color:#1e293b;
-    class FE,GW,REGSVC,INC,EV,REM,POL,AUD,AUT domain;
+    class FE,GW,REGSVC,INC,EV,REM,POL,AUD,AUT,DPL domain;
     class ML ml;
     class AI ai;
     class SG,CA,CT,OR,PA shop;
     class OTEL,PROM,GRAF,LOKI,TEMPO obs;
     class PG,REDIS data;
-    class DEV,GH,REG,KIND node;
+    class DEV,GH,REG,CHAOS,KIND node;
 ```
 
 > Note: `OLLAMA` (LLM server) may run on the workstation or as a cluster pod —
@@ -149,7 +159,7 @@ flowchart TB
 
 | Namespace | Components | Artifacts (images) |
 |---|---|---|
-| `platform` | frontend, gateway, registry, incidents, evidence, remediation, policy, audit, autonomy, ml-service, ai-service | `aegisdeploy/*:0.1` (P7 pins real versions) |
+| `platform` | frontend, gateway, registry, incidents, evidence, remediation, policy, audit, autonomy, ml-service, ai-service, **deployments** | `aegisdeploy/*:0.1` (P7 pins real versions) |
 | `aegisshop` | shop-gateway, catalog, cart, order, payment | `aegisshop/*:0.1` |
 | `observability` | otel-collector, prometheus, grafana, loki, tempo | pinned images (M1 versions) |
 | `data` | postgres (StatefulSet + pgvector), redis (StatefulSet) | postgres:16-alpine, redis:7-alpine |

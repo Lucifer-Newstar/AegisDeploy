@@ -20,6 +20,7 @@ flowchart LR
     TEMPO["«external» Tempo"]
     OLLAMA["«external» Ollama (LLM)"]
     VECTOR["«external» PostgreSQL (pgvector)"]
+    DEPLOY_TRK["«external» Deployment Tracker (REST :8701)"]
 
     %% ═══════════════════════════════════════════════════════
     %% COMPONENT BOUNDARY: AI SERVICE
@@ -36,6 +37,7 @@ flowchart LR
         P_TRACES["● traces :3200 (out)"]
         P_LLM["● LLM :11434 (out)"]
         P_VECTOR["● SQL :5432 pgvector (out)"]
+        P_DEPLOY["● REST :8701 (out)"]
 
         %% ── Parts ─────────────────────────────────────────
         REASON["ReasoningEngine<br/>(orchestrator)"]
@@ -44,6 +46,7 @@ flowchart LR
         RETRIEVER["RAGRetriever<br/>(embedder + vector)"]
         POSTMORTEM["PostmortemGenerator"]
         ASK["AskAegisService"]
+        CORR["ChangeCorrelator<br/>(DI-3)"]
 
         subgraph TOOLS["ToolRegistry (read-only tools)"]
             T1["GetMetricsTool"]
@@ -53,6 +56,7 @@ flowchart LR
             T5["GetDeploymentHistoryTool"]
             T6["GetKubernetesEventsTool"]
             T7["GetRunbookTool"]
+            T8["GetDeployRiskTool"]
         end
 
         %% ── Internal connectors ───────────────────────────
@@ -61,6 +65,7 @@ flowchart LR
         REASON -->|reason via| LLMCLIENT
         REASON -->|collect| COLLECTOR
         REASON -->|generate| POSTMORTEM
+        REASON -->|delegate correlation| CORR
         ASK -->|delegate| REASON
 
         %% ── Part → port wiring ────────────────────────────
@@ -72,6 +77,9 @@ flowchart LR
         P_TRACES --- T3
         P_LLM --- LLMCLIENT
         P_VECTOR --- RETRIEVER
+        P_DEPLOY --- CORR
+        P_DEPLOY --- T5
+        P_DEPLOY --- T8
     end
 
     %% ═══════════════════════════════════════════════════════
@@ -85,6 +93,7 @@ flowchart LR
     P_TRACES -->|trace queries| TEMPO
     P_LLM -->|completions| OLLAMA
     P_VECTOR -->|embeddings + retrieval| VECTOR
+    P_DEPLOY -->|deploy history & risk| DEPLOY_TRK
 
     %% ═══════════════════════════════════════════════════════
     %% COLOR CODING
@@ -93,10 +102,10 @@ flowchart LR
     classDef tool fill:#fdf2f8,stroke:#f472b6,color:#9d174d;
     classDef port fill:#fff7ed,stroke:#f97316,color:#7c2d12;
     classDef ext fill:#f3f4f6,stroke:#6b7280,color:#374151;
-    class REASON,COLLECTOR,LLMCLIENT,RETRIEVER,POSTMORTEM,ASK,TOOLS ai;
-    class T1,T2,T3,T4,T5,T6,T7 tool;
-    class P_REST,P_STREAMS,P_EVID,P_PROMQL,P_LOGQL,P_TRACES,P_LLM,P_VECTOR port;
-    class GATEWAY,EVENTBUS,EVID_STORE,PROM,LOKI,TEMPO,OLLAMA,VECTOR ext;
+    class REASON,COLLECTOR,LLMCLIENT,RETRIEVER,POSTMORTEM,ASK,CORR,TOOLS ai;
+    class T1,T2,T3,T4,T5,T6,T7,T8 tool;
+    class P_REST,P_STREAMS,P_EVID,P_PROMQL,P_LOGQL,P_TRACES,P_LLM,P_VECTOR,P_DEPLOY port;
+    class GATEWAY,EVENTBUS,EVID_STORE,PROM,LOKI,TEMPO,OLLAMA,VECTOR,DEPLOY_TRK ext;
 ```
 
 ---
@@ -109,8 +118,8 @@ flowchart LR
 | `EvidenceCollector` | ReasoningEngine.collect_evidence | Fetches evidence via the Evidence Store API |
 | `LLMClient` | ReasoningEngine.llm | Talks to the local LLM (Ollama) |
 | `RAGRetriever` | RAGRetriever | Embeds + retrieves runbooks/past incidents from pgvector |
-| `ToolRegistry` | list~Tool~ | Holds the seven compiled-in read-only tools |
-| `GetMetricsTool` … `GetRunbookTool` | the seven Tool realizations | Queries Prometheus/Loki/Tempo/registry/runbooks |
+| `ToolRegistry` | list~Tool~ | Holds the eight compiled-in read-only tools |
+| `GetMetricsTool` … `GetRunbookTool`, `GetDeployRiskTool` | the eight Tool realizations | Queries Prometheus/Loki/Tempo/registry/runbooks/**deploy risk** |
 | `PostmortemGenerator` | PostmortemGenerator | Writes the incident postmortem on close |
 | `AskAegisService` | AskAegisService | Chat front-end of the same engine (read-only) |
 
@@ -126,13 +135,15 @@ flowchart LR
 | `traces :3200` | out | Tempo | HTTP (read-only) |
 | `LLM :11434` | out | Ollama | OpenAI-compatible API |
 | `SQL :5432` | out | PostgreSQL (pgvector) | SQL (embeddings/retrieval) |
+| `REST :8701` | out | Deployment Tracker | HTTP/JSON (deploy history, risk — DI-1/DI-2/DI-3) |
 
 ## 3. Design Invariants
 
 - **All eight out-ports are read-only** — there is no write path from any part to any
   store (autonomy-model.md §3; component diagram §3).
 - **ToolRegistry is compiled-in** — the AI cannot register new tools at runtime; the
-  seven tools are the complete tool surface (security boundary).
+  **eight** tools (seven telemetry/ops + `GetDeployRiskTool`) are the complete tool
+  surface (security boundary).
 - **AskAegisService and ReasoningEngine share the same engine** — a chat question and
   an incident RCA use identical evidence/grounding paths, so answers are equally
   citable.

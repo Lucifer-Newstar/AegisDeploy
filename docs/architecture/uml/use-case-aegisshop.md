@@ -14,7 +14,8 @@ flowchart LR
     CUST["🛒 Customer"]                %% primary actor — end user
     STAFF["🧑‍💼 Shop Staff / Admin"]    %% manages catalog & orders
     PG["💳 Payment Gateway"]           %% external payment processor
-    AEGIS["🛰️ AegisDeploy Platform"]      %% external system — observes the app
+    AEGIS["🛰️ AegisDeploy Platform"]   %% external system — observes the app
+    REL["🚀 Release Engineer (CI/CD)"] %% deploys & rolls back the app
 
     %% ═══ SYSTEM BOUNDARY ══════════════════════════════════
     subgraph SHOP["AegisShop"]
@@ -31,6 +32,11 @@ flowchart LR
         AS10("Manage orders")
         AS11("Serve telemetry & health")
 
+    %% ── Deployment Intelligence use cases ────────────────
+        AS12("Deploy new version")
+        AS13("Rollback to previous version")
+        AS14("Run canary release")
+
         %% helper use cases
         VALIDATE("Validate cart")
         PROC("Process payment")
@@ -42,6 +48,7 @@ flowchart LR
     STAFF --- AS9 & AS10
     PG -.->|processes| AS7
     AEGIS -.->|consumes| AS11
+    REL --- AS12 & AS13 & AS14
 
     %% ═══ INCLUDE / EXTEND RELATIONSHIPS ══════════════════
     AS6 -.->|«include»| VALIDATE
@@ -53,8 +60,8 @@ flowchart LR
     classDef actor fill:#dbeafe,stroke:#2563eb,stroke-width:1.5px,color:#1e3a8a;
     classDef uc fill:#ecfdf5,stroke:#059669,stroke-width:1px,color:#064e3b;
     classDef helper fill:#fef3c7,stroke:#d97706,stroke-width:1px,color:#78350f;
-    class CUST,STAFF,PG,AEGIS actor;
-    class AS1,AS2,AS3,AS4,AS5,AS6,AS7,AS8,AS9,AS10,AS11 uc;
+    class CUST,STAFF,PG,AEGIS,REL actor;
+    class AS1,AS2,AS3,AS4,AS5,AS6,AS7,AS8,AS9,AS10,AS11,AS12,AS13,AS14 uc;
     class VALIDATE,PROC,AUTH helper;
 ```
 
@@ -74,6 +81,7 @@ monitors and protects. AegisShop exists to be the *test subject* — its fault h
 | **Shop Staff / Admin** | Secondary | Manages the product catalog and orders |
 | **Payment Gateway** | External system | Simulated payment processing (no real money) |
 | **AegisDeploy Platform** | External system | Consumes the shop's telemetry/health for monitoring (A1) |
+| **Release Engineer (CI/CD)** | Secondary | Deploys, rolls back, and canary-releases the app (the DI-1…DI-6 trigger) |
 
 ## 3. Use Cases (summary)
 
@@ -90,6 +98,9 @@ monitors and protects. AegisShop exists to be the *test subject* — its fault h
 | 9 | Manage product catalog | Staff | `catalog-service` | — |
 | 10 | Manage orders | Staff | `order-service` | — |
 | 11 | Serve telemetry & health | AegisDeploy | all services | the monitoring contract |
+| 12 | Deploy new version | Release Engineer (CI/CD) | order-service | DI-1 trigger (faulty-deploy target) |
+| 13 | Rollback to previous version | Release Engineer (CI/CD) | order-service | DI-5 rollback target |
+| 14 | Run canary release | Release Engineer (CI/CD) | order-service | DI-6 canary analysis target |
 
 ## 4. Include Semantics
 
