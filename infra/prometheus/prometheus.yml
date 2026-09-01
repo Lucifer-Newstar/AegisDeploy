@@ -25,9 +25,10 @@ scrape_configs:
     # Compose, service discovery in K8s). This entry is a placeholder; the
     # authoritative list is maintained per environment overlay.
 
-  # Demo workload — the app under monitoring. Targets are provided by the
-  # runtime overlay (compose.override.yml / k8s base) so this file stays
-  # environment-agnostic.
-  - job_name: demo-app
+  # AegisShop demo workload — the app under monitoring. First slice:
+  # catalog-service (walking skeleton). Static target uses the service DNS
+  # name, valid in Compose and Kubernetes alike (ADR-0005 posture).
+  - job_name: aegisshop-catalog
+    metrics_path: /metrics
     static_configs:
-      - targets: ["host.docker.internal:9000"]
+      - targets: ["catalog-service:9001"]

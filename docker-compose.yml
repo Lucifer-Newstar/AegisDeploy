@@ -91,6 +91,7 @@ services:
       - "3000:3000"
     volumes:
       - ./infra/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./infra/grafana/dashboards:/var/lib/grafana/dashboards:ro
       - grafana-data:/var/lib/grafana
     healthcheck:
       test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:3000/api/health"]
@@ -155,6 +156,26 @@ services:
     depends_on:
       tempo: { condition: service_started }
       loki: { condition: service_healthy }
+    networks: [aegisdeploy]
+    logging: *default-logging
+
+  # ── Demo workload (AegisShop) ─────────────────────────────────────────────
+  # First vertical slice: catalog-service. Proves the observability flow
+  # (metrics + traces → OTLP collector → Prometheus/Tempo → Grafana) end to
+  # end. More AegisShop services join in P2.
+  catalog-service:
+    build: ./demoapp/aegisshop/catalog-service
+    image: aegisshop/catalog-service:0.1.0
+    container_name: aegisshop-catalog
+    environment:
+      SERVICE_NAME: catalog-service
+      SERVICE_PORT: "9001"
+      ENVIRONMENT: dev
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+    ports:
+      - "9001:9001"
+    depends_on:
+      otel-collector: { condition: service_started }
     networks: [aegisdeploy]
     logging: *default-logging
 

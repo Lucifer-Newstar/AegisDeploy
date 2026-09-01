@@ -1,0 +1,55 @@
+# Catalog-service Kubernetes base (ADR-0005: 1:1 with the Compose service).
+# Uses the same image tag, env names, and probe paths as docker-compose.yml,
+# so the slice behaves identically in Compose and on a kind cluster (D1).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalog-service
+  labels:
+    app.kubernetes.io/name: catalog-service
+    app.kubernetes.io/part-of: aegisshop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: catalog-service
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: catalog-service
+        app.kubernetes.io/part-of: aegisshop
+    spec:
+      containers:
+        - name: catalog-service
+          image: aegisshop/catalog-service:0.1.0
+          ports:
+            - containerPort: 9001
+              name: http
+          env:
+            - name: SERVICE_NAME
+              value: catalog-service
+            - name: SERVICE_PORT
+              value: "9001"
+            - name: ENVIRONMENT
+              value: dev
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://otel-collector:4317
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi

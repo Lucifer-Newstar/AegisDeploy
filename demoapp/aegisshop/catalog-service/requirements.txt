@@ -1,0 +1,10 @@
+# Runtime dependencies for the container image (kept minimal for the slice).
+# Local development can use `pip install -e .[dev]` from the package instead.
+fastapi>=0.115
+uvicorn[standard]>=0.30
+pydantic>=2.7
+pydantic-settings>=2.3
+prometheus-client>=0.20
+opentelemetry-sdk>=1.26
+opentelemetry-exporter-otlp-proto-grpc>=1.26
+opentelemetry-instrumentation-fastapi>=0.47b0

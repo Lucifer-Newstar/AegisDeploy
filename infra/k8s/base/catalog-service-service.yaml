@@ -1,0 +1,17 @@
+# Catalog-service Service — AegisShop demo workload (walking skeleton).
+# Matches the Deployment selector and the Compose service DNS name
+# (ADR-0005: 1:1 with docker-compose.yml).
+apiVersion: v1
+kind: Service
+metadata:
+  name: catalog-service
+  labels:
+    app.kubernetes.io/name: catalog-service
+    app.kubernetes.io/part-of: aegisshop
+spec:
+  selector:
+    app.kubernetes.io/name: catalog-service
+  ports:
+    - name: http
+      port: 9001
+      targetPort: http
