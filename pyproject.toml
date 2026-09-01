@@ -1,0 +1,21 @@
+# Root-level tooling configuration shared by all Python packages.
+# Individual packages carry their own pyproject.toml for packaging;
+# this file only centralizes lint/type/test settings (single source of truth).
+
+[tool.ruff]
+# Lint rules for the whole monorepo (backend, ml, ai, demoapp).
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["E501"]  # line length handled by the formatter
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unused_configs = true
+
+[tool.pytest.ini_options]
+testpaths = ["backend", "demoapp"]
+addopts = "-q"

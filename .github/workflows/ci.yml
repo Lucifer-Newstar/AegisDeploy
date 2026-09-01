@@ -1,4 +1,4 @@
-# AegisDeploy — continuous integration (M1: foundation checks)
+# AegisDeploy — continuous integration (M1: foundation + walking skeleton)
 # Every PR and push to main must pass. Component jobs (backend tests, frontend
 # build, ml tests) are added as those components land in M2+.
 
@@ -77,6 +77,42 @@ jobs:
               raise SystemExit(f"README references missing files: {missing}")
           print("README links OK")
           EOF
+
+  # ── Python quality: lint · type check · tests ────────────────────────────
+  # Runs against the walking-skeleton packages (libs + service template +
+  # catalog-service slice). New backend packages are added to this job as
+  # they land in P2+.
+  python-quality:
+    name: Python quality (ruff · mypy · pytest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install packages (editable, with dev extras)
+        run: |
+          pip install -e backend/libs/telemetry[dev] \
+                      -e backend/libs/eventbus[dev] \
+                      -e backend/services/_template[dev] \
+                      -e demoapp/aegisshop/catalog-service[dev]
+
+      - name: Lint (ruff)
+        run: ruff check backend demoapp
+
+      - name: Type check (mypy --strict)
+        run: >
+          mypy backend/libs/telemetry backend/libs/eventbus
+          backend/services/_template demoapp/aegisshop/catalog-service
+
+      - name: Tests (pytest)
+        run: >
+          pytest backend/libs/telemetry backend/libs/eventbus
+          backend/services/_template demoapp/aegisshop/catalog-service
 
   # ── Build check for future components (scaffolded in M2) ─────────────────
   placeholder-backend-build:
