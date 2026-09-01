@@ -40,10 +40,10 @@ Grafana AND the console."
 
 | Deliverable | Detail | Acceptance |
 |---|---|---|
-| API contract set (OpenAPI) | Registry, health, deploy-tracker (DI-1), cart/order/payment — committed in `docs/contracts/` (new) | Contracts frozen by 2026-09-08; mock server generated from them |
-| Event catalogue v1 | Documented event types + payloads per service (envelope v0.2; `st:<type>` streams) | One table in `docs/architecture/telemetry-model.md` |
+| API contract set (OpenAPI) | Registry, health, deploy-tracker (DI-1), cart/order/payment — committed in [`docs/contracts/`](../contracts/) (drafted) | Contracts frozen by 2026-09-08; mock server generated from them |
+| Event catalogue v1 | Documented event types + payloads per service (envelope v0.2; `st:<type>` streams) — **done in [telemetry-model.md §3.5](../architecture/telemetry-model.md)** | One table in `docs/architecture/telemetry-model.md` |
 | Port + naming register | Services, ports, DNS names, metric/label conventions (extend `_template` README) | Every P2 service matches the register |
-| Integration protocol | Weekly sync cadence, checkpoint definition, demo script for the gate | Protocol doc in `docs/planning/` |
+| Integration protocol + edge cases | Weekly sync cadence, checkpoint definition, **cross-member edge-case register ([integration-edge-cases.md](integration-edge-cases.md))** | Register walked at every weekly sync |
 | Lead duties | Gate reviews, PR review backlog < 48 h, unblocking | No track blocked > 48 h |
 
 ### Jegatheesan K — Backend (AegisShop v1 + A2 + DI-1)
