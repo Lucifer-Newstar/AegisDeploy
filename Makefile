@@ -12,8 +12,8 @@
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
 
-infra-up: ## Start local dependencies (Postgres, Redis, Prometheus, Grafana, Loki, Tempo, OTel)
-	docker compose up -d --wait
+infra-up: ## Start the local stack (builds local service images first)
+	docker compose up -d --build --wait
 
 infra-down: ## Stop and remove the local stack (including data volumes)
 	docker compose down -v
