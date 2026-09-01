@@ -21,7 +21,7 @@ complexity. Changes to this table must be recorded as ADRs.
 | MLOps | **MLflow** | Experiment tracking + model registry for the anomaly pipeline. | None (keep light) |
 | Orchestration | **Docker Compose (dev) → Kubernetes (prod-ready)** | "Compose now, K8s-ready" posture; manifests under `infra/k8s/`. | Docker Swarm |
 | IaC | **Terraform** | Cloud provisioning later (e.g., GKE/EKS); structure reserved in `iac/terraform/`. | Pulumi |
-| CI/CD | **GitHub Actions** | Repository-native, free for public repos. | GitLab CI, ArgoCD (later) |
+| CI/CD | **GitHub Actions** | Repository-native, free for public repos. The CD workflow records **deployment events** to the Deployment Tracker (DI-1) and runs canary releases (DI-6, P7). | GitLab CI, ArgoCD (later) |
 | Containerization | **Docker** (multi-stage builds per service) | Standard. | Buildpacks |
 
 ## 2. Key Version Pins (as of foundation milestone)
@@ -50,3 +50,4 @@ complexity. Changes to this table must be recorded as ADRs.
 - **Terraform cloud provider** — depends on final demo hosting — M7.
 - **MLflow deployment mode** — M3.
 - **NATS vs Kafka for the Event Layer** at scale — when Redis Streams limits are hit.
+- **Canary tooling** (Argo Rollouts vs manual traffic-split analysis) — DI-6, decided at P7; default is a lightweight traffic-split comparison without extra tooling.

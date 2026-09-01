@@ -80,3 +80,22 @@ held-out experiment set, never on the evaluation set.
 | Configuration error | workload | crash on start, rollout failure |
 | Faulty deployment | rollout of bad revision | error rate after deploy |
 | Traffic spike | workload | load ↑, saturation |
+
+## 7. Deployment Intelligence (DI) Metrics
+
+> Added 2026-09-01 with the DI tier (DI-1…DI-7 — see
+> `docs/architecture/deployment-intelligence.md` §6). These join the metrics above
+> and are evaluated on the **faulty-deployment** and **canary** chaos faults (A11).
+
+| Metric | Definition | Target |
+|---|---|---|
+| **Change failure rate (CFR)** | failed rollouts (bad / rolled back) ÷ total deployments | ↓ (measured per experiment set) |
+| **Correlation accuracy** | % of faulty-deploy faults where DI-3 names the correct revision (top-1) | ≥ 0.8 |
+| **Rollout detection latency** | deploy start → `rollout.bad` flag (DI-4) | < 3 min |
+| **Rollback success rate** | % of rollbacks restoring health (DI-5) | ≥ 0.8 |
+| **Risk-score prediction recall** | % of faulty deploys scored high-risk before/at deploy (DI-2) | ≥ 0.7 |
+| **Auto-rollback safety** | % of auto-executed rollbacks policy-compliant (safety violations) | 100% (0 violations) |
+
+The baseline-vs-platform protocol (§5) applies to the deployment scenario exactly as
+to the runtime scenario: the **same** faulty-deploy manifests are run with a manual
+response workflow (baseline) and with AegisDeploy at increasing autonomy levels.

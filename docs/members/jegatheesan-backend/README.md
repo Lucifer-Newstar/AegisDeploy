@@ -10,6 +10,7 @@ that every other track consumes.
 ## Primary responsibilities
 
 - Backend services (Python / FastAPI) — gateway, registry, incidents, approvals, verification
+- **Deployment Tracker API (DI-1)** — deploy history, correlation support (DI-3), rollback API (DI-5)
 - APIs (OpenAPI-first) & database (PostgreSQL, Redis)
 - Authentication / authorization
 - Application business logic & backend integrations
@@ -28,6 +29,7 @@ that every other track consumes.
 | Telemetry envelope (Pydantic) | consume | Navin (P2 start) |
 | Anomaly events (Redis Streams) | consume | Navin (P3) |
 | Action catalog + policies | consume (design) | Navin (P5) |
+| **Deploy API + history (DI-1), correlation support (DI-3)** | **provide** | Navin + Dhanush |
 | OpenAPI spec for every service | **provide** | Dhanush (P2 start) |
 | Incident / evidence / approval APIs | **provide** | Dhanush + Navin |
 

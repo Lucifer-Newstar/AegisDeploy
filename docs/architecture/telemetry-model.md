@@ -5,8 +5,11 @@ Kubernetes events, deployments, anomalies, incidents, remediations — is wrappe
 **single event envelope**. This contract is what lets the Event Layer, anomaly pipeline,
 AI reasoning layer, and audit store interoperate without bespoke adapters.
 
-> Status: **v0.1 (contract draft)** — locked at M2 when ingestion lands. Changes are
-> additive; breaking changes require an ADR.
+> Status: **v0.2 (contract draft, + DI fields)** — extended 2026-09-01 for the
+> Deployment Intelligence tier (additive fields: `deployment.risk_score`,
+> `payload.canary`, `payload.rollout`; see
+> [deployment-intelligence.md](deployment-intelligence.md)). Locked at M2 when
+> ingestion lands. Changes are additive; breaking changes require an ADR.
 
 ## 1. The Envelope
 
@@ -96,9 +99,17 @@ AI reasoning layer, and audit store interoperate without bespoke adapters.
   "revision": "abc1234",
   "previous_revision": "def5678",
   "triggered_by": "github-actions | human | executor",
-  "status": "succeeded | failed | in_progress"
+  "status": "succeeded | failed | in_progress",
+  "risk_score": 0.72,
+  "risk_factors": ["large diff", "db-migration", "friday-17h"],
+  "canary": { "enabled": true, "traffic_split": 0.1, "healthy": true },
+  "rollout": { "status": "monitoring", "bad_after_s": null }
 }
 ```
+
+> **v0.2 additions (DI tier, 2026-09-01):** `risk_score` + `risk_factors` (DI-2),
+> `canary` block (DI-6), `rollout` block (DI-4). All optional and backward-compatible
+> — older producers that omit them remain valid.
 
 ### 2.6 `anomaly`
 ```json

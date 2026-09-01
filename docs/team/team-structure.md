@@ -44,7 +44,8 @@
   DevOps ↔ AI/ML) so components integrate cleanly
 - Reviews architecture-impacting changes (ADRs) before merge
 - Owns the cross-cutting AI/ML track of the platform (anomaly detection, AI
-  reasoning, RAG, autonomous remediation policy)
+  reasoning, RAG, autonomous remediation policy, and the **Deployment Intelligence
+  tier** — risk scoring, change correlation, rollback policy, CFR analytics)
 
 **Personal learning goal:** build strong practical knowledge in
 **SRE + DevOps + Cloud + Architecture**, while also working deeply with the AI/ML
@@ -62,6 +63,8 @@ Ownership = primary author/maintainer. "Review" = must approve changes before me
 | `backend/` | Member 2 | Member 4 |
 | `infra/` (docker, k8s), `iac/`, `.github/workflows/` | Member 3 | Member 4 |
 | `ml/`, `ai/`, `chaoslab/` | Member 4 | Member 2 (integration) |
+| **Deployment Intelligence tier (DI-1…DI-7)** — design & AI/ML parts | Member 4 | Member 3 (execution), Member 2 (APIs) |
+| **Deployment Intelligence** — tracker API, executors, dashboards | Members 2 & 3 | Member 4 |
 | `docs/architecture/`, `docs/architecture/adr/` | Member 4 | All (by area) |
 | `docs/team/` | Member 4 (maintainer) | All |
 | `README.md`, root configs | Member 4 | All |

@@ -14,6 +14,7 @@ final-year demonstration.
 - System visualization (health grids, charts, anomaly bands)
 - Incident visualization (timeline, evidence, AI reasoning panels)
 - AI interaction interfaces ("Ask Aegis" chat, approvals)
+- **Deployments page (DI):** deploy timeline, risk panel, bad-rollout banner, rollback view, canary view, CFR analytics (DI-1…DI-7)
 
 ## Repo areas owned
 
@@ -30,6 +31,7 @@ final-year demonstration.
 | RCA / evidence APIs | Navin | P4 |
 | Ask Aegis engine API | Navin | P4 end |
 | Approval workflow APIs | Jegatheesan | P5 |
+| **Deploy / risk / CFR APIs (DI-1, DI-2, DI-7)** | Jegatheesan + Navin | P2/P4/P6 |
 
 > Until each API lands, I develop against the **mock server** generated from the
 > OpenAPI contract — my track never blocks (phases.md §4).

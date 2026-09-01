@@ -63,6 +63,9 @@ Failure → escalate
 Only **predefined, reversible, low-risk** operations can run automatically, and only when
 a matching approved policy exists (see §3). Every automatic action is followed by recovery
 verification; on failure the incident escalates to a human.
+**Deployment case (DI-5):** a `rollout.bad` flag from the deploy-window evaluation can
+trigger a **safe auto-rollback** to a recent revision when the `safe-auto-rollback`
+policy matches — same rules (reversible, low-risk, verified recovery), same audit trail.
 
 ## 2. Policy Engine
 
@@ -92,13 +95,25 @@ policy:
   requires_approval: true           # Level 4 only
   conditions:
     - incident.severity >= critical
+
+policy:
+  id: safe-auto-rollback            # DI-5 — deployment intelligence tier
+  actions: [deployment.rollback]
+  risk_class: low                   # only low-risk, recent, reversible rollbacks
+  reversible: true
+  requires_approval: false          # Level 5 eligible
+  conditions:
+    - rollout.status == bad         # flagged by DI-4 deploy-window evaluation
+    - deploy.risk_score < 0.8
+    - rollback.distance <= 2        # only roll back to a recent revision
+    - deploy.age >= 2m              # never auto-rollback an old deploy
 ```
 
 ### Risk classification (initial matrix — refined at M5)
 
 | Risk class | Examples | Mode |
 |---|---|---|
-| Low | restart a single instance, scale up a replica, drain a canary | Level 5 (auto) if reversible + policy matches |
+| Low | restart a single instance, scale up a replica, drain a canary, **auto-rollback of a just-shipped bad rollout (DI-5)** | Level 5 (auto) if reversible + policy matches |
 | Medium | scale down, restart workload (multi-replica) | Level 4 (approval) |
 | High | rollback deployment, config mutation, data-affecting actions | Level 4 (approval) + escalation to on-call |
 | Forbidden | schema changes, credential rotation, destructive deletes | Never executable by the platform |

@@ -83,6 +83,12 @@ implementation must conform to; deviations should be recorded as ADRs
                          Incident Closed
 ```
 
+> **Deployment Intelligence tier (§3.11):** the diagram above shows the runtime
+> incident loop; the DI tier (upgrade 2026-09-01) augments the Intelligence Engine
+> and Remediation Planner with deployment context — every deploy is tracked, scored,
+> monitored in its rollout window, correlated to incidents, and (when safe) rolled
+> back automatically. See [deployment-intelligence.md](deployment-intelligence.md).
+
 ## 3. Component Responsibilities
 
 ### 3.1 Web Dashboard (frontend/)

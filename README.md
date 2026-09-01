@@ -33,6 +33,7 @@ and verifies system recovery — while keeping **humans in control** of higher-r
 | **Incident Management** | Correlates anomalies into incidents with severity, affected services, timestamps, telemetry evidence, deployment context, and status. |
 | **Root-Cause Analysis** | An AI reasoning layer combines logs, metrics, traces, deployments, and runbooks to produce evidence-backed root-cause explanations — not just "latency is high." |
 | **AI-Assisted Remediation** | Recommends actions: restart unhealthy workload, rollback deployment, scale service, replace instance, adjust configuration, or escalate. |
+| **Deployment Intelligence** | Tracks every deployment; ML risk scoring, bad-rollout detection, change-incident correlation ("caused by deploy `abc1234`"), policy-gated safe rollback, canary analysis, and change-failure analytics (DI-1…DI-7). |
 | **Controlled Autonomy** | Low-risk, predefined, reversible actions execute automatically; high-risk operations require human approval. |
 | **Recovery Verification** | Confirms health, error rates, latency, and SLOs recovered before closing the incident. |
 | **Postmortems** | AI-generated incident postmortems with timeline, evidence, and measured MTTD/MTTR. |
