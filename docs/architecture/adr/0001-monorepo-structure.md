@@ -6,7 +6,7 @@
 
 ## Context
 
-AegisSRE spans frontend, backend services, ML pipeline, AI reasoning, IaC, observability
+AegisDeploy spans frontend, backend services, ML pipeline, AI reasoning, IaC, observability
 configs, and a chaos lab. We need a repository layout that keeps related code close,
 allows independent CI for components, and stays navigable for a single engineer
 (and future collaborators) without polyrepo overhead.

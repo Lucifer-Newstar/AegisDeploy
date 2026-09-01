@@ -1,6 +1,6 @@
 # Team Structure
 
-> AegisSRE is a **four-member final-year team project**. This document defines each
+> AegisDeploy is a **four-member final-year team project**. This document defines each
 > member's role, primary responsibilities, and repository ownership so that everyone
 > knows their lane — and the integration points between lanes.
 >

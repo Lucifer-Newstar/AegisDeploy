@@ -58,7 +58,7 @@ held-out experiment set, never on the evaluation set.
    duration, and expected impact (see chaoslab/).
 2. **Baseline run** — conventional monitoring + human response workflow on the same
    failure; measure MTTD/MTTR and correctness manually.
-3. **Platform runs** — same failures with AegisSRE at increasing autonomy levels
+3. **Platform runs** — same failures with AegisDeploy at increasing autonomy levels
    (observe → recommend → approval → safe-auto).
 4. **Repetition** — N ≥ 5 runs per fault type for statistical stability; report mean ± std.
 5. **Fairness** — identical telemetry, identical environment, same fault manifests;

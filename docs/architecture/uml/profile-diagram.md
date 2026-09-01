@@ -1,4 +1,4 @@
-# Profile Diagram — AegisSRE UML Extension
+# Profile Diagram — AegisDeploy UML Extension
 
 > **Diagram 8 (UML 2.5 — Structural).** The **profile** (stereotype extension) used
 > across this UML set: every stereotype applied in Diagrams 2–7, with its base UML
@@ -7,7 +7,7 @@
 
 ```mermaid
 ---
-title: "Profile — Stereotypes used in the AegisSRE UML set"
+title: "Profile — Stereotypes used in the AegisDeploy UML set"
 ---
 classDiagram
     direction LR

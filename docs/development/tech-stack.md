@@ -1,6 +1,6 @@
 # Technology Stack
 
-Selected stack for AegisSRE (Milestone 1 decision). Selections follow the evaluation
+Selected stack for AegisDeploy (Milestone 1 decision). Selections follow the evaluation
 criteria in the proposal (§7): resource requirements, compatibility, cost, and project
 complexity. Changes to this table must be recorded as ADRs.
 

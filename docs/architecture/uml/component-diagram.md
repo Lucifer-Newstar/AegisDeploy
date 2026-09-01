@@ -1,4 +1,4 @@
-# Component Diagram — AegisSRE Platform
+# Component Diagram — AegisDeploy Platform
 
 > **Diagram 5 (UML 2.5 — Structural).** Deployable components of the platform with
 > their **provided/required interfaces** (protocol + port), the external dependencies
@@ -7,7 +7,7 @@
 
 ```mermaid
 ---
-title: "Component Diagram — AegisSRE Platform"
+title: "Component Diagram — AegisDeploy Platform"
 ---
 flowchart TB
     %% ═══════════════════════════════════════════════════════

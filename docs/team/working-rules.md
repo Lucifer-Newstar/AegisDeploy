@@ -1,6 +1,6 @@
 # Working Rules
 
-> The non-negotiable rules of the AegisSRE project, plus the git conventions the
+> The non-negotiable rules of the AegisDeploy project, plus the git conventions the
 > whole team must follow. Every member must read and follow this document.
 >
 > Maintainer: Member 4 (Team Lead).

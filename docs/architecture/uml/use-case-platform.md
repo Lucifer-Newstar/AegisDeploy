@@ -1,13 +1,13 @@
-# Use Case Diagram — AegisSRE Platform
+# Use Case Diagram — AegisDeploy Platform
 
-> **Diagram 1a (UML 2.5 — Behavioral).** Shows what the AegisSRE platform does *for
+> **Diagram 1a (UML 2.5 — Behavioral).** Shows what the AegisDeploy platform does *for
 > whom*. The AegisShop demo application is an **external system** (the monitored
 > subject), not part of the platform. Medium detail (~18 use cases) with
 > include/extend relationships. Decided 2026-08-31.
 
 ```mermaid
 ---
-title: "Use Case Diagram — AegisSRE Platform"
+title: "Use Case Diagram — AegisDeploy Platform"
 ---
 flowchart LR
     %% ═══ ACTORS ═══════════════════════════════════════════
@@ -19,7 +19,7 @@ flowchart LR
     NOTIF["🔔 Notification Service"]    %% external system receiving alerts
 
     %% ═══ SYSTEM BOUNDARY ══════════════════════════════════
-    subgraph AEGIS["AegisSRE Platform"]
+    subgraph AEGIS["AegisDeploy Platform"]
         direction TB
 
         %% ── SRE-facing use cases ─────────────────────────
@@ -88,7 +88,7 @@ flowchart LR
 
 ## 1. Purpose
 
-Documents the **functional requirements** of the AegisSRE platform from the user's
+Documents the **functional requirements** of the AegisDeploy platform from the user's
 perspective: who interacts with the system and which capabilities each actor uses.
 This is the requirements-level contract that the class diagram (Diagram 2) and the
 phase plan (P2–P8) refine.

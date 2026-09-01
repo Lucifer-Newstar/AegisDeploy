@@ -1,6 +1,6 @@
 # Telemetry & Event Model
 
-Every signal entering or flowing through AegisSRE — metric samples, logs, traces,
+Every signal entering or flowing through AegisDeploy — metric samples, logs, traces,
 Kubernetes events, deployments, anomalies, incidents, remediations — is wrapped in a
 **single event envelope**. This contract is what lets the Event Layer, anomaly pipeline,
 AI reasoning layer, and audit store interoperate without bespoke adapters.

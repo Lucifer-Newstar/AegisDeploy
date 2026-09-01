@@ -1,6 +1,6 @@
-# Class Diagram — AegisSRE Platform
+# Class Diagram — AegisDeploy Platform
 
-> **Diagram 2a (UML 2.5 — Structural).** Static structure of the AegisSRE platform:
+> **Diagram 2a (UML 2.5 — Structural).** Static structure of the AegisDeploy platform:
 > all layers — telemetry envelope, event layer, core domain (services, incidents,
 > remediation, policy, audit), ML detection, and AI reasoning/RAG/tools.
 > Full detail: attributes with types, methods, multiplicity, inheritance,
