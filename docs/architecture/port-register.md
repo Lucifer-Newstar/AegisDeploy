@@ -36,12 +36,12 @@
 | Service | Port | DNS | Contract | Status |
 |---|---|---|---|---|
 | catalog | **9001** | catalog-service | [catalog-service.yaml](../contracts/catalog-service.yaml) | **LIVE** (slice) |
-| cart | 9002* | cart-service | [cart-service.yaml](../contracts/cart-service.yaml) | pending (P2, Jega) |
-| order | 9003* | order-service | [order-service.yaml](../contracts/order-service.yaml) | pending (P2, Jega) |
-| payment | 9004* | payment-service | [payment-service.yaml](../contracts/payment-service.yaml) | pending (P2, Jega) |
+| cart | 9002 | cart-service | [cart-service.yaml](../contracts/cart-service.yaml) | pending (P2, Jega) |
+| order | 9003 | order-service | [order-service.yaml](../contracts/order-service.yaml) | pending (P2, Jega) |
+| payment | 9004 | payment-service | [payment-service.yaml](../contracts/payment-service.yaml) | pending (P2, Jega) |
 
-\* proposed defaults — confirmed at the kickoff sync (decision D1), then the
-"(proposed)" markers are dropped from the contracts.
+Ports **locked 2026-09-01** (lead pre-approval, decision D1) — recorded at
+the kickoff sync; team confirmation is a formality.
 
 ## 4. Infrastructure (compose, fixed)
 

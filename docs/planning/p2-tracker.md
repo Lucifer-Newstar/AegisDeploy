@@ -48,6 +48,7 @@
 - [x] D7 — Sync pack (kickoff agenda, D1–D9, weekly format, demo-of-week)
 - [x] D8 — Local setup guide + env var reference
 - [x] D9 — Handover zip removed (folder with `.git/` is the deliverable)
+- [x] D10 — Sync prep: D1–D9 decision-log draft (`decision-log-draft-p2-sync.md`) + kickoff demo script (`sync-demo-script.md`) — prepped 2026-09-01
 
 ## Calendar (this stage)
 

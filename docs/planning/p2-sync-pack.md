@@ -23,9 +23,9 @@
 
 | # | Item | Time | Lead | Output |
 |---|---|---|---|---|
-| 1 | **Skeleton walkthrough** — repo tour, `make infra-up`, Grafana "AegisShop — Catalog Service" dashboard, `curl :9001/products`, CI green. What the foundation gives each track (libs, template, ports, CI) | 10 min | Navin | Everyone can run the stack |
+| 1 | **Skeleton walkthrough** — run the [demo script](sync-demo-script.md) (repo tour, `make infra-up`, Grafana dashboard, `curl :9001/products`, CI + drift check live) | 10 min | Navin | Everyone can run the stack |
 | 2 | **Contracts + event catalogue** — the 3 OpenAPI files, deployment state machine, freeze process (after 09-08: contract PR + lead review). CORS dev policy (edge case #1) is **already decided** — announce, don't debate | 15 min | Navin | Questions only; change requests as issues **before** freeze |
-| 3 | **Close these decisions** (defaults proposed — confirm or override, then record) | 15 min | all | Decision-log rows (same day) |
+| 3 | **Close these decisions** (defaults proposed — confirm or override, then record; copy from the [D1–D9 draft](decision-log-draft-p2-sync.md)) | 15 min | all | Decision-log rows (same day) |
 | 4 | **Track commitments** — each member states week-1 deliverable + branch name (e.g. `feat/jega-registry-health`) | 10 min | each | One line each in sync notes |
 | 5 | **Edge-case register + demo-of-week intro** — how the register is walked; demo-of-week format (§3); PR template + CI jobs | 5 min | Navin | Shared understanding |
 | 6 | **Open forum** — questions on setup/contracts/workflow | 5 min | all | — |
@@ -34,7 +34,7 @@
 
 | # | Decision | Proposed default | Decider | Blocks |
 |---|---|---|---|---|
-| D1 | cart/order/payment ports | `9002` / `9003` / `9004` (contracts are provisional until this closes) | Jega + Navin | contracts freeze |
+| D1 | cart/order/payment ports | `9002` / `9003` / `9004` — **locked 2026-09-01** (lead pre-approval); team confirms at sync | Jega + Navin | contracts freeze |
 | D2 | DB layer | **SQLAlchemy 2.x + Alembic** (migrations versioned from P2) | Jega | AegisShop v1 models |
 | D3 | Frontend mock tooling | `openapi-typescript` types + MSW mocks (Prism as fallback) | Dhanush | console scaffold |
 | D4 | Logs → Loki path | **OTLP logs from services** via existing collector (no new component); promtail as fallback | Gokul | edge case #6 (trace_id in logs) |
