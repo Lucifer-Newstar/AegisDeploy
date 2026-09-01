@@ -1,6 +1,12 @@
-# AegisDeploy — continuous integration (M1: foundation + walking skeleton)
-# Every PR and push to main must pass. Component jobs (backend tests, frontend
-# build, ml tests) are added as those components land in M2+.
+# AegisDeploy — continuous integration
+# Every PR and push to main must pass. Jobs cover everything that exists
+# today: backend libs + service template + catalog slice (python-quality),
+# the catalog container (docker-build), Kubernetes manifests (k8s-lint),
+# compose/YAML (yaml-and-compose) and docs.
+#
+# Component jobs land with their components:
+#   frontend-build → enabled when frontend/ lands (P2, Dhanush)
+#   ml / ai jobs   → added in P3 (detectors) and P4 (reasoning)
 
 name: CI
 
@@ -14,11 +20,15 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   # ── Validate YAML + compose config ────────────────────────────────────────
   yaml-and-compose:
     name: YAML & compose
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
 
@@ -38,9 +48,14 @@ jobs:
         run: docker compose config --quiet
 
   # ── Lint Kubernetes manifests (K8s-ready posture, ADR-0005) ──────────────
+  # Enforced since the walking skeleton (catalog-service base). Two checks:
+  # kubeconform validates each manifest against the k8s schema; kustomize
+  # build proves the kustomization assembles (and would fail on missing
+  # referenced files).
   k8s-lint:
     name: Kubernetes manifests
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
 
@@ -49,42 +64,53 @@ jobs:
           curl -sL https://github.com/yannh/kubeconform/releases/download/v0.6.7/kubeconform-linux-amd64.tar.gz \
             | tar xz -C /usr/local/bin kubeconform
 
-      - name: Lint all Kubernetes manifests
+      - name: Install kustomize
         run: |
-          find infra/k8s -name '*.yaml' -print0 \
-            | xargs -0 -r kubeconform -strict -summary \
-            || true   # TODO: enforce once infra/k8s/base/ lands (M1.1)
+          curl -sL https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv5.4.3/kustomize_v5.4.3_linux_amd64.tar.gz \
+            | tar xz -C /usr/local/bin kustomize
+
+      - name: Schema-validate manifests (kubeconform)
+        run: |
+          # kustomization.yaml is not a k8s schema — validated by kustomize build below
+          find infra/k8s -name '*.yaml' ! -name 'kustomization.yaml' -print0 \
+            | xargs -0 -r kubeconform -strict -summary
+
+      - name: Validate kustomize bases assemble
+        run: kustomize build infra/k8s/base > /dev/null
 
   # ── Markdown & docs sanity ────────────────────────────────────────────────
   docs:
     name: Docs sanity
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check README links referenced in repo exist
+      - name: Check all markdown links resolve
         run: |
           python3 - <<'EOF'
           import re
           from pathlib import Path
-          readme = Path("README.md").read_text()
-          missing = []
-          for m in re.finditer(r"\]\(([^)]+)\)", readme):
-              target = m.group(1).split("#")[0].strip()
-              if target and not target.startswith(("http", "mailto")) and not Path(target).exists():
-                  missing.append(target)
-          if missing:
-              raise SystemExit(f"README references missing files: {missing}")
-          print("README links OK")
+          bad = []
+          for p in sorted(Path("docs").rglob("*.md")):
+              for m in re.finditer(r"\]\(([^)]+)\)", p.read_text()):
+                  t = m.group(1).split("#")[0].strip()
+                  if not t or t.startswith(("http", "mailto")):
+                      continue
+                  if not (p.parent / t).resolve().exists():
+                      bad.append(f"{p}: {t}")
+          if bad:
+              raise SystemExit("Broken docs links:\n" + "\n".join(bad))
+          print("All docs links: OK")
           EOF
 
   # ── Python quality: lint · type check · tests ────────────────────────────
-  # Runs against the walking-skeleton packages (libs + service template +
-  # catalog-service slice). New backend packages are added to this job as
-  # they land in P2+.
+  # Covers the walking-skeleton packages. New backend packages are added to
+  # this job (and to root pyproject testpaths) as they land in P2+.
   python-quality:
     name: Python quality (ruff · mypy · pytest)
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
@@ -114,12 +140,41 @@ jobs:
           pytest backend/libs/telemetry backend/libs/eventbus
           backend/services/_template demoapp/aegisshop/catalog-service
 
-  # ── Build check for future components (scaffolded in M2) ─────────────────
-  placeholder-backend-build:
-    name: Backend (placeholder)
+  # ── Container build (AegisShop + platform images as they land) ───────────
+  # Currently the one real app image (catalog-service). Each new service
+  # image joins this job in its PR (PR template checklist).
+  docker-build:
+    name: Container build
     runs-on: ubuntu-latest
-    if: ${{ false }}   # enabled when backend/ lands in M2
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-      - name: Build backend image
-        run: docker build -f infra/docker/backend.Dockerfile .
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build catalog-service image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./demoapp/aegisshop/catalog-service
+          file: ./demoapp/aegisshop/catalog-service/Dockerfile
+          tags: aegisshop/catalog-service:ci-${{ github.sha }}
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ── Frontend (placeholder — enabled when frontend/ lands, P2) ────────────
+  frontend-build:
+    name: Frontend (placeholder)
+    runs-on: ubuntu-latest
+    if: ${{ false }}   # enable when Dhanush lands the console scaffold (P2)
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Build console
+        run: |
+          cd frontend && npm ci && npm run build
