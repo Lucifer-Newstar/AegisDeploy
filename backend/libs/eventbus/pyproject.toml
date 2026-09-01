@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aegisdeploy-eventbus"
+version = "0.1.0"
+description = "AegisDeploy event layer (Redis Streams producer/consumer, ADR-0004)"
+requires-python = ">=3.12"
+dependencies = ["redis>=5", "aegisdeploy-telemetry>=0.2"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "fakeredis>=2.23", "ruff>=0.6", "mypy>=1.11"]
+
+[tool.setuptools.packages.find]
+include = ["eventbus*"]
