@@ -29,7 +29,10 @@ docs/
 │   ├── features.md              ← locked feature scope (A1–A12, B, C, D, E)
 │   ├── product-vision.md        ← how the final product looks & behaves
 │   ├── phases.md                ← phase plan: gates, non-disruption, integration
-│   └── timeline.md              ← 8–10 month calendar, member assignments
+│   ├── timeline.md              ← 8–10 month calendar, member assignments
+│   ├── p2-kickoff.md            ← P2 kickoff: tracks, contracts-first, gate
+│   ├── p2-sync-pack.md          ← team sync agenda + operating rhythm
+│   └── integration-edge-cases.md← cross-member risk register (Team Lead)
 │
 ├── team/                        ← WHO & HOW WE WORK
 │   ├── team-structure.md        ← members, roles, ownership matrix
