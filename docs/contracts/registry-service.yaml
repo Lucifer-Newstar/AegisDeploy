@@ -1,0 +1,189 @@
+# AegisDeploy — registry-service contract (A2)
+# Port: 8101 · Version: 1.0.0 · Owner: Jegatheesan K · Freeze: 2026-09-08
+#
+# Service registry & live health: every platform + AegisShop service
+# registers on startup and heartbeats periodically. The registry answers
+# "what is running and is it actually healthy" — the Command Center's data
+# source.
+#
+# Changelog:
+#  1.0.0  initial contract (P2 kickoff)
+openapi: 3.1.0
+info:
+  title: AegisDeploy Registry Service (A2)
+  version: 1.0.0
+  description: Service registry and live health aggregation.
+servers:
+  - url: http://localhost:8101
+    description: local compose
+
+paths:
+  /health:
+    get:
+      summary: Liveness probe (template standard)
+      responses:
+        "200":
+          description: process is up
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: healthy
+
+  /ready:
+    get:
+      summary: Readiness probe — registry depends on Postgres + Redis
+      responses:
+        "200":
+          description: dependencies reachable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ready"
+        "503":
+          description: a dependency is unreachable
+
+  /services:
+    get:
+      summary: List all registered services with live status
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [healthy, degraded, unhealthy, unknown]
+        - name: include_heartbeats
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+      responses:
+        "200":
+          description: service list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ServiceInfo"
+    post:
+      summary: Register a service (called by a service on startup)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "201":
+          description: registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceInfo"
+        "422":
+          description: invalid payload
+
+  /services/{service_id}:
+    get:
+      summary: Get one service
+      parameters:
+        - name: service_id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: catalog-service
+      responses:
+        "200":
+          description: service info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceInfo"
+        "404":
+          description: unknown service
+
+  /services/{service_id}/heartbeat:
+    post:
+      summary: Heartbeat (periodic liveness from the service)
+      parameters:
+        - name: service_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: heartbeat recorded; returns updated info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceInfo"
+        "404":
+          description: unknown service (must register first)
+
+components:
+  schemas:
+    Ready:
+      type: object
+      properties:
+        status:
+          type: string
+          const: ready
+        dependencies:
+          type: object
+          additionalProperties:
+            type: string
+            enum: [ok, down]
+          example:
+            postgres: ok
+            redis: ok
+
+    RegisterRequest:
+      type: object
+      required: [id, name, url]
+      properties:
+        id:
+          type: string
+          description: stable service id, equals the compose/K8s service name
+          example: catalog-service
+        name:
+          type: string
+          example: AegisShop Catalog
+        url:
+          type: string
+          format: uri
+          example: http://catalog-service:9001
+        version:
+          type: string
+          example: 0.1.0
+
+    ServiceInfo:
+      type: object
+      required: [id, name, url, status, registered_at]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        url:
+          type: string
+          format: uri
+        version:
+          type: string
+        status:
+          type: string
+          enum: [healthy, degraded, unhealthy, unknown]
+          description: aggregated from /ready probes; degraded = ready but slow/partial
+        last_heartbeat_at:
+          type: string
+          format: date-time
+        registered_at:
+          type: string
+          format: date-time

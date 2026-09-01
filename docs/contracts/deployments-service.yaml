@@ -1,0 +1,252 @@
+# AegisDeploy — deployments-service contract (DI-1 deploy tracker)
+# Port: 8701 · Version: 1.0.0 · Owner: Jegatheesan K (schema w/ Gokul) · Freeze: 2026-09-08
+#
+# DI-1: records every deployment as an event and serves deployment history.
+# The quality of this data decides DI-3 (change-incident correlation, P4)
+# and DI-4 (bad-rollout detection, P3 base) — see event catalogue
+# (telemetry-model.md §3.5) for the deployment state machine.
+#
+# Changelog:
+#  1.0.0  initial contract (P2 kickoff)
+openapi: 3.1.0
+info:
+  title: AegisDeploy Deployments Service (DI-1)
+  version: 1.0.0
+  description: Deployment tracker — record and query deployment events.
+servers:
+  - url: http://localhost:8701
+    description: local compose
+
+paths:
+  /health:
+    get:
+      summary: Liveness probe
+      responses:
+        "200":
+          description: ok
+
+  /ready:
+    get:
+      summary: Readiness probe (needs Postgres)
+      responses:
+        "200":
+          description: ready
+        "503":
+          description: Postgres unreachable
+
+  /deployments:
+    post:
+      summary: Record a deployment event (envelope v0.2, type=deployment)
+      description: >
+        Body is the standard telemetry envelope with type `deployment` and
+        the canonical deployment_payload (schema enforced at ingestion —
+        P2 gate criterion). Idempotent on envelope `id`: replaying the same
+        event returns the stored record (200) instead of duplicating it.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeploymentEnvelope"
+      responses:
+        "201":
+          description: stored
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeploymentRecord"
+        "200":
+          description: duplicate event id — existing record returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeploymentRecord"
+        "422":
+          description: envelope failed schema validation
+
+    get:
+      summary: Query deployment history
+      parameters:
+        - name: service
+          in: query
+          required: false
+          schema:
+            type: string
+            example: catalog-service
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [in_progress, succeeded, failed]
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 50
+            maximum: 500
+      responses:
+        "200":
+          description: list, newest first
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DeploymentRecord"
+
+  /deployments/{event_id}:
+    get:
+      summary: Get one deployment event by envelope id
+      parameters:
+        - name: event_id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: evt_01J8B2ABC
+      responses:
+        "200":
+          description: record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeploymentRecord"
+        "404":
+          description: unknown event id
+
+  /deployments/{service}/latest:
+    get:
+      summary: Latest deployment for a service (DI-4 window start, P3)
+      parameters:
+        - name: service
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: latest deployment event (in_progress or succeeded)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeploymentRecord"
+        "404":
+          description: no deployments recorded for this service
+
+components:
+  schemas:
+    # Envelope v0.2 (see backend/libs/telemetry) — the fields DI-1 consumes.
+    DeploymentEnvelope:
+      type: object
+      required: [id, source, type, service, timestamp, payload]
+      properties:
+        id:
+          type: string
+          example: evt_01J8B2ABC
+        schema_version:
+          type: string
+          const: "0.2"
+        source:
+          type: string
+          enum: [deployment, registry]
+        type:
+          type: string
+          const: deployment
+        service:
+          type: string
+          example: catalog-service
+        environment:
+          type: string
+          default: dev
+        severity:
+          type: string
+          enum: [info, warning, critical]
+          default: info
+        timestamp:
+          type: string
+          format: date-time
+          description: producer-side UTC timestamp — authoritative
+        correlation_id:
+          type: string
+          nullable: true
+        trace_id:
+          type: string
+          nullable: true
+        payload:
+          $ref: "#/components/schemas/DeploymentPayload"
+
+    DeploymentPayload:
+      type: object
+      required: [action, revision, triggered_by, status]
+      properties:
+        action:
+          type: string
+          enum: [deploy, rollback, scale, restart]
+        revision:
+          type: string
+          description: git sha or image tag of the release
+          example: v2.4.0
+        previous_revision:
+          type: string
+          nullable: true
+        triggered_by:
+          type: string
+          enum: [pipeline, operator, platform]
+        status:
+          type: string
+          enum: [in_progress, succeeded, failed]
+        risk_score:
+          type: number
+          minimum: 0
+          maximum: 1
+          nullable: true
+          description: DI-2 output (set from P4 onward)
+        risk_factors:
+          type: array
+          items:
+            type: string
+          description: DI-2 output (P4)
+        canary:
+          type: object
+          properties:
+            enabled:
+              type: boolean
+            traffic_split:
+              type: number
+            healthy:
+              type: boolean
+        rollout:
+          type: object
+          description: DI-4 deploy-window state (P3)
+          properties:
+            status:
+              type: string
+              enum: [started, monitoring, finished, bad]
+            bad_after_s:
+              type: integer
+              nullable: true
+              description: seconds after deploy start when flagged bad
+
+    DeploymentRecord:
+      type: object
+      required: [event_id, service, revision, status, stored_at]
+      properties:
+        event_id:
+          type: string
+          description: envelope id — unique (idempotency key)
+        service:
+          type: string
+        revision:
+          type: string
+        status:
+          type: string
+          enum: [in_progress, succeeded, failed]
+        envelope:
+          $ref: "#/components/schemas/DeploymentEnvelope"
+          description: the full stored envelope (payload as received)
+        stored_at:
+          type: string
+          format: date-time
+          description: consumer-side receive time (for audit only — never for DI timing math)

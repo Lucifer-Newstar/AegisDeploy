@@ -186,6 +186,76 @@ AI reasoning layer, and audit store interoperate without bespoke adapters.
 | Policy engine / executor | `remediation`, `audit` |
 | Recovery verifier | `incident` (closed/escalated), `health` |
 
+### 3.5 Event catalogue v1 (P2 scope)
+
+The canonical register of every event type: stream name (ADR-0004), payload
+builder, producers, consumers, retention. **Source of truth for naming** —
+any new event type updates this table in the same PR.
+
+**Rules (contracts-first):**
+1. Type names come from `EVENT_TYPES` in `backend/libs/telemetry` — the
+   envelope validates them at construction, so typos fail fast (no silent
+   orphan streams).
+2. **Additive-only evolution.** The envelope uses `extra="forbid"` — a
+   consumer validates fields it does not know. Adding a field is safe
+   (defaults); renaming/removing is a coordinated contract change. All
+   producers/consumers share the monorepo lib, so skew is controlled.
+3. **`envelope.timestamp` is authoritative** (UTC, producer-side). Consumers
+   never re-stamp; DI timing math (DI-4 `bad_after_s`, MTTD) uses it —
+   `stored_at` is audit-only.
+4. **At-least-once** (ADR-0004): consumers are idempotent on `envelope.id`
+   (the deployments-service keeps a unique index on it).
+
+| Type | Stream | Payload builder | Producers | Consumers | Retention | Phase |
+|---|---|---|---|---|---|---|
+| `metric` | `st:metric` | `metric_payload` | all services (Prometheus scrape) | dashboards, detectors (P3) | Prometheus 15d | P2 ✓ |
+| `log` | `st:log` | `log_payload` | services → stdout → Loki | Loki, Tempo↔Loki jump (via `trace_id`) | Loki 7d | P2 (Gokul) |
+| `trace` | `st:trace` | — (OTLP native) | services via OTLP | Tempo, trace→log jump | Tempo 7d | P2 ✓ |
+| `deployment` | `st:deployment` | `deployment_payload` | DI-1 pipeline hook, deployments-service API | deployments-service (P2), DI-4 window eval (P3), DI-2/DI-3 (P4) | Postgres (long) | **P2** |
+| `health` | `st:health` | — | registry heartbeats (P2), recovery verifier (P5) | registry, dashboards | short TTL | P2 |
+| `k8s_event` | `st:k8s_event` | — | k8s watcher (P7) | DI-6 canary analysis (P7) | long | P7 |
+| `anomaly` | `st:anomaly` | `anomaly_payload` | ml detectors (P3) | incident manager (P3) | Postgres (replayable) | P3 |
+| `incident` | `st:incident` | — | incident manager (P3) | console, AI reasoner (P4) | Postgres (long) | P3 |
+| `remediation` | `st:remediation` | — | AI reasoner (P4), executor (P5) | approvals UI (P5) | Postgres (long) | P4/P5 |
+| `audit` | `st:audit` | — | policy engine, executors (P5) | audit viewer (C5, P6) | Postgres, append-only | P5 |
+
+**Deployment event state machine (DI-1 → DI-4):**
+
+```
+payload.status:  in_progress ──► succeeded
+                        └──────► failed
+
+rollout.status (when set):  started ──► monitoring ──► finished
+                                       └─────────────► bad   (DI-4: bad_after_s = seconds
+                                                            after deploy start when flagged)
+```
+
+Example (DI-4 output — produced by the detector, P3):
+
+```json
+{
+  "id": "evt_01J8C0DEPLOY",
+  "schema_version": "0.2",
+  "source": "deployment",
+  "type": "deployment",
+  "service": "catalog-service",
+  "timestamp": "2026-09-01T10:00:00Z",
+  "payload": {
+    "action": "deploy",
+    "revision": "v2.4.0",
+    "previous_revision": "v2.3.1",
+    "triggered_by": "pipeline",
+    "status": "succeeded",
+    "rollout": { "status": "bad", "bad_after_s": 90 }
+  }
+}
+```
+
+**Stream retention (compose, P2):** `st:metric`/`st:health` 1 h,
+`st:log` 24 h, `st:deployment` long (Postgres is the real store — the stream
+is the delivery mechanism). Set via `EventBus(stream_ttls=...)` at service
+startup.
+
 ## 4. Storage Mapping
 
 | Event type | Primary store | Notes |

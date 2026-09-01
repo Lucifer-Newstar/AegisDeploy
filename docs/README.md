@@ -18,6 +18,12 @@ docs/
 │   ├── proposal.md              ← the original project proposal (full text)
 │   └── roadmap.md               ← milestone-level roadmap
 │
+├── contracts/                   ← P2 API contracts (OpenAPI, freeze 2026-09-08)
+│   ├── README.md                ← conventions + mock-server + CORS policy
+│   ├── registry-service.yaml    ← A2 registry + health (:8101)
+│   ├── deployments-service.yaml ← DI-1 deploy tracker (:8701)
+│   └── aegisshop-v1.yaml        ← catalog/cart/order/payment (9001–9004)
+│
 ├── planning/                    ← HOW WE DECIDE (development-phase planning)
 │   ├── README.md                ← planning index + decision log
 │   ├── features.md              ← locked feature scope (A1–A12, B, C, D, E)
@@ -67,6 +73,7 @@ docs/
 | How the platform works | [architecture/system-architecture.md](architecture/system-architecture.md) |
 | How autonomy/remediation works | [architecture/autonomy-model.md](architecture/autonomy-model.md) |
 | The telemetry/event contract | [architecture/telemetry-model.md](architecture/telemetry-model.md) |
+| P2 API contracts (OpenAPI) | [contracts/](contracts/) |
 | Why we chose the stack | [development/tech-stack.md](development/tech-stack.md) |
 | How to contribute | [development/contributing.md](development/contributing.md) |
 | Machine setup + env vars | [development/local-setup.md](development/local-setup.md) |
