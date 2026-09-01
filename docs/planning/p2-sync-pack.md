@@ -40,7 +40,9 @@
 | D4 | Logs → Loki path | **OTLP logs from services** via existing collector (no new component); promtail as fallback | Gokul | edge case #6 (trace_id in logs) |
 | D5 | DI-1 deploy-event hook | Compose `make deploy-events` script = **gate path**; CI hook best-effort (edge case #7) | Gokul + Jega | DI-1 acceptance |
 | D6 | Registry status semantics | `healthy` = `/ready` ok; `degraded` = ready but slow; `unhealthy` = probe fail (contracts/registry-service.yaml) | Jega + Navin | Command Center |
-| D7 | Contract-drift CI check | Implemented by Navin in P2 (edge case #8); manual checklist until then | Navin | freeze confidence |
+| D7 | Contract-drift CI check | Implemented by Navin in P2 (edge case #8) — **done 2026-09-01** (`scripts/check_contract_drift.py`) | Navin | freeze confidence |
+| D8 | Order ↔ cart coupling | order-service reads the cart synchronously via `GET /cart/{user_id}` (simple v1); client-passed items as fallback | Jega + Navin | order contract |
+| D9 | "paid" status path | payment-service calls `POST /orders/{order_id}/paid` (explicit endpoint, sync v1); event-driven alternative from P3 | Jega + Navin | order/payment contracts |
 
 > Rule: **no decision leaves the room unrecorded.** Every row lands in the
 > planning [decision log](README.md) the same day, or the sync is not done.
