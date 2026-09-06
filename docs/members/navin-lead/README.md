@@ -28,6 +28,7 @@ four members' work; drive the research question to an evidence-backed answer.
 ## Team-facing guides
 
 - **[kickoff-guide.md](kickoff-guide.md)** — run the P2 kickoff sync: agenda, live demo script, D1–D9 decisions + decision-log rows, weekly sync rhythm, demo-of-week format, gate checklist.
+- **[study-path.md](study-path.md)** — chronological codebase reading order (37 steps, ~5–6 h, tiers + checkpoints) with 30-second/2-minute explainers, plus an emergency-prep section when the sync is imminent.
 
 ## Personal learning goal
 
