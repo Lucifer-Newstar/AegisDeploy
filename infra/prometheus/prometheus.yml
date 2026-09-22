@@ -10,25 +10,36 @@ rule_files:
   - /etc/prometheus/alerts.yml
 
 scrape_configs:
-  # Prometheus itself
   - job_name: prometheus
     static_configs:
       - targets: ["localhost:9090"]
 
-  # AegisDeploy control-plane services (added as they come online; jobs are
-  # additive so local Compose and K8s can share this file)
-  - job_name: aegisdeploy-backend
+  - job_name: aegisdeploy-registry
     metrics_path: /metrics
     static_configs:
-      - targets: ["host.docker.internal:8000"]
-    # NOTE: real targets are injected per-runtime (docker-compose DNS names in
-    # Compose, service discovery in K8s). This entry is a placeholder; the
-    # authoritative list is maintained per environment overlay.
+      - targets: ["registry-service:8101"]
 
-  # AegisShop demo workload — the app under monitoring. First slice:
-  # catalog-service (walking skeleton). Static target uses the service DNS
-  # name, valid in Compose and Kubernetes alike (ADR-0005 posture).
+  - job_name: aegisdeploy-deployments
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["deployments-service:8701"]
+
   - job_name: aegisshop-catalog
     metrics_path: /metrics
     static_configs:
       - targets: ["catalog-service:9001"]
+
+  - job_name: aegisshop-cart
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["cart-service:9002"]
+
+  - job_name: aegisshop-order
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["order-service:9003"]
+
+  - job_name: aegisshop-payment
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["payment-service:9004"]

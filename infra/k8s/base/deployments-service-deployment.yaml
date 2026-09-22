@@ -1,0 +1,53 @@
+# deployments-service Kubernetes base (ADR-0005: 1:1 with the Compose service).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployments-service
+  labels:
+    app.kubernetes.io/name: deployments-service
+    app.kubernetes.io/part-of: aegisdeploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: deployments-service
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: deployments-service
+        app.kubernetes.io/part-of: aegisdeploy
+    spec:
+      containers:
+        - name: deployments-service
+          image: aegisdeploy/deployments-service:0.1.0
+          ports:
+            - containerPort: 8701
+              name: http
+          env:
+            - name: SERVICE_NAME
+              value: deployments-service
+            - name: SERVICE_PORT
+              value: "8701"
+            - name: ENVIRONMENT
+              value: dev
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://otel-collector:4317
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi

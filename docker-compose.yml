@@ -1,5 +1,5 @@
 # =============================================================================
-# AegisDeploy — Local development stack (Milestone 1: Foundation)
+# AegisDeploy — Local development stack (P2: observability + AegisShop v1)
 #
 # Runs the platform's data + observability dependencies. Application services
 # (backend, frontend, ml, ai) are added as they are implemented — see
@@ -125,9 +125,7 @@ services:
     container_name: aegisdeploy-tempo
     command: ["-config.file=/etc/tempo/tempo.yaml"]
     ports:
-      - "3200:3200"   # Tempo HTTP API
-      - "4317:4317"   # OTLP gRPC (traces)
-      - "4318:4318"   # OTLP HTTP (traces)
+      - "3200:3200"   # Tempo HTTP API (OTLP receivers are internal to the Compose network)
     volumes:
       - ./infra/tempo/tempo.yaml:/etc/tempo/tempo.yaml:ro
       - tempo-data:/var/tempo
@@ -175,6 +173,101 @@ services:
       - "9001:9001"
     depends_on:
       otel-collector: { condition: service_started }
+    networks: [aegisdeploy]
+    logging: *default-logging
+
+  cart-service:
+    build: ./demoapp/aegisshop/cart-service
+    image: aegisshop/cart-service:0.1.0
+    container_name: aegisshop-cart
+    environment:
+      SERVICE_NAME: cart-service
+      SERVICE_PORT: "9002"
+      ENVIRONMENT: dev
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+    ports:
+      - "9002:9002"
+    depends_on:
+      otel-collector: { condition: service_started }
+    networks: [aegisdeploy]
+    logging: *default-logging
+
+  order-service:
+    build: ./demoapp/aegisshop/order-service
+    image: aegisshop/order-service:0.1.0
+    container_name: aegisshop-order
+    environment:
+      SERVICE_NAME: order-service
+      SERVICE_PORT: "9003"
+      ENVIRONMENT: dev
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      CART_SERVICE_URL: http://cart-service:9002
+    ports:
+      - "9003:9003"
+    depends_on:
+      cart-service: { condition: service_started }
+      otel-collector: { condition: service_started }
+    networks: [aegisdeploy]
+    logging: *default-logging
+
+  payment-service:
+    build: ./demoapp/aegisshop/payment-service
+    image: aegisshop/payment-service:0.1.0
+    container_name: aegisshop-payment
+    environment:
+      SERVICE_NAME: payment-service
+      SERVICE_PORT: "9004"
+      ENVIRONMENT: dev
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+    ports:
+      - "9004:9004"
+    depends_on:
+      otel-collector: { condition: service_started }
+    networks: [aegisdeploy]
+    logging: *default-logging
+
+  registry-service:
+    build: ./backend/services/registry-service
+    image: aegisdeploy/registry-service:0.1.0
+    container_name: aegisdeploy-registry
+    environment:
+      SERVICE_NAME: registry-service
+      SERVICE_PORT: "8101"
+      ENVIRONMENT: dev
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+    ports:
+      - "8101:8101"
+    depends_on:
+      otel-collector: { condition: service_started }
+    networks: [aegisdeploy]
+    logging: *default-logging
+
+  deployments-service:
+    build: ./backend/services/deployments-service
+    image: aegisdeploy/deployments-service:0.1.0
+    container_name: aegisdeploy-deployments
+    environment:
+      SERVICE_NAME: deployments-service
+      SERVICE_PORT: "8701"
+      ENVIRONMENT: dev
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+    ports:
+      - "8701:8701"
+    depends_on:
+      otel-collector: { condition: service_started }
+    networks: [aegisdeploy]
+    logging: *default-logging
+
+  console:
+    build: ./frontend
+    image: aegisdeploy/console:0.1.0
+    container_name: aegisdeploy-console
+    environment:
+      PORT: "3030"
+    ports:
+      - "3030:3030"
+    depends_on:
+      registry-service: { condition: service_started }
     networks: [aegisdeploy]
     logging: *default-logging
 

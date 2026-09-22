@@ -1,18 +1,10 @@
-# AegisDeploy alerting rules — M1 baseline set.
-# These rules become the *ground truth signals* that the anomaly pipeline and
+# AegisDeploy alerting rules — P2 baseline set.
+# These rules become the ground-truth signals that the anomaly pipeline and
 # incident manager consume; keep them minimal and deterministic for now.
 groups:
   - name: aegisdeploy-baseline
     interval: 30s
     rules:
-      - alert: AegisDeployBackendDown
-        expr: up{job="aegisdeploy-backend"} == 0
-        for: 1m
-        labels:
-          severity: critical
-        annotations:
-          summary: "AegisDeploy backend is unreachable"
-
       - alert: AegisDeployPrometheusTargetDown
         expr: up == 0
         for: 2m
@@ -20,3 +12,11 @@ groups:
           severity: warning
         annotations:
           summary: "Scrape target {{ $labels.job }} is down"
+
+      - alert: AegisShopCatalogDown
+        expr: up{job="aegisshop-catalog"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "AegisShop catalog-service is unreachable"

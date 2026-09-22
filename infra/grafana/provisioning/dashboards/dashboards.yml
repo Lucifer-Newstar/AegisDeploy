@@ -1,5 +1,4 @@
-# AegisDeploy Grafana — no dashboard auto-provisioning in M1.
-# Dashboards are added from M2 onward (as JSON in this directory).
+# AegisDeploy Grafana — file-provider dashboards (P2).
 apiVersion: 1
 providers:
   - name: default

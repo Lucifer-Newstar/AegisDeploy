@@ -1,0 +1,53 @@
+# console Kubernetes base (ADR-0005: 1:1 with the Compose service).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: console
+  labels:
+    app.kubernetes.io/name: console
+    app.kubernetes.io/part-of: aegisdeploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: console
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: console
+        app.kubernetes.io/part-of: aegisdeploy
+    spec:
+      containers:
+        - name: console
+          image: aegisdeploy/console:0.1.0
+          ports:
+            - containerPort: 3030
+              name: http
+          env:
+            - name: SERVICE_NAME
+              value: console
+            - name: SERVICE_PORT
+              value: "3030"
+            - name: ENVIRONMENT
+              value: dev
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://otel-collector:4317
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi

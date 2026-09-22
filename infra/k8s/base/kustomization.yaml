@@ -1,19 +1,21 @@
 # AegisDeploy Kubernetes base (Kustomize)
 # ADR-0005: every Compose service has a 1:1 Kustomize base here, using the same
-# image tags, env names, and config mounts. Landed incrementally — this file is
-# the anchor for CI linting (see .github/workflows/ci.yml).
+# image tags, env names, and config mounts.
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  # Walking-skeleton slice: the first manifest of the AegisShop demo workload.
   - catalog-service-deployment.yaml
   - catalog-service-service.yaml
-# More manifests will land incrementally as components land, e.g.:
-#   - postgres.yaml
-#   - redis.yaml
-#   - prometheus.yaml
-#   - grafana.yaml
-#   - loki.yaml
-#   - tempo.yaml
-#   - otel-collector.yaml
+  - cart-service-deployment.yaml
+  - cart-service-service.yaml
+  - order-service-deployment.yaml
+  - order-service-service.yaml
+  - payment-service-deployment.yaml
+  - payment-service-service.yaml
+  - registry-service-deployment.yaml
+  - registry-service-service.yaml
+  - deployments-service-deployment.yaml
+  - deployments-service-service.yaml
+  - console-deployment.yaml
+  - console-service.yaml

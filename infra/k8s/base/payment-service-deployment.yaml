@@ -1,0 +1,53 @@
+# payment-service Kubernetes base (ADR-0005: 1:1 with the Compose service).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-service
+  labels:
+    app.kubernetes.io/name: payment-service
+    app.kubernetes.io/part-of: aegisshop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: payment-service
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: payment-service
+        app.kubernetes.io/part-of: aegisshop
+    spec:
+      containers:
+        - name: payment-service
+          image: aegisshop/payment-service:0.1.0
+          ports:
+            - containerPort: 9004
+              name: http
+          env:
+            - name: SERVICE_NAME
+              value: payment-service
+            - name: SERVICE_PORT
+              value: "9004"
+            - name: ENVIRONMENT
+              value: dev
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://otel-collector:4317
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi

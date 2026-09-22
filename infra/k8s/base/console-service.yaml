@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: console
+  labels:
+    app.kubernetes.io/name: console
+    app.kubernetes.io/part-of: aegisdeploy
+spec:
+  selector:
+    app.kubernetes.io/name: console
+  ports:
+    - name: http
+      port: 3030
+      targetPort: http
