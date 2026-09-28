@@ -1,196 +1,193 @@
-# Feature Specification
+# Feature Scope & Acceptance
 
-> The **locked scope** of AegisDeploy, decided 2026-08-31 (see [README.md](README.md) §2).
-> This is the contract between the four members: what gets built, who owns it, and
-> what "done" means for each feature.
+> **Purpose:** define what the team will build, who leads each item, what it depends on, and how completion is checked. This is the scope reference; phase order and gates are in [phases.md](phases.md).
 >
-> Status legend: ✅ locked · 🧪 stretch (buffer only) · ❌ out of scope
+> **Scope status:** `Core` = approved project scope · `Stretch` = optional only if the core is on schedule and the Team Lead approves · `Cut` = not planned. Reopening a cut item requires a decision-log entry.
 
 ---
 
-## 1. Scope Statement
+## 1. How to read the catalogue
 
-**In scope (approved combo):**
+- **Feature ID** identifies the item. `A–E` and `DI` are separate ID families; for example, **D1** means Kubernetes, while **DI-1** means deployment tracking.
+- **Priority tier** (P0/P1) is a feature priority, not development phase P0/P1/P2.
+- Each item is separated into **Outcome**, **Lead / support**, **Needs**, and **Done when**. Leads coordinate delivery; support members contribute their named part.
+- Numeric targets are acceptance thresholds, not promises about production-grade capability.
 
-```
-Tier A — Core platform ......... A1–A12 (the complete detect→verify loop)
-Tier B — AI depth .............. B1 RAG knowledge base, B2 "Ask Aegis" assistant
-Tier C — Product/UX ............ C1 full console, C3 runbooks, C4 postmortems, C5 audit viewer
-Tier D — DevOps/Cloud .......... D1 Kubernetes, D5 CI/CD, D6 SLO dashboards & burn-rate alerts
-Tier E — Academic .............. E2 comparison study, E4 thesis-ready documentation
-Tier DI — Deployment Intelligence DI-1…DI-7 (upgrade 2026-09-01; see
-           docs/architecture/deployment-intelligence.md)
-Demo subject ................... our own microservices demo application ("AegisShop", name TBC)
-```
+## 2. Approved scope at a glance
 
-**Out of scope (explicitly cut at planning):**
+| Group | Included items | Purpose |
+|---|---|---|
+| **A · Core platform (P0)** | A1–A12 | Observe, detect, investigate, act safely, verify, and evaluate. |
+| **B · AI depth (P1)** | B1–B2 | Grounded knowledge retrieval and read-only assistant. |
+| **C · Product / UX (P1)** | C1, C3–C5 | Complete console and supporting views. |
+| **D · DevOps / Cloud (P1)** | D1, D5–D6 | Kubernetes, CI/CD, and SLO monitoring. |
+| **E · Academic (P1)** | E2, E4 | Comparative evaluation and milestone documentation. |
+| **DI · Deployment Intelligence** | DI-1–DI-7 | Understand deployment risk, impact, rollback, canaries, and outcomes. |
 
-| Cut item | Reason |
+**Demo application:** AegisShop, the team's own instrumented microservices app. Its service map is in [phases.md §7](phases.md#7-demo-application-aegisshop).
+
+### Not planned
+
+| Item | Status / reason |
 |---|---|
-| B3 LoRA/QLoRA fine-tuning | Risky (GPU/hardware), uncertain payoff — **optional stretch in the final buffer month** if the core is ahead of schedule. |
-| B4 Time-series forecasting | Peripheral to the core loop. |
-| B6 Incident clustering | Nice-to-have; evaluation already covers false-alarm reduction. |
-| C2 Service topology map | Heavy for Member 1; not required to answer the research question. |
-| C6 Notifications | Can be added post-demo if time permits. |
-| D2 GitOps (ArgoCD/Flux) | Ops credibility, not core. |
-| D3 Terraform cloud provisioning | Needs cloud account + cost; local cluster suffices for the demo. |
-| D4 Advanced chaos tooling (chaos-mesh) | Our own chaoslab scripts cover the required fault types deterministically. |
-| E3 Literature survey | Thesis background can cite existing surveys instead. |
-| E5 User study | Optional; evaluation protocol (§A12) already gives objective data. |
+| B3 · LoRA/QLoRA fine-tuning | **Stretch** in the final buffer only; drop it if core gates slip or hardware is unsuitable. |
+| B4 · Time-series forecasting; B6 · incident clustering | **Cut:** not needed for the core research question. |
+| C2 · topology map; C6 · notifications | **Cut:** not required for the agreed demo. |
+| D2 · GitOps; D3 · cloud Terraform; D4 · chaos-mesh | **Cut:** local Kubernetes and the team's deterministic chaos lab cover the need. |
+| E3 · literature survey; E5 · user study | **Cut:** outside the agreed evaluation plan. |
 
-> Re-opening any cut item requires a Team Lead decision and a note in the Decision Log.
+No cut feature is implicitly included as “nice to have.”
 
 ---
 
-## 2. Feature Catalogue
+## 3. Tier A — Core platform (P0)
 
-### Tier A — Core platform (P0)
+### A1 · Observability pipeline
+- **Outcome:** collect app telemetry through OpenTelemetry; route metrics to Prometheus, logs to Loki, traces to Tempo; carry Kubernetes and deployment events on the shared event layer using the [telemetry envelope](../architecture/telemetry-model.md).
+- **Lead / support:** Gokul / Navin (design and shared telemetry).
+- **Needs:** shared infra stack.
+- **Done when:** metrics appear in Grafana within 60 seconds of startup, logs are queryable, traces can be joined by `trace_id`, and required events are ingested.
 
-#### A1 — Observability pipeline
-- **What:** OpenTelemetry collector receives OTLP from the demo app; metrics → Prometheus, logs → Loki, traces → Tempo; Kubernetes events and deployment events become first-class signals on the Event Layer. All signals use the telemetry envelope (see `docs/architecture/telemetry-model.md`).
-- **Owner:** Gokul J (design: Navin J). **Dependencies:** M1 infra stack (done).
-- **Acceptance criteria:** demo-app metrics visible in Grafana within 60 s of startup; logs queryable in Loki; traces joinable via `trace_id`; k8s + deployment events present on the event layer.
+### A2 · Service registry and health
+- **Outcome:** API-managed service catalogue (owner, endpoints, SLOs) plus current health.
+- **Lead / support:** Jegatheesan.
+- **Needs:** A1.
+- **Done when:** services can be created/read/updated/deleted through the API; health refreshes every 15 seconds; the console can read the result.
 
-#### A2 — Service registry & live health
-- **What:** catalog of monitored services (name, owner, SLOs, endpoints) + live health state per service.
-- **Owner:** Jegatheesan K. **Dependencies:** A1.
-- **Acceptance criteria:** CRUD via API; health polled every 15 s; dashboard reads registry + health.
+### A3 · Anomaly detection
+- **Outcome:** detect unusual p95 latency, error rate, CPU/memory, and request rate using statistical baselines and Isolation Forest; publish `anomaly.score` events with model, threshold, window, and baseline context.
+- **Lead / support:** Navin / Gokul (data plumbing).
+- **Needs:** A1–A2.
+- **Done when:** precision, recall, and F1 are each at least 0.85 on the agreed chaoslab evaluation set; detection latency is under 60 seconds from fault onset.
 
-#### A3 — Anomaly detection
-- **What:** statistical baselines (z-score/EWMA) + Isolation Forest over latency p95, error rate, CPU/mem, RPS; emits `anomaly.score` events with score, threshold, model, window, baseline.
-- **Owner:** Navin J (ML) — with Gokul on data plumbing. **Dependencies:** A1, A2.
-- **Acceptance criteria:** precision/recall/F1 ≥ 0.85 on the chaoslab evaluation set; detection latency < 60 s from fault onset.
+### A4 · Incident manager
+- **Outcome:** group anomaly events into incidents, assign severity, enforce `open → investigating → remediating → verifying → closed | escalated`, and retain an append-only timeline.
+- **Lead / support:** Jegatheesan / Navin (design).
+- **Needs:** A3.
+- **Done when:** an incident is created within 30 seconds of its qualifying anomaly; invalid state transitions are rejected; timeline API is usable. Postmortem generation is delivered under A5/C4.
 
-#### A4 — Incident manager
-- **What:** correlates anomaly events into incidents; severity (sev1–sev4), state machine `open → investigating → remediating → verifying → closed | escalated`, full incident timeline; AI postmortem generation at close (delivered with A5).
-- **Owner:** Jegatheesan K (design: Navin J). **Dependencies:** A3.
-- **Acceptance criteria:** anomaly → incident created < 30 s; state transitions enforced; timeline API complete.
+### A5 · Evidence and root-cause analysis
+- **Outcome:** gather evidence through read-only tools (metrics, logs, traces, service health, deployment history, Kubernetes events, runbooks); return ranked cause hypotheses with citations and confidence; generate a postmortem when an incident closes.
+- **Lead / support:** Navin; Jegatheesan and Gokul provide APIs/tools.
+- **Needs:** A1–A4; B1 retrieval context is integrated when available. RCA must still run against seeded evidence if retrieval is delayed.
+- **Done when:** top-1 cause accuracy is at least 70% on evaluation faults, each hypothesis cites evidence, and a postmortem is available after closure.
 
-#### A5 — Evidence collection & root-cause analysis
-- **What:** the reasoning layer collects evidence via read-only tools (`get_metrics`, `get_logs`, `get_traces`, `get_service_health`, `get_deployment_history`, `get_kubernetes_events`, `get_runbook`); produces root-cause hypotheses **with cited evidence and confidence scores**; generates postmortems on incident close.
-- **Owner:** Navin J. **Dependencies:** A1–A4, B1 (grounding).
-- **Acceptance criteria:** top-1 RCA accuracy ≥ 70% on evaluation faults; every hypothesis cites evidence; postmortem rendered after close.
+### A6 · Remediation planner and policy engine
+- **Outcome:** define actions (restart, rollback, scale, replace instance, config update, escalate), risk levels (low/medium/high/forbidden), and versioned policies. This component alone decides approval versus automatic execution.
+- **Lead / support:** Navin (policy design) / Jegatheesan (implementation).
+- **Needs:** A4–A5.
+- **Done when:** risk classification passes the agreed evaluation set with zero safety violations; policies can be changed without code edits.
 
-#### A6 — Remediation planner & policy engine
-- **What:** action catalog (restart, rollback, scale, replace instance, config update, escalate); risk classes (low/medium/high/forbidden); declarative, versioned policies; the *only* component allowed to decide execution mode (auto vs approval).
-- **Owner:** Navin J (design) + Jegatheesan K (implementation). **Dependencies:** A4, A5.
-- **Acceptance criteria:** correct risk classification on the evaluation set; safety violations = 0; policies loadable without code changes.
+### A7 · Approval workflow (Level 4)
+- **Outcome:** let an authorized person approve, reject, or defer an action with an impact summary; record actor, reason, and decision.
+- **Lead / support:** Jegatheesan (API) / Dhanush (UI).
+- **Needs:** A6.
+- **Done when:** a decision takes at most three UI clicks and every decision is audit-logged.
 
-#### A7 — Approval workflow (Level 4)
-- **What:** approve / reject / defer actions with impact summary; full audit trail; approval UI in the console.
-- **Owner:** Jegatheesan K + Dhanush Kumar S (UI). **Dependencies:** A6.
-- **Acceptance criteria:** an approval can be completed in ≤ 3 clicks; every decision audit-logged with actor + reason.
+### A8 · Safe autonomous execution (Level 5)
+- **Outcome:** run only policy-approved, low-risk, reversible actions automatically; enforce cooldowns, rate limits, and a global autonomy-mode kill switch.
+- **Lead / support:** Gokul (execution) / Navin (policy and safety).
+- **Needs:** A6–A7.
+- **Done when:** at least 80% of eligible evaluation actions succeed; the kill switch takes effect immediately; no policy-violating action runs.
 
-#### A8 — Safe autonomous execution (Level 5)
-- **What:** low-risk, reversible actions execute automatically when an approved policy matches; cooldowns, rate limits, global autonomy-mode kill switch (observe / recommend / approval / safe-auto).
-- **Owner:** Gokul J + Navin J. **Dependencies:** A6, A7.
-- **Acceptance criteria:** auto-execution success rate ≥ 80% on eligible faults; kill switch takes effect immediately; never auto-executes a policy-violating action.
+### A9 · Recovery verification
+- **Outcome:** check health, errors, latency, and SLO status after remediation; close only when recovered, otherwise escalate.
+- **Lead / support:** Navin (logic) / Jegatheesan (API).
+- **Needs:** A4 and A8.
+- **Done when:** verdict accuracy is at least 90% against ground truth; no unrecovered incident is closed.
 
-#### A9 — Recovery verification
-- **What:** post-remediation checks (health, error rate, latency, SLO budget) → `closed` or `escalated`; incident cannot close without it.
-- **Owner:** Navin J. **Dependencies:** A4, A8.
-- **Acceptance criteria:** verification verdict accuracy ≥ 90% vs ground truth; zero unrecovered incidents closed.
+### A10 · Core dashboard
+- **Outcome:** live overview, service detail, incident detail, and approvals views, including MTTD/MTTR and incident evidence.
+- **Lead / support:** Dhanush.
+- **Needs:** A2, A4–A7 APIs.
+- **Done when:** core views render live API data; incident detail shows timeline, reasoning, and evidence. The complete eight-page scope is C1.
 
-#### A10 — Dashboard core
-- **What:** console pages for overview (command center), service detail, incident detail, approvals queue — live from APIs, MTTD/MTTR panels.
-- **Owner:** Dhanush Kumar S. **Dependencies:** A2, A4–A7 APIs.
-- **Acceptance criteria:** all core pages render from live API data; incident detail shows timeline + AI reasoning + evidence.
+### A11 · Chaos lab
+- **Outcome:** deterministic CLI fault injection for CPU saturation, memory exhaustion, container crash, database outage, network latency, HTTP 5xx, dependency failure, config error, faulty deployment, and traffic spike; restore state after each experiment.
+- **Lead / support:** Gokul / Navin (fault definitions and ground truth).
+- **Needs:** AegisShop.
+- **Done when:** all ten faults are injectable; each run records fault label, start/end time, and restoration result for A12.
 
-#### A11 — Chaos lab
-- **What:** deterministic failure injection for 10 fault types (CPU saturation, memory exhaustion, container crash, DB unavailable, network latency, HTTP 5xx, dependency failure, config error, faulty deployment, traffic spike); experiment manifests; automatic state restoration.
-- **Owner:** Gokul J + Navin J. **Dependencies:** demo app.
-- **Acceptance criteria:** every fault injectable via CLI (later UI); each experiment produces labeled ground truth (fault, start time, end time) used by A12.
-
-#### A12 — Evaluation framework
-- **What:** baseline (conventional monitoring + manual response) vs platform runs on identical faults; N ≥ 10 runs per fault type; automated metrics report (MTTD, MTTR, RCA accuracy, autonomy success rates, mean ± std).
-- **Owner:** Navin J (lead; all members support runs). **Dependencies:** A11, E4.
-- **Acceptance criteria:** one command generates the full evaluation report; results reproducible.
-
-### Tier B — AI depth (P1)
-
-#### B1 — RAG knowledge base
-- **What:** runbooks (markdown), past incidents, service metadata, known failure patterns → embedded into pgvector; retrieval API for the reasoning layer.
-- **Owner:** Navin J. **Dependencies:** A4, Postgres pgvector.
-- **Acceptance criteria:** retrieval returns the relevant runbook for evaluation faults (recall@5 ≥ 0.8); RCA context includes retrieved knowledge.
-
-#### B2 — "Ask Aegis" assistant
-- **What:** chat interface where the user asks natural-language questions; the assistant answers using **read-only tools only**, showing tool calls and evidence citations. No write tools are ever exposed.
-- **Owner:** Navin J (engine) + Dhanush Kumar S (UI). **Dependencies:** B1, tool layer.
-- **Acceptance criteria:** questions about health/metrics/logs answered with cited evidence; UI displays tool calls; write-tool exposure = 0.
-
-### Tier C — Product / UX (P1)
-
-| ID | Feature | Owner | Depends on | Acceptance criteria |
-|---|---|---|---|---|
-| C1 | Full console — 8 pages (command center, service, incident, approvals, postmortem, runbooks, Ask Aegis, **deployments**) | Dhanush K | A10, B2 | Pages match [product-vision.md](product-vision.md); demo-ready at M7 |
-| C3 | Runbook repository UI (list + viewer, linked to incidents) | Dhanush K | B1 | runbook opens in console; incident links to runbook |
-| C4 | Postmortem viewer | Dhanush K | A5 | rendered AI postmortem with timeline + metrics |
-| C5 | Audit log viewer | Dhanush K | audit store | filterable audit trail rendered |
-
-### Tier D — DevOps / Cloud (P1)
-
-| ID | Feature | Owner | Depends on | Acceptance criteria |
-|---|---|---|---|---|
-| D1 | Kubernetes deployment of platform + demo app (Kustomize bases per ADR-0005; kind/k3s cluster) | Gokul J | all services containerized | full stack runs via `kubectl apply`; same configs as Compose |
-| D5 | CI/CD — test, lint, build, push images, (optional) deploy | Gokul J | components | green pipeline on every PR; images in registry |
-| D6 | SLO dashboards + burn-rate alerts per service | Gokul J + Navin J | A1 | SLO panels live in Grafana; burn-rate alerts fire on evaluation faults |
-
-### Tier E — Academic (P1)
-
-| ID | Item | Owner | Depends on | Acceptance criteria |
-|---|---|---|---|---|
-| E2 | Comparison study: conventional vs AI-assisted workflow (MTTD/MTTR, correctness) | Navin J | A12 | report with statistics, committed to repo |
-| E4 | Thesis-ready documentation at every milestone | Navin J | all | docs complete + indexed at each M-milestone |
+### A12 · Evaluation framework
+- **Outcome:** compare conventional monitoring/manual response with AegisDeploy on identical faults; automate MTTD, MTTR, RCA, autonomy, and summary statistics.
+- **Lead / support:** Navin / all members (runs and validation).
+- **Needs:** A11 and E4.
+- **Done when:** one documented command produces a reproducible report with at least ten runs per fault type and mean ± standard deviation.
 
 ---
 
-### Tier DI — Deployment Intelligence (upgrade 2026-09-01)
+## 4. Tier B — AI depth (P1)
 
-> Design: [docs/architecture/deployment-intelligence.md](../architecture/deployment-intelligence.md).
-> Full set of 7 capabilities, integrated into existing phases (no timeline change).
+### B1 · RAG knowledge base
+- **Outcome:** index runbooks, prior incidents, service metadata, and known failure patterns in pgvector for retrieval by the reasoning layer.
+- **Lead / support:** Navin.
+- **Needs:** A4 and PostgreSQL/pgvector.
+- **Done when:** relevant runbooks achieve recall@5 of at least 0.8 on evaluation faults and retrieved context is available to RCA.
 
-| ID | Capability | Owner | Depends on | Acceptance criteria |
+### B2 · Ask Aegis
+- **Outcome:** answer natural-language health questions using read-only tools; show tool calls and cited evidence. No write tools are exposed.
+- **Lead / support:** Navin (engine) / Dhanush (UI).
+- **Needs:** B1 and the read-only tool layer.
+- **Done when:** health/metric/log questions receive evidence-cited answers, tool calls are visible, and write-tool exposure is zero.
+
+---
+
+## 5. Tier C — Product / UX (P1)
+
+| ID | Outcome | Lead / support | Needs | Done when |
 |---|---|---|---|---|
-| DI-1 | Deployment tracking & registry (deploy events, history API, per-service deploy timeline) | Jegatheesan K (API) + Gokul J (pipeline hook) | A1, envelope | every deploy/rollback recorded; history API live by P2 gate |
-| DI-2 | Deployment risk scoring (ML: pre-deploy prediction + post-deploy risk) | Navin J | DI-1, A3 | risk score for every deploy; prediction recall ≥ 0.7 on faulty-deploy faults |
-| DI-3 | Change-incident correlation (RCA attributes incidents to deployments) | Navin J | A5, DI-1 | top-1 correlation accuracy ≥ 0.8 on faulty-deploy faults |
-| DI-4 | Bad-rollout detection (deploy-window anomaly evaluation) | Navin J + Gokul J | DI-1, A3 | rollout.bad flagged < 3 min on faulty-deploy faults |
-| DI-5 | Rollback intelligence (recommend + policy-gated execution, safe auto-rollback for low-risk) | Navin J (design) + Gokul J (executor) | A6, A8, DI-4 | rollback restores health in ≥ 80% of faulty-deploy runs; safety violations = 0 |
-| DI-6 | Canary / progressive delivery analysis (canary vs stable metric comparison) | Gokul J | D1, DI-4 | canary deployment in demo; analysis visible in console |
-| DI-7 | Change-failure analytics (CFR dashboards, deployment postmortems, CFR evaluation metric) | Navin J + Gokul J (dashboards), Jegatheesan K (backend), Dhanush K (UI) | A12, DI-1 | CFR panel live; CFR included in evaluation report |
+| **C1** | Eight-page console: command center, service, incident, approvals, postmortem, runbooks, Ask Aegis, deployments. | Dhanush | A10, B2, supporting APIs | All eight pages work on live APIs and match [product-vision.md](product-vision.md). |
+| **C3** | Runbook list and viewer linked to incidents. | Dhanush | B1 | Runbook opens in console from its incident link. |
+| **C4** | Postmortem viewer. | Dhanush | A5 | Timeline, evidence, actions, and metrics render after incident close. |
+| **C5** | Audit-log viewer. | Dhanush | Audit store | Audit entries can be filtered and inspected. |
 
 ---
 
-## 3. Dependency Graph
+## 6. Tier D — DevOps / Cloud (P1)
 
-```text
-A1 ──▶ A2 ──▶ A3 ──▶ A4 ──▶ A5 ──▶ A6 ──▶ A7 ──▶ A8 ──▶ A9
-                │        │       │       │       │
-                │        │       ▼       │       │
-                │        │      B1 ◀─────┘       │
-                │        │       │              │
-                │        │       ▼              │
-                │        │      B2 ─────────────┘
-                │        │
-                ▼        ▼
-              A10 ◀───── C1 (C3◀B1, C4◀A5, C5◀audit)
-Demo app ──▶ A11 ──▶ A12 ──▶ E2
-A1 ──▶ D6     all ──▶ D1, D5     E4 (ongoing)
-```
-
-- **Critical path:** A1 → A2 → A3 → A4 → A5 → A6 → A8 → A9 → A12 → E2.
-- **Parallel tracks:** Dhanush (C1 UI) runs alongside the critical path; Gokul (D1/D5/D6/A11) overlaps after A1.
+| ID | Outcome | Lead / support | Needs | Done when |
+|---|---|---|---|---|
+| **D1** | Run platform and AegisShop on kind using Kustomize bases (k3s fallback). | Gokul | Containerized services | `kubectl apply` brings up the stack with behavior/config aligned to Compose. |
+| **D5** | CI/CD: test, lint, build, publish images; deployment is optional. | Gokul | Service components | PR pipeline is green and images are published to the agreed registry. |
+| **D6** | Per-service SLO dashboards and burn-rate alerts. | Gokul / Navin (SLO definitions) | A1 | Grafana panels are live and alerts fire in evaluation scenarios. |
 
 ---
 
-## 4. Micro-Decisions (decided 2026-08-31)
+## 7. Tier E — Academic (P1)
 
-| # | Decision | Chosen | Rationale |
-|---|---|---|---|
-| 1 | Demo app name | **AegisShop** | Brand-consistent; retail microservices is the industry-standard SRE demo pattern (evaluators recognize it instantly). |
-| 2 | Demo app tech | **Python/FastAPI microservices, OTel-instrumented, Postgres + Redis** | One language across the whole repo; first-class Python OTel; Postgres/Redis already in the compose stack (zero new infra). |
-| 3 | B3 LoRA/QLoRA fine-tuning | **Keep as gated buffer stretch** (Apr–May 2027) | Free optional upside (MLOps depth for the thesis). Gate: core milestones M1–M8 on schedule; otherwise dropped. Never on the critical path. |
-| 4 | Cluster for D1 (Kubernetes) | **kind** | Fastest startup, offline-capable, CI-friendly, native Kustomize support. Fallback: k3s on constrained machines. |
+| ID | Outcome | Lead / support | Needs | Done when |
+|---|---|---|---|---|
+| **E2** | Compare conventional and AI-assisted workflows using MTTD, MTTR, and correctness. | Navin | A12 | Statistical results are documented and committed. |
+| **E4** | Keep implementation, decisions, and results documented at each milestone. | Navin / all owners update their docs | All tracks | Milestone docs are current, linked, and understandable without verbal context. |
 
-> Decider: Navin Jairam (Team Lead), on agent recommendation, 2026-08-31.
-> Re-opening any decision requires a Team Lead call + Decision Log entry.
+---
+
+## 8. Deployment Intelligence (DI)
+
+> Detailed design: [deployment-intelligence.md](../architecture/deployment-intelligence.md). DI is integrated into P2–P8; it does not add a phase.
+
+| ID | Outcome | Lead / support | Needs | Done when |
+|---|---|---|---|---|
+| **DI-1** | Record deploy/rollback events; expose history and per-service timeline. | Jegatheesan (API) / Gokul (pipeline event) | A1, envelope | Each deploy/rollback is recorded and history API is available at P2 gate. |
+| **DI-2** | Score deployment risk before/after rollout. | Navin | DI-1, A3 | Every demo deployment gets a score; recall ≥0.7 on faulty-deploy faults. |
+| **DI-3** | Attribute incidents to likely causing deployments. | Navin / Jegatheesan (history API) | A5, DI-1 | Top-1 correlation accuracy ≥0.8 on faulty-deploy faults. |
+| **DI-4** | Evaluate anomalies in a deployment window and flag bad rollouts. | Navin / Gokul (telemetry) | DI-1, A3 | `rollout.bad` is flagged within three minutes on faulty-deploy tests. |
+| **DI-5** | Recommend rollback and execute only under the A6/A8 policy. | Navin (policy) / Gokul (executor) | A6, A8, DI-4 | Health is restored in ≥80% of faulty-deploy runs, with zero safety violations. |
+| **DI-6** | Compare canary and stable metrics to assess a progressive rollout. | Gokul | D1, DI-4 | Demo canary is analyzed and result is visible in console. |
+| **DI-7** | Calculate change-failure rate (CFR), show trends, and include deployment postmortems. | Jegatheesan (data) / Gokul (dashboard) / Dhanush (UI) / Navin (evaluation) | DI-1 for dashboard data; A12 for evaluation | CFR panel is live and the metric appears in evaluation report. |
+
+---
+
+## 9. Delivery map
+
+| Phase | Feature IDs delivered or advanced |
+|---|---|
+| P2 | A1, A2, DI-1; console scaffold |
+| P3 | A3, A4, DI-4 base |
+| P4 | A5, B1, B2, DI-2, DI-3 |
+| P5 | A6–A9, DI-5 |
+| P6 (parallel) | A10, C1, C3–C5, D5, D6, DI-7 dashboards |
+| P7 | D1, A11, DI-6 |
+| P8 | A12, E2, DI-7 evaluation |
+
+For acceptance gates and integration demonstrations, use [phases.md](phases.md).

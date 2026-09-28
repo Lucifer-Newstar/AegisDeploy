@@ -1,61 +1,43 @@
-# Roadmap
+# AegisDeploy Roadmap
 
-Phase-based roadmap for AegisDeploy. **Scope locked 2026-08-31** — see
-[../planning/features.md](../planning/features.md) for the full feature specification,
-[../planning/phases.md](../planning/phases.md) for gates & integration checkpoints,
-[../planning/product-vision.md](../planning/product-vision.md) for the product target, and
-[../planning/timeline.md](../planning/timeline.md) for the calendar.
-Every phase ends with a **ready-and-working increment** + integration checkpoint.
+> Short milestone view. Feature meaning and acceptance criteria: [feature scope](../planning/features.md). Phase gates and integration proof: [phase plan](../planning/phases.md). Calendar targets: [timeline](../planning/timeline.md).
+>
+> Dates are targets; the gate, not the date, determines completion. P6 is a parallel track during P5.
 
-## P1 — Foundation ✅ (2026-08-31)
-- Repo layout, docs hub, ADRs 0001–0005, team + planning docs
-- Docker Compose observability stack (Postgres, Redis, Prometheus, Grafana, Loki, Tempo, OTel)
-- CI (YAML/compose validation, k8s lint, docs checks), Makefile
+---
 
-## P2 — Observability & Demo App v1 (Sep–Oct)
-- A1 observability pipeline; AegisShop v1 (5 services, OTel-instrumented)
-- A2 service registry & live health; telemetry envelope v0.1 (Pydantic)
-- **DI-1 deployment tracking** (deploy events + history API)
-- Console scaffold + design system (mock data)
-- **Gate:** AegisShop telemetry in Grafana; registry + console + deploy events live
+## P1 · Foundation — passed 2026-08-31
+- Repo, documentation hub, ADRs, Compose observability stack, CI, and Makefile.
+- **Gate:** healthy stack, green CI, indexed docs. **Status:** passed.
 
-## P3 — Detection & Incidents (Oct–Nov)
-- A3 anomaly detection (statistical baselines + Isolation Forest)
-- A4 incident manager (state machine, severity, timeline); evidence store
-- DI-4 deploy-window evaluation (base)
-- **Gate:** injected fault → anomaly → incident on screen
+## P2 · Observability + AegisShop v1 — target 2026-10-31
+- **Build:** A1 observability, A2 registry/health, AegisShop v1, DI-1 deploy history, console scaffold.
+- **Prove:** app telemetry is queryable; registry and deploy history respond; scaffold runs on mocks; integrated app/platform startup works.
 
-## P4 — RCA & AI (Nov–Dec)
-- A5 evidence collection + root-cause analysis with citations
-- B1 RAG knowledge base (pgvector); B2 "Ask Aegis" assistant (read-only tools)
-- **DI-2 deployment risk scoring; DI-3 change-incident correlation**
-- **Gate:** AI explains a fault with cited evidence; chat works; deploys correlated
+## P3 · Detection + incidents — target 2026-11-30
+- **Build:** A3 anomaly detection, A4 incident manager, DI-4 deployment-window baseline.
+- **Prove:** injected fault becomes a scored anomaly and a visible incident.
 
-## P5 — Remediation & Autonomy (Dec–Jan)
-- A6 remediation planner + policy engine; A7 human approval workflow
-- A8 safe autonomous execution (low-risk, reversible); A9 recovery verification
-- **DI-5 rollback intelligence** (recommend, policy-gated, safe auto-rollback)
-- **Gate:** full approve → execute → verify → close cycle; safe auto-rollback
+## P4 · AI reasoning — target 2026-12-31
+- **Build:** A5 evidence/RCA, B1 RAG, B2 Ask Aegis, DI-2 risk scoring, DI-3 deployment correlation.
+- **Prove:** live incident is explained with citations; deploy-related fault is attributed correctly.
 
-## P6 — Console Complete (Nov–Jan, parallel)
-- C1 full console (8 pages), C3 runbooks UI, C4 postmortem viewer, C5 audit viewer
-- D5 CI/CD full pipeline; D6 SLO dashboards + burn-rate alerts
-- **DI-7 change-failure analytics** (CFR dashboards)
-- **Gate:** every page live from real APIs; CI/CD green; CFR panel live
+## P5 · Remediation + autonomy — target 2027-01-31
+- **Build:** A6 policy, A7 approvals, A8 safe-auto, A9 verification, DI-5 rollback intelligence.
+- **Prove:** human-approved and eligible safe-auto actions both execute and verify recovery; safety checks pass.
 
-## P7 — K8s & Chaos Lab (Jan–Feb)
-- D1 Kubernetes deployment (kind, Kustomize bases per ADR-0005)
-- A11 chaoslab: 10 fault types, experiment manifests, ground truth
-- **DI-6 canary / progressive delivery analysis**
-- **Gate:** platform + AegisShop on cluster; faults injectable; canary analyzed
+## P6 · Product completion (parallel) — target 2027-01-31
+- **Build:** eight console pages, C3–C5, D5 CI/CD, D6 SLOs, DI-7 CFR dashboard.
+- **Prove:** live-data product walkthrough; pipeline, SLO, and CFR views work.
 
-## P8 — Evaluation (Feb–Mar)
-- A12 evaluation framework (baseline vs platform, N ≥ 10 per fault); E2 comparison study
-- **DI-7 change failure rate as a headline evaluation metric**
-- **Gate:** evaluation report with MTTD/MTTR + CFR statistics committed
+## P7 · Kubernetes + chaos lab — target 2027-02-28
+- **Build:** D1 kind deployment, A11 ten-fault chaoslab, DI-6 canary analysis.
+- **Prove:** platform/app run in kind; faults record ground truth; canary result appears in console.
 
-## Report & Demo (Mar–Apr)
-- Thesis report, demo video, console polish, E4 documentation final pass
+## P8 · Evaluation + report — target 2027-03-31
+- **Build:** A12 evaluation, E2 comparison, DI-7 CFR analysis.
+- **Prove:** reproducible report includes MTTD, MTTR, RCA, autonomy, and CFR results.
 
-## Buffer / Stretch (Apr–Jun)
-- B3 LoRA fine-tune experiment (gated), viva preparation, optional E1 dataset release
+## Report, demo, and buffer — Apr–Jun 2027
+- Final report, demo video, and documentation pass.
+- Viva preparation. B3 fine-tuning is optional and only proceeds if the core is on schedule and the Team Lead approves it.

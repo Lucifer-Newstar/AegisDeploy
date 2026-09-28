@@ -1,35 +1,26 @@
-# Jegatheesan — Phase Plan (Backend)
+# Jegatheesan · Backend Phase Plan
 
-> My view of each phase: what I deliver, what I need, what I hand over, and when my
-> track is "done". Mirrors [docs/planning/phases.md](../../planning/phases.md).
+> **Purpose:** my delivery and handoff by phase. Shared scope: [features](../../planning/features.md). Shared gates: [phases](../../planning/phases.md). Dates: [timeline](../../planning/timeline.md).
 
----
+| Phase | I deliver | I need | Handoff / completion check |
+|---|---|---|---|
+| **P2 · Service foundation** | A2 registry/health APIs; AegisShop service APIs and initial data models; DI-1 deployment-history API; OpenAPI contracts for my services. | Navin's shared telemetry/event contract; agreed ports and service list. | Registry/health acceptance passes; app services start; deploy/rollback events can be recorded and queried. |
+| **P3 · Incidents** | A4 severity/state machine, append-only timeline, evidence storage, incident APIs, test event producer/fault hooks as needed. | Navin's anomaly-event schema (or test producer while it is in progress). | Injected test event creates an incident with valid transitions and a readable timeline. |
+| **P4 · Evidence APIs** | APIs needed by RCA/incident views; deployment history detail for DI-3; harden AegisShop. | Read-only tool/API shapes agreed with Navin and Gokul. | AI and console can retrieve incident, service, evidence, and deploy data using the documented contracts. |
+| **P5 · Governed actions** | A6 planner implementation, A7 approval API, A9 verification API, audit records. | Navin's risk/policy contract; Gokul's executor interface. | Approval → execution → verification path works; state transitions and audit records are correct. |
+| **P6 · API completion** | API polish, OpenAPI client regeneration, integration fixes, authN/authZ baseline. | Frontend integration feedback and agreed API changes. | Console pages consume stable, documented APIs; generated clients are current. |
+| **P7 · Cluster/app hardening** | AegisShop fault hooks, backend Kustomize support with Gokul, migration/startup hardening. | kind cluster and deployment conventions. | Backend and demo app run in kind; fault hooks are repeatable. |
+| **P8 · Evaluation support** | Final API docs; support test runs and data checks. | Frozen experiment protocol and stable stack. | API docs match behavior and evaluation runs complete without data-shape ambiguity. |
 
-## Phase Overview
+## Working rules
 
-| Phase | My deliverables | Depends on | Integration output | Done when |
-|---|---|---|---|---|
-| **P2** | Backend service skeleton (API gateway, service registry, health); AegisShop v1 backend services (catalog, cart, order, payment + DB models); shared envelope lib; OpenAPI contracts committed; **DI-1 deploy tracker API** | Envelope v0.1 + event lib (Navin, P2 start) | AegisShop APIs run; registry lists services; OpenAPI published; **deploy events recorded** | Registry + health API pass acceptance (A2); AegisShop services healthy; DI-1 API live |
-| **P3** | A4 incident manager (state machine, severity, timeline API); evidence store; incident APIs; fault hooks in AegisShop | Anomaly events (Navin) or test producer | Incident created from injected fault; timeline API live | Fault-to-incident integration demo passes |
-| **P4** | Evidence collection APIs for AI tools; incident APIs for the reasoning layer; **deploy history API (DI-3 support)**; AegisShop hardening | — | RCA engine consumes my APIs; incident page data live; **correlation API live** | P4 checkpoint demo passes |
-| **P5** | A6 remediation planner implementation; A7 approval workflow API; A9 verification API; audit logging | Policy design (Navin), executors (Gokul) | Approve → execute → verify → close works end-to-end | Full-loop demo passes |
-| **P6** | API polish, OpenAPI client regeneration, integration fixes; authN/authZ baseline | — | Frontend fully live on my APIs | Product walkthrough passes |
-| **P7** | Fault hooks finalization; backend manifests for K8s (with Gokul); DB migration hardening | Cluster (Gokul) | Backend + AegisShop run on kind | Cluster demo clean |
-| **P8** | API documentation finalization; support evaluation runs | — | Docs complete; runs stable | Report + demo done |
+- OpenAPI is the shared API contract; commit it before a consumer builds against an endpoint.
+- Keep Pydantic models aligned with the shared telemetry envelope; use versioned database migrations.
+- During dependency delays, use the test producer or mocks; do not block another track.
 
-## My Track's Key Risks
+## Backend completion check
 
-| Risk | Mitigation |
-|---|---|
-| Incident state machine complexity | Model on the envelope contract; unit tests per transition; timeline events append-only |
-| API contract churn | Contracts-first + OpenAPI as artifact; breaking changes need lead sign-off |
-| AegisShop scope creep | Only the 5 services in phases.md §7; faults defined by Navin's specs |
-| DB schema changes late | Migrations versioned from P2; envelope JSONB for evidence |
-
-## Definition of Done (per service/feature)
-
-- [ ] OpenAPI contract committed before implementation of consumers
-- [ ] Pydantic models reuse the envelope (no bespoke shapes)
-- [ ] Health endpoint + OTel metrics/logs/traces
-- [ ] Unit tests; CI green; code commented (rule 3)
-- [ ] This file updated; features.md acceptance criteria met
+- [ ] API and event contracts are committed and validated.
+- [ ] Services expose health checks and required telemetry.
+- [ ] Unit/integration tests cover behavior and state transitions; CI passes.
+- [ ] Migrations, API docs, and this plan reflect the implementation.

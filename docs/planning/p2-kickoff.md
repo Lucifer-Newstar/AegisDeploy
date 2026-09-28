@@ -125,4 +125,4 @@ this history — **so the quality of P2's deploy events decides P4's accuracy.**
 2. Jega: `cart-service` branch (copy `_template`); registry design notes
 3. Gokul: logs→Loki config for catalog; AegisShop v1 service list in compose
 4. Dhanush: `frontend/` scaffold branch; design tokens
-5. Team: kickoff sync to confirm naming/ports (per phases.md §P2 note)
+5. Team: kickoff sync to confirm naming/ports (see the P2 section in [phases.md](phases.md))
