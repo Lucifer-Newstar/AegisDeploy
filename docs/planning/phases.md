@@ -1,151 +1,150 @@
-# Phase Plan — Gates, Non-Disruption & Integration
+# Development Phases & Integration Gates
 
-> Development is split into **phases**. Every phase ends with a **ready-and-working
-> increment** (the phase gate) — the project only moves to the next phase when the gate
-> passes. Phases are designed so the four members' tracks **never block each other**,
-> and every phase ends with an **integration checkpoint** where all tracks merge into a
-> fully functioning project.
+> **Purpose:** show the order of work and the proof required to finish each phase. Feature definitions and owners are in [features.md](features.md); dates are in [timeline.md](timeline.md); each member's assignments are in their [member plan](../members/README.md).
 >
-> Decided by Team Lead (2026-08-31). Schedule & member calendar: [timeline.md](timeline.md).
-> Feature details: [features.md](features.md). Per-member detail: [docs/members/](../members/).
+> A phase is complete only when its gate and integration checkpoint pass, tests/CI are appropriate, and documentation is updated. Dates are targets; gates are the completion rule.
 
 ---
 
-## 1. Phase Principles
+## 1. How phase planning works
 
-| # | Principle | Meaning |
-|---|---|---|
-| 1 | **Working increment per phase** | No phase ends with half-built work — the gate proves the increment works. |
-| 2 | **Contracts first** | Shared contracts (telemetry envelope, API schemas, event types, tool interfaces) are defined and committed *before* dependent tracks start, so members build in parallel. |
-| 3 | **Non-blocking tracks** | Mock servers, seeded data, and interface stubs absorb dependencies — nobody waits on anybody. |
-| 4 | **Integration at phase end** | The last 2–3 days of each phase are an integration window: all tracks merge, the integration demo runs, blockers get fixed. |
-| 5 | **Gate review** | The Team Lead reviews the gate. A phase is **done** only when its gate criteria pass and docs are updated (E4). |
+- **Phase:** a time-boxed delivery stage (P1–P8). Do not confuse these labels with feature priority tiers P0/P1.
+- **Track:** one member's work inside a phase. Members can build in parallel against agreed contracts and mocks.
+- **Gate:** the minimum working result required to finish a phase.
+- **Integration checkpoint:** an end-to-end demonstration of that result with the tracks connected.
+- **Feature IDs:** refer to [features.md](features.md). `D1` is Kubernetes; `DI-1` is deployment tracking.
 
-## 2. Phase Overview
+### Working rules
 
-| Phase | Focus | Ready & working at phase end (gate) | Integration checkpoint |
+1. Commit shared API, event, and telemetry contracts before consumers implement against them.
+2. Use mock servers, test producers, and seeded fixtures when a dependency is not ready.
+3. Reserve the final 2–3 days of a phase for fixes, integration, and gate review; do not add scope then.
+4. Shared Compose/infra changes go through PRs. A passed gate and a decision-log entry open the next phase.
+
+---
+
+## 2. Phase summary
+
+| Phase | Focus | Gate result | Integration checkpoint |
 |---|---|---|---|
-| **P1 Foundation** ✅ | Repo, docs, stack, CI | `docker compose up --wait` → healthy stack; CI green; docs indexed | — (solo) |
-| **P2 Observability + Demo App v1** | A1 pipeline, AegisShop v1, A2 registry, **DI-1 deployment tracking**, console scaffold | AegisShop runs with metrics/logs/traces in Grafana; registry API works; **deploy events recorded**; console scaffold renders | **"One command shows every AegisShop service in Grafana AND the console"** |
-| **P3 Detection + Incidents** | A3 anomaly detection, A4 incident manager, **DI-4 deploy-window evaluation (base)** | Injected fault → anomaly → incident with timeline | Live **fault-to-incident** demo |
-| **P4 AI Reasoning** | A5 RCA, B1 RAG, B2 Ask Aegis, **DI-2 risk scoring, DI-3 change-incident correlation** | AI explains a fault with cited evidence; chat answers; **incidents attributed to deployments** | Incident detail shows AI reasoning live |
-| **P5 Remediation + Autonomy** | A6 planner/policy, A7 approvals, A8 safe-auto, A9 verification, **DI-5 rollback intelligence** | Full approve → execute → verify → close cycle; safe-auto for low-risk; **safe auto-rollback**; kill switch | Complete **autonomous loop** demo |
-| **P6 Product Complete** | C1 8 pages, C3/C4/C5, D5 CI/CD, D6 SLO dashboards, **DI-7 CFR dashboards** | Console complete on live data; CI/CD green; SLO panels live; **CFR panel live** | Full **product walkthrough** |
-| **P7 Kubernetes + Chaos Lab** | D1 K8s (kind), A11 chaoslab (10 faults), **DI-6 canary analysis** | Whole platform + AegisShop on kind; all faults injectable with ground truth; **canary deployment analyzed** | **Cluster-wide** demo + fault injection show |
-| **P8 Evaluation + Report** | A12 runs (N≥10/fault), E2 study, demo video | Evaluation report with statistics; submission-ready demo | Final **thesis demo** |
+| **P1 · Foundation** ✅ | Repo, documentation, base stack, CI | Stack starts healthy; CI and docs checks pass. | Passed 2026-08-31. |
+| **P2 · Observability + AegisShop v1** | A1, A2, DI-1, app v1, console scaffold | App telemetry is queryable; registry/health and deploy history work; console scaffold runs on mocks. | One command starts the app/platform; services appear in Grafana and console. |
+| **P3 · Detection + incidents** | A3, A4, DI-4 base | Injected fault produces anomaly and incident with timeline; target detection metrics pass. | Fault-to-incident demo. |
+| **P4 · AI reasoning** | A5, B1, B2, DI-2, DI-3 | Cited RCA and read-only Q&A work; faulty deployment can be correlated. | Live incident shows evidence and reasoning. |
+| **P5 · Remediation + autonomy** | A6–A9, DI-5 | Approval and safe-auto paths execute within policy and verify recovery. | Demonstrate one approval action and one eligible auto action. |
+| **P6 · Product completion (parallel)** | C1, C3–C5, D5–D6, DI-7 dashboard | Eight console pages use live APIs; CI/CD, SLO, and CFR views work. | Live-data product walkthrough. |
+| **P7 · Kubernetes + chaos lab** | D1, A11, DI-6 | Platform/app run on kind; ten faults produce ground truth; canary is analyzed. | Cluster demo with fault injection. |
+| **P8 · Evaluation + report** | A12, E2, DI-7 evaluation | Reproducible evaluation report and demo materials are ready. | Final thesis demonstration. |
 
-## 3. Phase Details
+P6 overlaps P5 in the calendar; it is a parallel product track, not a prerequisite that blocks the P5 gate.
 
-### P1 — Foundation ✅ (Aug–Sep 2026)
-- **Deliverables:** repo layout, docs hub, ADR-0001..0005, compose observability stack, CI, team + planning docs.
-- **Gate:** stack healthy, CI green, docs indexed. — *Passed 2026-08-31.*
+---
 
-### P2 — Observability + Demo App v1 (Sep–Oct)
-- **Objective:** the platform can see the demo app, and every member has a running scaffold.
-- **Tracks:** Gokul (A1 pipeline: OTel configs, dashboards, compose additions), Jega (AegisShop backend services + A2 registry/health + **DI-1 deployment tracker API**), Navin (telemetry envelope v0.1 + event layer design + **API contracts**), Dhanush (console scaffold + design system on mock data).
-- **Gate criteria:**
-  - AegisShop services visible in Grafana (metrics), Loki (logs), Tempo (traces) within 60 s of start.
-  - Registry + health API returns service list; envelope schema enforced at ingestion.
-  - Console scaffold renders Command Center from the mock server.
-- **Integration checkpoint:** one command runs AegisShop + platform; Grafana and console both show all services.
+## 3. Phase assignments and gates
 
-### P3 — Detection + Incidents (Oct–Nov)
-- **Objective:** the platform notices when something breaks.
-- **Tracks:** Navin (A3 detectors + feature pipeline + threshold tuning), Jega (A4 incident manager + timeline API + evidence store), Gokul (metric plumbing, mini-fault validation), Dhanush (service detail page w/ anomaly bands).
-- **DI hook:** deploy-window evaluation seeded in P3 (DI-4 base) — post-deploy metrics evaluated as a first-class window.
-- **Gate criteria:** injected CPU/latency spike → `anomaly.score` event → incident created in < 30 s; detection precision/recall ≥ 0.85 on validation set.
-- **Integration checkpoint:** fault-to-incident demo run from the chaos hooks.
+### P1 · Foundation — passed
+- **Work:** repo structure, ADRs, Compose observability stack, CI, and planning docs.
+- **Gate:** stack healthy, CI green, docs indexed.
+- **Result:** passed 2026-08-31.
 
-### P4 — AI Reasoning (Nov–Dec)
-- **Objective:** the platform explains *why*.
-- **Tracks:** Navin (A5 evidence collection + RCA engine, B1 RAG on pgvector, B2 Ask Aegis engine, **DI-2 risk scoring + DI-3 change-incident correlation**), Jega (evidence APIs, incident APIs for reasoning, **deploy history API**), Dhanush (incident detail w/ AI reasoning panel + Ask Aegis UI), Gokul (read-only query proxies for AI tools).
-- **Gate criteria:** top-1 RCA accuracy ≥ 70% on seeded evaluation faults; every hypothesis cites evidence; Ask Aegis answers a health question with citations; **DI-3 attributes faulty-deploy faults to the correct revision (≥ 0.8)**.
-- **Integration checkpoint:** live incident shows AI reasoning; chat answers from live data.
+### P2 · Observability + AegisShop v1
+- **Goal:** make the demo app observable and give every track a usable starting point.
+- **Tracks:**
+  - **Gokul:** A1 pipeline, Grafana dashboards, Compose wiring.
+  - **Jegatheesan:** A2 registry/health, AegisShop backend, DI-1 history API.
+  - **Navin:** shared telemetry/event design, contract coordination, integration protocol.
+  - **Dhanush:** console scaffold and design system using mock data.
+- **Gate:** AegisShop metrics/logs/traces are queryable; registry and health API respond; deploy events/history are recorded; console scaffold runs on mocks.
+- **Checkpoint:** start app and platform together; verify services in Grafana and console.
 
-### P5 — Remediation + Autonomy (Dec–Jan)
-- **Objective:** the platform acts — within boundaries.
-- **Tracks:** Jega (A6 planner impl, A7 approval workflow API, A9 verification API), Navin (policy engine design, risk matrix, A8 kill switch, A9 logic, **DI-5 rollback policy**), Gokul (executors: restart/**rollback**/scale with least-privilege creds), Dhanush (approvals UI, autonomy mode indicator).
-- **Gate criteria:** approve → execute → verify → close works end-to-end; safe-auto fires only for policy-approved low-risk actions; **safe auto-rollback works for low-risk rollbacks**; kill switch immediate; safety violations = 0.
-- **Integration checkpoint:** full-loop demo with both a Level 4 (approval) and a Level 5 (auto) action.
+### P3 · Detection + incidents
+- **Goal:** turn a controlled fault into a tracked incident.
+- **Tracks:** Navin—A3 detector and tuning; Jegatheesan—A4 incident state machine/timeline; Gokul—metric plumbing and fault validation; Dhanush—service/incident views with anomaly context.
+- **DI work:** establish the DI-4 deployment evaluation window.
+- **Gate:** CPU/latency test fault produces `anomaly.score`, then an incident within 30 seconds; precision/recall/F1 meet A3 thresholds on the agreed validation set.
+- **Checkpoint:** run a fault-to-incident demo from the test hooks.
 
-### P6 — Product Complete (Nov–Jan, parallel)
-- **Objective:** the console is a complete product on live data.
-- **Tracks:** Dhanush (C1 pages 4–8, C3 runbooks, C4 postmortems, C5 audit), Gokul (D5 CI/CD full: tests/build/images; D6 SLO dashboards + burn-rate alerts; **DI-7 CFR dashboards**), Jega (API polish, OpenAPI client regen), Navin (integration lead, SLO definitions).
-- **Gate criteria:** all 8 pages live from real APIs; CI/CD green on every PR; SLO panels + burn-rate alerts working; **change-failure-rate panel live**.
-- **Integration checkpoint:** full product walkthrough (page-by-page from live data).
+### P4 · AI reasoning
+- **Goal:** explain incidents using traceable evidence.
+- **Tracks:** Navin—A5, B1, B2, DI-2, DI-3; Jegatheesan—evidence/incident APIs and deploy history; Gokul—read-only query proxies; Dhanush—incident reasoning and Ask Aegis UI.
+- **Gate:** top-1 RCA accuracy ≥70%; every hypothesis cites evidence; Ask Aegis answers a health question with citations; DI-3 top-1 accuracy ≥0.8 on faulty-deploy tests.
+- **Checkpoint:** inspect a live incident in the UI and ask a question answered from live evidence.
 
-### P7 — Kubernetes + Chaos Lab (Jan–Feb)
-- **Objective:** production-shaped deployment + objective failure injection.
-- **Tracks:** Gokul (D1 kind cluster + Kustomize bases for every service, A11 chaoslab implementation, **DI-6 canary analysis**), Navin (fault specs, experiment manifests, ground-truth schema), Jega (fault hooks in AegisShop), Dhanush (final UX pass on cluster).
-- **Gate criteria:** entire platform + AegisShop runs on kind via `kubectl apply`; all 10 fault types injectable with labeled ground truth; **canary deployment runs and its analysis is visible in the console**.
-- **Integration checkpoint:** cluster-wide run + live fault injection.
+### P5 · Remediation + autonomy
+- **Goal:** execute permitted actions and prove recovery without bypassing safeguards.
+- **Tracks:** Jegatheesan—A6 implementation, A7 approval API, A9 verification API; Navin—policy/risk matrix, A8 mode and kill switch, verification logic, DI-5 policy; Gokul—scoped restart/rollback/scale executors; Dhanush—approval UI and autonomy indicator.
+- **Gate:** approve → execute → verify → close works; only allowed low-risk actions auto-run; low-risk rollback restores service; kill switch is immediate; safety violations = 0.
+- **Checkpoint:** show one human-approved and one policy-approved automatic action end-to-end.
 
-### P8 — Evaluation + Report (Feb–Mar)
-- **Objective:** answer the research question with data.
-- **Tracks:** Navin (A12 evaluation lead, E2 comparison study, **DI-7 CFR metric in the report**), all members (experiment runs, N ≥ 10 per fault), Dhanush (demo video, screenshots), Jega (API docs finalization), Gokul (cluster stability).
-- **Gate criteria:** evaluation report committed (MTTD/MTTR, RCA accuracy, autonomy success rates, **change failure rate**, mean ± std); demo video ready; docs final pass (E4).
-- **Integration checkpoint:** final thesis demo.
+### P6 · Product completion (parallel)
+- **Goal:** finish the console and operational views on real APIs while P5 proceeds.
+- **Tracks:** Dhanush—C1 eight pages, C3–C5; Gokul—D5 pipeline, D6 SLOs, DI-7 dashboards; Jegatheesan—API polish/client generation; Navin—SLO definitions and integration coordination.
+- **Gate:** all eight pages use live data; CI/CD is green; SLO and burn-rate views work; CFR dashboard is live.
+- **Checkpoint:** walkthrough of the product using live data.
 
-## 4. Non-Disruption Design
+### P7 · Kubernetes + chaos lab
+- **Goal:** run the integrated platform in a reproducible cluster and validate controlled experiments.
+- **Tracks:** Gokul—D1 kind/Kustomize, A11 implementation, DI-6; Navin—fault specs/manifests/ground truth; Jegatheesan—AegisShop fault hooks and hardening; Dhanush—cluster UX pass.
+- **Gate:** platform and app start on kind; all ten fault types inject and restore state with labeled ground truth; canary analysis appears in console.
+- **Checkpoint:** cluster-wide demo with a live fault injection.
 
-The phase split is built so no member's track blocks another's:
+### P8 · Evaluation + report
+- **Goal:** answer the research question with reproducible evidence.
+- **Tracks:** Navin—A12/E2 and results; all members—at least ten runs per fault; Dhanush—demo video/screenshots; Jegatheesan—API docs; Gokul—cluster stability.
+- **Gate:** report includes at least ten runs per fault type and MTTD, MTTR, RCA, autonomy, and CFR results with mean ± standard deviation; demo materials and milestone docs are complete.
+- **Checkpoint:** final thesis demonstration.
 
-| Track | Never blocks on | Because |
-|---|---|---|
-| Frontend (Dhanush) | Backend/AI APIs | OpenAPI contract → generated client + **mock server**; each page works on mocks until its API lands |
-| Backend (Jega) | AI features | Incident manager accepts events from a **test producer** until A3 detectors ship; AI consumes APIs, not the reverse |
-| DevOps (Gokul) | Application code | Observability stack + compose/K8s configs are code-independent; Dockerfiles land with each service PR |
-| Lead/AI (Navin) | Frontend | AI outputs are APIs + events; UI is Dhanush's consumption point, designed against the same contracts |
+---
 
-**Cross-track dependency table:**
+## 4. Non-blocking work and handoffs
 
-| Consumer | Needs from | Available by | Late-mitigation |
+| Consumer | Needs | Target | If late |
 |---|---|---|---|
-| Jega (registry/health) | envelope + event lib (Navin) | P2 start | contract stub package |
-| Jega (incident manager) | anomaly events (Navin) | P3 | test event producer |
-| Navin (RCA tools) | query APIs (Gokul/Jega) | P4 | seeded evidence fixtures |
-| Dhanush (incident UI) | incident APIs (Jega) | P3 end | mock server keeps UI moving |
-| Dhanush (Ask Aegis UI) | B2 engine API (Navin) | P4 end | mock responses |
-| Gokul (executors) | action catalog + policies (Navin) | P5 | dry-run mode |
-| All | shared stack (Gokul) | P1 ✅ | compose configs versioned via PRs |
+| Jegatheesan · registry | Shared envelope/event contract from Navin | P2 start | Use committed stub package. |
+| Jegatheesan · incidents | Anomaly event from Navin | P3 | Use test event producer. |
+| Navin · RCA | Query APIs from Gokul/Jegatheesan | P4 | Use seeded evidence fixtures. |
+| Dhanush · UI | OpenAPI/API responses | Per page phase | Continue on generated mock server. |
+| Gokul · executors | Action catalog and policies | P5 | Use dry-run mode. |
+| All tracks | Shared Compose/infra stack | Available baseline | Propose shared changes by PR; keep local setup reproducible. |
 
-**Shared-stack rule:** changes to `docker-compose.yml` / `infra/` configs land via PRs
-(never direct-to-main pushes), so nobody's local stack breaks mid-phase (ADR-0005).
+**Handoff rule:** provider commits the contract and a sample response/event; consumer confirms it against a mock or test; the real implementation replaces the mock without changing the agreed shape silently.
 
-## 5. Integration Protocol (end of every phase)
+---
 
-1. **Feature freeze** — last 2–3 days of the phase: no new features, fixes only.
-2. **Merge tracks** — all member branches merged to `main` via PRs; CI must pass.
-3. **Integration demo** — the checkpoint script for the phase runs end-to-end
-   (checkpoint criteria in §3); Team Lead runs it, members fix their own failures.
-4. **Gate review** — checklist (§6) reviewed by the Team Lead; result recorded in the
-   planning decision log.
-5. **Move on** — only a passed gate opens the next phase.
+## 5. End-of-phase integration routine
 
-## 6. Phase Gate Checklist (used by the Team Lead)
+1. Freeze new feature work for the final 2–3 days; fix defects only.
+2. Merge member branches by PR with CI passing.
+3. Run the phase checkpoint from a clean environment and record evidence.
+4. Review the gate checklist; record pass/fail and decisions in the planning log.
+5. If a gate fails, record owner and next check date; do not label the phase complete.
 
-```text
-[ ] Working increment demonstrated (gate criteria in §3)
-[ ] Integration checkpoint passed
-[ ] CI green (where applicable)
-[ ] Tests pass (where applicable)
-[ ] Docs updated for this phase (E4) — no documentation debt
-[ ] ADRs / decision log current
-[ ] Phase artifacts committed with conventional messages
-[ ] Team Lead sign-off
-```
+### Gate checklist
 
-## 7. Demo Application (AegisShop) — v1 Service Map
+- [ ] Gate behavior demonstrated and acceptance targets checked.
+- [ ] Integration checkpoint passed; evidence linked.
+- [ ] Tests and CI pass where applicable.
+- [ ] Contracts, diagrams, runbooks, and member plans updated as needed.
+- [ ] Decisions and risks recorded; Team Lead signs off.
 
-AegisShop is our own microservices demo app (decision 2026-08-31). v1 services:
+---
 
-| Service | Role | Stack | Fault hooks (chaos targets) |
+## 6. Autonomy and safety boundary
+
+All remediation—including rollback—uses the same policy and execution path. The AI may gather evidence and recommend actions; it does not receive unrestricted write access. High-risk actions require approval, automatic actions must be predefined, low-risk, reversible, rate-limited, and auditable; recovery verification is required before closing an incident. See [features.md](features.md) A6–A9 and the autonomy ADRs.
+
+---
+
+## 7. Demo application: AegisShop
+
+AegisShop is the team's instrumented retail microservices app, used as the target for telemetry, faults, and evaluation. It is not part of the AegisDeploy control plane.
+
+| Service | Responsibility | Stack | Example fault target |
 |---|---|---|---|
-| `shop-gateway` | public API entry | FastAPI | HTTP 5xx injection, traffic spike, latency |
-| `catalog-service` | product catalog | FastAPI | CPU saturation |
-| `cart-service` | shopping cart | FastAPI + Redis | Redis unavailable |
-| `order-service` | order processing | FastAPI + Postgres | DB unavailable, faulty deployment |
-| `payment-service` | simulated payments | FastAPI | container crash, latency |
+| `shop-gateway` | Public API entry | FastAPI | HTTP 5xx, traffic spike, latency |
+| `catalog-service` | Product catalogue | FastAPI | CPU saturation |
+| `cart-service` | Shopping cart | FastAPI + Redis | Redis unavailable |
+| `order-service` | Order processing | FastAPI + PostgreSQL | DB unavailable, faulty deployment |
+| `payment-service` | Simulated payments | FastAPI | Container crash, latency |
 
-Shared infra: Postgres (orders), Redis (cart). All services OTel-instrumented
-(metrics + logs + traces). Final naming/tech confirmed by Jegatheesan at P2 kickoff.
+All services emit metrics, logs, and traces. PostgreSQL supports orders; Redis supports cart. Confirm final service contracts with the backend owner before implementation changes.

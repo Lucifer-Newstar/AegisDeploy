@@ -7,7 +7,7 @@
 > contract PR.
 >
 > Draft v1 by Navin (Team Lead) — final naming/tech confirmed with Jega at the
-> P2 kickoff sync (phases.md §P2 note).
+> P2 kickoff sync ([P2 phase plan](../planning/phases.md)).
 
 ## Files
 

@@ -1,35 +1,26 @@
-# Gokul — Phase Plan (DevOps / Cloud)
+# Gokul · DevOps / Cloud Phase Plan
 
-> My view of each phase: what I deliver, what I need, what I hand over, and when my
-> track is "done". Mirrors [docs/planning/phases.md](../../planning/phases.md).
+> **Purpose:** my delivery and handoff by phase. Shared scope: [features](../../planning/features.md). Shared gates: [phases](../../planning/phases.md). Dates: [timeline](../../planning/timeline.md).
 
----
+| Phase | I deliver | I need | Handoff / completion check |
+|---|---|---|---|
+| **P2 · Observability** | A1 collector/backend wiring, Prometheus/Loki/Tempo dashboards, Compose additions, service image support. | Telemetry contract and service ports. | App metrics/logs/traces are queryable within 60 seconds; integrated startup works. |
+| **P3 · Data plumbing** | Clean metric streams, alert/health wiring, mini-fault validation. | Navin's detector input/event shape. | Detector receives expected metrics; validation fault produces usable data. |
+| **P4 · Read-only tools** | Least-privilege query adapters for metrics, logs, traces, and Kubernetes evidence. | Tool/API contract from Navin and service access. | RCA can retrieve the required evidence without write permissions. |
+| **P5 · Executors** | Scoped restart/rollback/scale executors, dry-run path, audit integration, DI-5 execution. | Versioned action catalog and policy from Navin; APIs from Jegatheesan. | Approved actions work end-to-end; no broad admin credentials; rollback path is tested. |
+| **P6 · Delivery/operations** | D5 CI/CD, D6 SLO/burn-rate dashboards, DI-7 CFR dashboard. | Buildable services and metric definitions. | PR pipeline is green; SLO and CFR panels show live or evaluation data. |
+| **P7 · Cluster/chaos** | D1 kind/Kustomize deployment, A11 fault injection, DI-6 canary analysis. | Service images/manifests, fault specs from Navin, app hooks from Jegatheesan. | Stack runs on kind; ten faults produce ground truth and restore state; canary analysis is visible. |
+| **P8 · Evaluation support** | Keep evaluation cluster stable and support repeatable runs. | Frozen experiment manifests and report protocol. | At least ten runs per fault can complete and be retained. |
 
-## Phase Overview
+## Working rules
 
-| Phase | My deliverables | Depends on | Integration output | Done when |
-|---|---|---|---|---|
-| **P2** | A1 observability pipeline: OTel configs, Prometheus/Loki/Tempo wiring, Grafana dashboards; compose additions for AegisShop; Dockerfiles for services | — (stack exists) | AegisShop telemetry visible in Grafana/Loki/Tempo | P2 gate: telemetry in Grafana < 60 s |
-| **P3** | Metrics plumbing for the anomaly pipeline; alert/health wiring; mini-fault validation runs | Detector API (Navin) | Anomaly pipeline receives clean metric streams | Fault → anomaly validation passes |
-| **P4** | Read-only query proxies for AI tools (metrics/logs/traces/k8s with least privilege); Grafana evidence dashboards | — | RCA engine tools operational | P4 checkpoint demo passes |
-| **P5** | Executors infra (restart/**rollback**/scale with scoped credentials, dry-run mode); autonomy-mode support; **DI-5 rollback execution** | Action catalog + policies (Navin) | Safe execution path works end-to-end; **safe auto-rollback works** | Full-loop demo passes |
-| **P6** | D5 CI/CD full pipeline (test, lint, build, images); D6 SLO dashboards + burn-rate alerts (with Navin); **DI-7 CFR dashboards** | Services | CI green on every PR; SLO + CFR panels live | Product walkthrough passes |
-| **P7** | D1 kind cluster + Kustomize bases for every service; A11 chaoslab implementation + experiment manifests; **DI-6 canary deployment + analysis** | Fault specs (Navin), fault hooks (Jega) | Whole platform + AegisShop on kind; 10 faults injectable; **canary analyzed** | Cluster + chaos checkpoint passes |
-| **P8** | Cluster stability for evaluation runs; support experiment execution | — | N≥10 runs per fault complete | Evaluation report done |
+- Keep Compose and Kubernetes behavior/configuration aligned; shared stack changes go through PRs.
+- Pin images, validate manifests, and use least privilege. Executors must be auditable and support dry run.
+- Use deterministic experiment durations and restore state after chaos tests.
 
-## My Track's Key Risks
+## DevOps completion check
 
-| Risk | Mitigation |
-|---|---|
-| Cluster/CI flakiness eats time | kind is fast + reproducible; CI jobs timeboxed; k3s fallback |
-| Config drift Compose vs K8s | Shared `infra/` configs; kubeconform lint in CI; ADR-0005 discipline |
-| Executor safety (least privilege) | Scoped credentials only; dry-run mode; audit logging mandatory (A8) |
-| Chaoslab nondeterminism | Experiment manifests with fixed durations + automatic state restore |
-
-## Definition of Done (per deliverable)
-
-- [ ] Configs live in `infra/` and are mounted by the runtime (Compose/K8s)
-- [ ] Images pinned + healthchecked; compose validated by CI
-- [ ] Executors logged to audit store; no admin credentials in AI layer
-- [ ] Docs updated (runbooks/ops notes) + this file updated
-- [ ] CI green; code/comments per rule 3
+- [ ] Configs are versioned and mounted by the intended runtime.
+- [ ] CI validates Compose, images, and Kubernetes manifests as applicable.
+- [ ] No admin credentials are exposed to the AI layer.
+- [ ] Operational notes/runbooks and this plan are updated; relevant CI checks pass.

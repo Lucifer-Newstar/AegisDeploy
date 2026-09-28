@@ -1,38 +1,28 @@
-# Navin — Phase Plan (Team Lead / SRE / AI-SRE)
+# Navin · Team Lead / SRE / AI-SRE Phase Plan
 
-> My view of each phase: what I deliver, what I need, what I hand over, and when my
-> track is "done". Mirrors [docs/planning/phases.md](../../planning/phases.md).
-> As Team Lead I also run the **gate review** for every phase (phases.md §6).
+> **Purpose:** my delivery and handoff by phase. Shared scope: [features](../../planning/features.md). Shared gates: [phases](../../planning/phases.md). Dates: [timeline](../../planning/timeline.md). I coordinate each gate review but do not replace feature owners.
 
----
+| Phase | I deliver | I need | Handoff / completion check |
+|---|---|---|---|
+| **P1 · Foundation** | Repo/docs structure, ADRs, planning baseline, CI foundation. | — | Passed 2026-08-31. |
+| **P2 · Shared contracts** | Telemetry envelope/event semantics, architecture decisions, API contract coordination, integration protocol. | Service requirements from all tracks. | Shared contracts are committed and consumers can use sample events/mock APIs. |
+| **P3 · Detection** | A3 feature pipeline, statistical/Isolation Forest detectors, thresholds, validation. | Gokul's metric streams; A2 service context. | `anomaly.score` reaches incident track; precision/recall/F1 meet agreed targets. |
+| **P4 · Reasoning** | A5 RCA/evidence logic, B1 retrieval, B2 read-only assistant, DI-2 risk and DI-3 correlation. | Incident/deploy APIs from Jegatheesan; query tools from Gokul. | Cited RCA reaches ≥70% top-1; DI-3 reaches ≥0.8 top-1 on agreed faulty-deploy tests; UI can consume outputs. |
+| **P5 · Safety and policy** | A6 policy/risk design, A8 autonomy modes/kill switch, A9 verification logic, DI-5 rollback policy and safety docs. | Action API from Jegatheesan; scoped executors from Gokul. | Policies are testable; zero safety violations; recovery decisions are auditable. |
+| **P6 · Integration** | Define SLOs with Gokul, coordinate cross-track fixes, review live-data product checkpoint. | Live service/API and dashboard data. | SLO definitions are documented; product gate evidence and decisions are recorded. |
+| **P7 · Evaluation design** | A11 fault definitions, experiment manifests, ground-truth schema, faulty-deploy/canary scenarios. | Gokul's chaoslab; Jegatheesan's fault hooks. | Ten deterministic scenarios produce labeled, recoverable runs. |
+| **P8 · Results** | Lead A12/E2 runs, CFR analysis, research results and thesis chapter. | All members' repeatable runs and raw results. | Report is reproducible, limitations are recorded, and results answer the research question. |
+| **Buffer** | Viva preparation; B3 only as an approved stretch. | Core gates on schedule and suitable hardware/time. | B3 is omitted if it threatens core delivery; no buffer item changes locked scope by itself. |
 
-## Phase Overview
+## Lead responsibilities across phases
 
-| Phase | My deliverables | Depends on | Integration output | Done when |
-|---|---|---|---|---|
-| **P1** | Repo, docs hub, ADRs, planning docs, CI foundation | — | ✅ passed 2026-08-31 | gate passed |
-| **P2** | Telemetry envelope v0.1 (Pydantic); event layer design; **API contracts**; architecture refinement; integration protocol | — | Everyone builds against committed contracts | Contracts committed + P2 gate passed |
-| **P3** | A3 anomaly detection (statistical baselines + Isolation Forest), feature pipeline, threshold tuning, validation mini-eval | Metric streams (Gokul) | `anomaly.score` events → incident manager | Detection precision/recall ≥ 0.85; gate passed |
-| **P4** | A5 evidence collection + RCA engine (hypotheses w/ citations); B1 RAG (pgvector: runbooks, past incidents); B2 Ask Aegis engine (read-only tools); **DI-2 deployment risk scoring + DI-3 change-incident correlation** | Incident/evidence APIs (Jega), query proxies (Gokul) | AI reasoning APIs + engine for the UI; **correlation API** | RCA accuracy ≥ 70%; **correlation accuracy ≥ 0.8**; gate passed |
-| **P5** | A6 policy engine design + risk matrix; A8 safe-auto design + kill switch; A9 verification logic; **DI-5 rollback policy**; autonomy docs | Action catalog (with Jega), executors (Gokul) | Policy engine + verification service; **rollback policy live** | Safety violations = 0; gate passed |
-| **P6** | SLO definitions (with Gokul); integration lead; autonomy mode documentation | — | SLO dashboards live; product walkthrough | Gate passed |
-| **P7** | A11 fault specs + experiment manifests + ground-truth schema; evaluation protocol; **faulty-deploy + canary experiment specs (DI-4/DI-6)** | Chaoslab impl (Gokul) | 10 injectable faults with labels; **faulty-deploy ground truth** | Cluster + chaos gate passed |
-| **P8** | A12 evaluation lead (baseline vs platform, N≥10/fault); E2 comparison study; **DI-7 CFR metric**; thesis report (results chapter) | All members' support | Evaluation report + thesis chapter | Report committed; gate passed |
-| **Buffer** | B3 LoRA/QLoRA fine-tune experiment (gated); viva preparation | Core ahead of schedule | Optional MLOps add-on | — |
+- Keep scope, contracts, decisions, and dependencies clear; update the relevant record when a decision changes.
+- Facilitate weekly syncs and gate reviews; record pass/fail, evidence, owners, and follow-up dates.
+- Enforce the safety boundary: the AI recommends; policy and scoped executors control actions; verification precedes closure.
 
-## My Track's Key Risks
+## AI / research completion check
 
-| Risk | Mitigation |
-|---|---|
-| LLM behavior variance | Evidence-first design: hypotheses must cite telemetry; confidence scores; rule-based RCA fallback scaffolding |
-| RAG corpus too small early | Seed with runbooks + fault specs from P2; grow with each incident (E1 dataset) |
-| Policy/safety defects | Risk matrix frozen at P5 design; dry-run mode; audit-everything; kill switch |
-| Lead bandwidth split (architecture + AI + coordination) | Contracts-first removes blocking; weekly sync keeps coordination cheap; delegate impl to members where sensible |
-
-## Definition of Done (per deliverable)
-
-- [ ] Contract/API documented and committed before consumers start
-- [ ] AI outputs cite evidence; no unsupported claims
-- [ ] Policies/ADRs reviewed; safety violations = 0
-- [ ] Evaluation data reproducible (protocol in operations/evaluation.md)
-- [ ] Docs updated (E4); decision log current; gate checklist complete
+- [ ] AI claims cite evidence; read-only tools remain separate from action execution.
+- [ ] Policies, thresholds, and evaluation protocol are versioned and testable.
+- [ ] Raw experiment results and scripts are retained for reproducibility.
+- [ ] Decision log, phase gate evidence, and this plan are current.

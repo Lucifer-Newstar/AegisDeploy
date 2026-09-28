@@ -146,7 +146,7 @@ classDiagram
 ## 1. Purpose
 
 Static model of the demo application: five FastAPI microservices (see
-[phases.md](../../planning/phases.md) §7), their domain entities, external dependency
+[AegisShop service map](../../planning/phases.md#7-demo-application-aegisshop)), their domain entities, external dependency
 (payment gateway), and the **FaultHook** interface that makes every service
 chaos-ready (A11).
 

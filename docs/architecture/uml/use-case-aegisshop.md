@@ -71,7 +71,7 @@ flowchart LR
 
 Documents the functional requirements of the **demo application** that the platform
 monitors and protects. AegisShop exists to be the *test subject* — its fault hooks
-(see [phases.md](../../planning/phases.md) §7) make it chaos-ready.
+(see [AegisShop service map](../../planning/phases.md#7-demo-application-aegisshop)) make it chaos-ready.
 
 ## 2. Actors
 

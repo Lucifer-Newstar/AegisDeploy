@@ -1,45 +1,40 @@
-# Member Folders
+# Member Plans
 
-> One designated folder per team member. Each folder contains:
->
-> - **README.md** — who the member is, their role, the repository areas they own,
->   and the contracts they consume/provide.
-> - **phase-plan.md** — the member's *own view* of the phases: what they deliver in
->   each phase, what they depend on, what they hand over at integration, and what
->   "done" means for their track.
->
-> Maintained by each member; reviewed by the Team Lead. Team-level roles & ownership:
-> [docs/team/team-structure.md](../team/team-structure.md).
+Each member folder contains two documents:
+
+- **README.md — role and interfaces:** responsibility, owned repository areas, and contracts provided or consumed.
+- **phase-plan.md — delivery commitment:** that member's work by phase, dependencies, handoff, and completion check.
+
+Team-level ownership is in [team-structure.md](../team/team-structure.md). Shared scope is in [features.md](../planning/features.md); phase gates are in [phases.md](../planning/phases.md).
 
 ---
 
-## 1. Member Index
+## 1. Member index
 
-| Member | Role | Folder | Primary tracks |
+| Member | Role | Folder | Main areas |
 |---|---|---|---|
-| **Dhanush Kumar S** | Frontend Developer | [dhanush-frontend/](dhanush-frontend/) | Console (8 pages incl. deployments), design system, visualization, AI/approval UIs, demo video |
-| **Jegatheesan K** | Backend Developer | [jegatheesan-backend/](jegatheesan-backend/) | APIs, AegisShop backend, incident manager, approvals/verification services, DB |
-| **Gokul J** | DevOps / Cloud Engineer | [gokul-devops/](gokul-devops/) | Observability infra, Docker/CI-CD, Kubernetes, chaoslab, executors infra |
-| **Navin Jairam M** | Team Lead — SRE / DevOps / Architecture | [navin-lead/](navin-lead/) | Architecture, contracts, AI-SRE (anomaly, RCA, RAG, policy), evaluation, integration |
+| **Dhanush Kumar S** | Frontend developer | [dhanush-frontend](dhanush-frontend/) | Console, design system, charts, AI/approval UI, demo materials |
+| **Jegatheesan K** | Backend developer | [jegatheesan-backend](jegatheesan-backend/) | APIs, AegisShop, incidents, approvals, verification, persistence |
+| **Gokul J** | DevOps / cloud engineer | [gokul-devops](gokul-devops/) | Observability, containers, CI/CD, Kubernetes, chaoslab, executors |
+| **Navin Jairam M** | Team lead / SRE / AI-SRE | [navin-lead](navin-lead/) | Architecture, shared contracts, AI-SRE, evaluation, integration |
 
-## 2. Quick Dependency Map
+## 2. Main handoffs
 
 ```text
-Navin ──contracts/envelope──▶ everyone (P2 start)
-Navin ──anomaly events──────▶ Jega (P3)     Jega ──incident APIs──▶ Dhanush (P3 end)
-Navin ──RCA/RAG/Ask engine──▶ Dhanush (P4)  Jega ──approval APIs──▶ Dhanush (P5)
-Gokul ──observability stack──▶ everyone      Gokul ──executors─────▶ A6/A8 (P5)
-Gokul ──K8s + chaoslab──────▶ everyone (P7)  All  ──integration────▶ Navin (gate review)
+Navin: shared telemetry/events ──▶ backend + platform tracks (P2)
+Navin: anomaly events ────────────▶ Jegatheesan's incident manager (P3)
+Jegatheesan: service/incident APIs ▶ Dhanush's console (P2–P5)
+Gokul: observability + query tools ▶ all tracks (P2–P4)
+Navin: action policies ───────────▶ Jegatheesan + Gokul (P5)
+Gokul: cluster + chaoslab ────────▶ all tracks (P7)
+All members: integrated result ───▶ phase gate review (each phase)
 ```
 
-> **Rule:** nobody blocks. Every arrow above has a mock/stub alternative until the
-> real contract lands (see [docs/planning/phases.md](../planning/phases.md) §4).
+Use the contracts and mocks described in [phases.md §4](../planning/phases.md#4-non-blocking-work-and-handoffs) while an implementation is pending. Do not silently change an interface used by another member.
 
-## 3. How to Use Your Folder
+## 3. Keeping plans current
 
-1. Read `docs/planning/phases.md` first — your phase-plan mirrors the phases there.
-2. Keep your `phase-plan.md` **updated as you work** — it is your commitment for each
-   phase and the input to the gate review.
-3. Update your README when your role/ownership changes (tell the Team Lead).
-4. Everything here is docs-only — implementation lives in your code folders
-   (`frontend/`, `backend/`, `infra/`, `ml/`+`ai/`+`chaoslab/`).
+1. Check the shared phase gate and feature acceptance criteria before starting work.
+2. In your `phase-plan.md`, keep each phase's deliverable, dependency, handoff, and completion check current.
+3. Update your README when role ownership or interfaces change; tell the Team Lead.
+4. Record scope/interface decisions in the decision log. Implementation lives in code, not in this folder.
