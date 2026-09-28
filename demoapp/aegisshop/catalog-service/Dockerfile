@@ -22,4 +22,4 @@ COPY catalog_service ./catalog_service
 EXPOSE 9001
 HEALTHCHECK --interval=10s --timeout=3s --retries=5 \
     CMD python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:9001/health', timeout=3).status==200 else 1)"
-CMD ["uvicorn", "catalog_service.main:app", "--host", "0.0.0.0", "--port", "9001"]
+CMD ["python", "-m", "uvicorn", "catalog_service.main:app", "--host", "0.0.0.0", "--port", "9001"]
