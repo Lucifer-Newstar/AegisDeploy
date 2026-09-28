@@ -52,8 +52,8 @@ the kickoff sync; team confirmation is a formality.
 | Prometheus | 9090 | scrape + remote-write |
 | Grafana | 3000 | console-in-a-pinch, dashboards |
 | Loki | 3100 | logs |
-| Tempo | 3200 | traces API |
-| OTel collector | 4317 (gRPC) / 4318 (HTTP) | OTLP ingress |
+| Tempo | 3200 | traces API; OTLP receivers are internal to the Compose network |
+| OTel collector | 4317 (gRPC) / 4318 (HTTP) | host-published OTLP ingress for apps; forwards traces to Tempo internally |
 
 **Port-range policy:** 3xxx–6xxx infra · 8xxx platform control plane ·
 9xxx demo workload (AegisShop). New service = next free port in its range;
