@@ -44,10 +44,10 @@ docs/
 │
 ├── members/                     ← PER-MEMBER PLANNING (each member's folder)
 │   ├── README.md                ← member index + cross-member dependencies
-│   ├── dhanush-frontend/        ← Member 1 — frontend
-│   ├── jegatheesan-backend/     ← Member 2 — backend
-│   ├── gokul-devops/            ← Member 3 — DevOps / cloud
-│   └── navin-lead/              ← Member 4 — team lead / SRE / AI-SRE
+│   ├── dhanush-frontend/        ← Member 1 — frontend (+ work-log)
+│   ├── jegatheesan-backend/     ← Member 2 — backend (+ work-log)
+│   ├── gokul-devops/            ← Member 3 — DevOps / cloud (+ work-log)
+│   └── navin-lead/              ← Member 4 — team lead / SRE / AI-SRE (+ work-log)
 │
 ├── architecture/                ← SYSTEM DESIGN (how the platform works)
 │   ├── system-architecture.md   ← components, responsibilities, data flows

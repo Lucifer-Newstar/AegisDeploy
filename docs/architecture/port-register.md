@@ -20,7 +20,7 @@
 
 | Service | Port | DNS | Contract | Feature | Phase | Status |
 |---|---|---|---|---|---|---|
-| registry | **8101** | registry-service | [registry-service.yaml](../contracts/registry-service.yaml) | A2 registry + health | P2 | pending (Jega) |
+| registry | **8101** | registry-service | [registry-service.yaml](../contracts/registry-service.yaml) | A2 registry + health | P2 | **LIVE** |
 | incidents | 8201 | incidents-service | — | A4 incident manager | P3 | planned |
 | evidence | 8202 | evidence-service | — | A5 evidence store | P3/P4 | planned |
 | remediation | 8301 | remediation-service | — | A6/A7 planner + approvals | P5 | planned |
@@ -29,16 +29,16 @@
 | autonomy | 8402 | autonomy-service | — | A8 autonomy modes + kill switch | P5 | planned |
 | ml | 8501 | ml-service | — | A3 detectors / DI-2 / DI-3 | P3/P4 | planned |
 | ai | 8601 | ai-service | — | B1 RAG / B2 Ask Aegis / RCA | P4 | planned |
-| deployments | **8701** | deployments-service | [deployments-service.yaml](../contracts/deployments-service.yaml) | DI-1 deploy tracker | P2 | pending (Jega) |
+| deployments | **8701** | deployments-service | [deployments-service.yaml](../contracts/deployments-service.yaml) | DI-1 deploy tracker | P2 | **LIVE** |
 
 ## 3. AegisShop demo workload (9xxx)
 
 | Service | Port | DNS | Contract | Status |
 |---|---|---|---|---|
 | catalog | **9001** | catalog-service | [catalog-service.yaml](../contracts/catalog-service.yaml) | **LIVE** (slice) |
-| cart | 9002 | cart-service | [cart-service.yaml](../contracts/cart-service.yaml) | pending (P2, Jega) |
-| order | 9003 | order-service | [order-service.yaml](../contracts/order-service.yaml) | pending (P2, Jega) |
-| payment | 9004 | payment-service | [payment-service.yaml](../contracts/payment-service.yaml) | pending (P2, Jega) |
+| cart | 9002 | cart-service | [cart-service.yaml](../contracts/cart-service.yaml) | **LIVE** (P2) |
+| order | 9003 | order-service | [order-service.yaml](../contracts/order-service.yaml) | **LIVE** (P2) |
+| payment | 9004 | payment-service | [payment-service.yaml](../contracts/payment-service.yaml) | **LIVE** (P2) |
 
 Ports **locked 2026-09-01** (lead pre-approval, decision D1) — recorded at
 the kickoff sync; team confirmation is a formality.
@@ -50,10 +50,11 @@ the kickoff sync; team confirmation is a formality.
 | Postgres | 5432 | platform DB |
 | Redis | 6379 | eventbus streams (ADR-0004) |
 | Prometheus | 9090 | scrape + remote-write |
-| Grafana | 3000 | console-in-a-pinch, dashboards |
+| Grafana | 3000 | dashboards (console-in-a-pinch) |
+| AegisDeploy console | 3030 | Next.js SRE console (P2 scaffold; Grafana keeps 3000) |
 | Loki | 3100 | logs |
-| Tempo | 3200 | traces API |
-| OTel collector | 4317 (gRPC) / 4318 (HTTP) | OTLP ingress |
+| Tempo | 3200 | traces API; OTLP receivers are internal to the Compose network |
+| OTel collector | 4317 (gRPC) / 4318 (HTTP) | host-published OTLP ingress for apps; forwards traces to Tempo internally |
 
 **Port-range policy:** 3xxx–6xxx infra · 8xxx platform control plane ·
 9xxx demo workload (AegisShop). New service = next free port in its range;

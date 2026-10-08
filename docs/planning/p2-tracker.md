@@ -1,6 +1,6 @@
 # P2 Status Tracker (Team Lead view)
 
-> **Owner:** Navin Jairam · **Updated:** 2026-09-01 · **Source:** pending-work
+> **Owner:** Navin Jairam · **Updated:** 2026-10-10 · **Source:** pending-work
 > review (24 items). Checked items move to the decision log / PRs; this file
 > is the lead's board through the P2 gate (2026-10-31).
 
@@ -17,9 +17,9 @@
 - [ ] A9 — `git push -u origin main`
 - [ ] A10 — Invite team collaborators: Jega, Gokul, Dhanush
 - [ ] A11 — Members' machine setup per `docs/development/local-setup.md`
-- [ ] A12 — Dhanush: Node 22 + frontend scaffold setup (his P2 branch)
-- [ ] A13 — Jega: DB tooling (Alembic/migrations with first models)
-- [ ] A14 — Gokul: Docker tooling + compose additions
+- [x] A12 — Dhanush: Node 22 + frontend scaffold setup (console on :3030)
+- [ ] A13 — Jega: DB tooling (Alembic/migrations with first models) — P2 APIs are in-memory; migrations follow
+- [x] A14 — Gokul: Docker tooling + compose additions
 
 ## B. Getting it to the team
 

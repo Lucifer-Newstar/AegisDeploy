@@ -7,18 +7,18 @@
 > contract PR.
 >
 > Draft v1 by Navin (Team Lead) — final naming/tech confirmed with Jega at the
-> P2 kickoff sync (phases.md §P2 note).
+> P2 kickoff sync ([P2 phase plan](../planning/phases.md)).
 
 ## Files
 
 | Contract | Version | Service(s) | Port | Status |
 |---|---|---|---|---|
-| [registry-service.yaml](registry-service.yaml) | 1.0.0 | A2 registry + health | **8101** | pending (P2, Jega) |
-| [deployments-service.yaml](deployments-service.yaml) | 1.0.0 | DI-1 deploy tracker | **8701** | pending (P2, Jega) |
-| [catalog-service.yaml](catalog-service.yaml) | 1.0.0 | catalog | 9001 | **LIVE** (slice) |
-| [cart-service.yaml](cart-service.yaml) | 1.0.0 | cart | 9002 | pending (P2, Jega) |
-| [order-service.yaml](order-service.yaml) | 1.0.0 | order | 9003 | pending (P2, Jega) |
-| [payment-service.yaml](payment-service.yaml) | 1.0.0 | payment | 9004 | pending (P2, Jega) |
+| [registry-service.yaml](registry-service.yaml) | 1.0.0 | A2 registry + health | **8101** | **LIVE** |
+| [deployments-service.yaml](deployments-service.yaml) | 1.0.0 | DI-1 deploy tracker | **8701** | **LIVE** |
+| [catalog-service.yaml](catalog-service.yaml) | 1.0.0 | catalog | 9001 | **LIVE** |
+| [cart-service.yaml](cart-service.yaml) | 1.0.0 | cart | 9002 | **LIVE** |
+| [order-service.yaml](order-service.yaml) | 1.0.0 | order | 9003 | **LIVE** |
+| [payment-service.yaml](payment-service.yaml) | 1.0.0 | payment | 9004 | **LIVE** |
 
 Ports locked 2026-09-01 (D1 pre-approval) — recorded at the kickoff sync.
 [manifest.json](manifest.json) maps each service to its contract file for the
@@ -39,9 +39,9 @@ drift check — **add a row there when a service lands** (PR template).
    envelope v0.2 (`backend/libs/telemetry`), never a bespoke shape. The
    deployments-service validates incoming envelopes with the shared lib
    (schema enforced at ingestion — P2 gate).
-5. **CORS (dev policy)** — all services allow origin `http://localhost:3000`
-   (Next.js dev server) in `dev` only. Applied via the service template when
-   services are built. Production goes same-origin through the gateway (P6).
+5. **CORS (dev policy)** — P2 services allow origins `http://localhost:3000`
+   (legacy Next default) and `http://localhost:3030` (console; Grafana keeps
+   3000) in `dev` only. Production goes same-origin through the gateway (P6).
 6. **Versioning** — contracts are additive-only; breaking changes require a
    contract PR even after freeze (the freeze is about *stability*, not
    immutability). Each file carries a `version` field + changelog comment.
