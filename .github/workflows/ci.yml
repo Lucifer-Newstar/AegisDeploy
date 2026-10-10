@@ -6,8 +6,8 @@
 #   k8s-manifests        → K8s manifests match real schemas + kustomize bases assemble
 #   docs-links           → every link inside docs/** points to a real file
 #   python-quality       → ruff (style) + mypy (types) + pytest (tests) + contract drift
-#   docker-build         → the catalog-service container image actually builds
-#   frontend-build       → disabled until the console lands (P2, Dhanush)
+#   docker-build         → catalog + registry container images actually build
+#   frontend-build       → console (Next.js) production build
 #
 # New jobs are added when their component lands (ml in P3, ai in P4).
 
@@ -123,7 +123,12 @@ jobs:
                       -e backend/libs/telemetry[dev] \
                       -e backend/libs/eventbus[dev] \
                       -e backend/services/_template[dev] \
-                      -e demoapp/aegisshop/catalog-service[dev]
+                      -e backend/services/registry-service[dev] \
+                      -e backend/services/deployments-service[dev] \
+                      -e demoapp/aegisshop/catalog-service[dev] \
+                      -e demoapp/aegisshop/cart-service[dev] \
+                      -e demoapp/aegisshop/order-service[dev] \
+                      -e demoapp/aegisshop/payment-service[dev]
 
       - name: Style (ruff)
         run: ruff check backend demoapp
@@ -131,12 +136,24 @@ jobs:
       - name: Types (mypy --strict)
         run: >
           mypy backend/libs/telemetry backend/libs/eventbus
-          backend/services/_template demoapp/aegisshop/catalog-service
+          backend/services/_template
+          backend/services/registry-service
+          backend/services/deployments-service
+          demoapp/aegisshop/catalog-service
+          demoapp/aegisshop/cart-service
+          demoapp/aegisshop/order-service
+          demoapp/aegisshop/payment-service
 
       - name: Tests (pytest)
         run: >
           pytest backend/libs/telemetry backend/libs/eventbus
-          backend/services/_template demoapp/aegisshop/catalog-service
+          backend/services/_template
+          backend/services/registry-service
+          backend/services/deployments-service
+          demoapp/aegisshop/catalog-service
+          demoapp/aegisshop/cart-service
+          demoapp/aegisshop/order-service
+          demoapp/aegisshop/payment-service
 
       - name: Contract drift (docs/contracts vs live APIs)
         run: python3 scripts/check_contract_drift.py
@@ -162,11 +179,21 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  # 6 ── Frontend: enabled when the console lands (P2) ───────────────────────
+      - name: Build the registry-service image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend/services/registry-service
+          file: ./backend/services/registry-service/Dockerfile
+          tags: aegisdeploy/registry-service:ci-${{ github.sha }}
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # 6 ── Frontend: P2 console scaffold ───────────────────────────────────────
   frontend-build:
-    name: Frontend (starts in P2)
+    name: Frontend (console)
     runs-on: ubuntu-latest
-    if: ${{ false }}   # remove `if` when Dhanush's console scaffold lands
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

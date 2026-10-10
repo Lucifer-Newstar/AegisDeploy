@@ -148,17 +148,20 @@ docker compose ps
 
 # 3. Open the dashboards
 #    Grafana       → http://localhost:3000   (admin / aegis)
+#    Console       → http://localhost:3030   (P2 scaffold, mock data)
 #    Prometheus    → http://localhost:9090
 #    Loki          → http://localhost:3100
 #    Tempo         → http://localhost:3200
+#    Registry      → http://localhost:8101/services
+#    Catalog API   → http://localhost:9001/products
 #    OTLP endpoint → localhost:4317 (gRPC) / 4318 (HTTP)
 
 # 4. Tear down
 make infra-down
 ```
 
-Application services (backend, frontend, ml, ai) are added incrementally as they are
-implemented; the observability foundation above is version-pinned and fully functional now.
+P2 services (registry, deployments, AegisShop cart/order/payment, console) start
+with the same `make infra-up` command.
 
 ## 5. Documentation
 

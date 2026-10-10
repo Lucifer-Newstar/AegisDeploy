@@ -137,17 +137,20 @@ win** (ADR-0005: same container in Compose and K8s).
 ## 5. Run the local stack
 
 ```bash
-make infra-up           # docker compose up -d --wait (stack + catalog-service)
+make infra-up           # docker compose up -d --build --wait (stack + P2 services + console)
 docker compose ps       # all services healthy
 ```
 
 | Service | URL | Login |
 |---|---|---|
 | Grafana | http://localhost:3000 | `admin` / `aegis` (from `.env`) |
+| Console | http://localhost:3030 | — (P2 mock scaffold) |
 | Prometheus | http://localhost:9090 | — |
 | Loki | http://localhost:3100 | — |
 | Tempo | http://localhost:3200 | — |
 | Catalog API | http://localhost:9001/products | — |
+| Registry API | http://localhost:8101/services | — |
+| Deployments API | http://localhost:8701/deployments | — |
 
 **First-run verification (5 minutes):**
 1. `curl localhost:9001/health` → `{"status":"healthy"}`
