@@ -31,9 +31,50 @@ class DeploymentRecord:
         }
 
 
+def _startup_envelope(service: str, revision: str = "v0.1.0") -> dict[str, Any]:
+    ts = _now().isoformat().replace("+00:00", "Z")
+    return {
+        "id": f"evt_startup_{service}_{revision}",
+        "schema_version": "0.2",
+        "source": "deployment",
+        "type": "deployment",
+        "service": service,
+        "environment": "dev",
+        "severity": "info",
+        "timestamp": ts,
+        "payload": {
+            "action": "deploy",
+            "revision": revision,
+            "triggered_by": "platform",
+            "status": "succeeded",
+        },
+    }
+
+
 class DeploymentStore:
     def __init__(self) -> None:
         self._items: dict[str, DeploymentRecord] = {}
+        self.seed_startup_deploys()
+
+    def seed_startup_deploys(self) -> None:
+        """DI-1 pipeline hook: every process start records the running revision."""
+        for service in (
+            "catalog-service",
+            "cart-service",
+            "order-service",
+            "payment-service",
+            "registry-service",
+            "deployments-service",
+        ):
+            envelope = _startup_envelope(service)
+            rec = DeploymentRecord(
+                event_id=str(envelope["id"]),
+                service=service,
+                revision="v0.1.0",
+                status="succeeded",
+                envelope=envelope,
+            )
+            self.put(rec)
 
     def reset(self) -> None:
         self._items.clear()

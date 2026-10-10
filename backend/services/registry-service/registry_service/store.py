@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import urllib.error
+import urllib.request
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 
@@ -23,6 +25,19 @@ class ServiceRecord:
     registered_at: datetime = field(default_factory=_now)
     last_heartbeat_at: datetime | None = None
 
+    def probe_ready(self, timeout: float = 0.4) -> None:
+        """Set status from the service's own /ready (A2 live health)."""
+        url = self.url.rstrip("/") + "/ready"
+        try:
+            with urllib.request.urlopen(url, timeout=timeout) as resp:
+                if 200 <= int(resp.status) < 300:
+                    self.status = "healthy"
+                    self.last_heartbeat_at = _now()
+                    return
+            self.status = "degraded"
+        except (urllib.error.URLError, TimeoutError, ValueError, OSError):
+            self.status = "unhealthy"
+
     def refresh_status(self, now: datetime | None = None) -> None:
         now = now or _now()
         stamp = self.last_heartbeat_at or self.registered_at
@@ -34,8 +49,11 @@ class ServiceRecord:
         else:
             self.status = "unknown"
 
-    def as_dict(self, include_heartbeats: bool = True) -> dict[str, str | None]:
-        self.refresh_status()
+    def as_dict(
+        self, include_heartbeats: bool = True, *, skip_refresh: bool = False
+    ) -> dict[str, str | None]:
+        if not skip_refresh:
+            self.refresh_status()
         payload: dict[str, str | None] = {
             "id": self.id,
             "name": self.name,
@@ -77,8 +95,20 @@ class RegistryStore:
         self._items.clear()
         self._seed()
 
+    def _maybe_probe(self) -> bool:
+        from registry_service.config import settings
+
+        if not settings.registry_probe:
+            return False
+        for rec in self._items.values():
+            rec.probe_ready()
+        return True
+
     def list(self, status: str | None = None, include_heartbeats: bool = True) -> list[dict[str, str | None]]:
-        out = [rec.as_dict(include_heartbeats) for rec in self._items.values()]
+        probed = self._maybe_probe()
+        out = [
+            rec.as_dict(include_heartbeats, skip_refresh=probed) for rec in self._items.values()
+        ]
         if status:
             out = [row for row in out if row["status"] == status]
         return sorted(out, key=lambda row: row["id"] or "")
@@ -86,7 +116,12 @@ class RegistryStore:
     def get(self, service_id: str) -> ServiceRecord | None:
         rec = self._items.get(service_id)
         if rec:
-            rec.refresh_status()
+            from registry_service.config import settings
+
+            if settings.registry_probe:
+                rec.probe_ready()
+            else:
+                rec.refresh_status()
         return rec
 
     def register(self, service_id: str, name: str, url: str, version: str = "0.1.0") -> ServiceRecord:

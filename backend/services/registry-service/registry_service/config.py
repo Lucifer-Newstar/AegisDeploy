@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     service_port: int = 8101
     environment: str = "dev"
     otel_exporter_otlp_endpoint: str = ""
+    registry_probe: bool = False
 
 
 settings = Settings()

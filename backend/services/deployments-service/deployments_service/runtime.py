@@ -71,9 +71,45 @@ def _init_tracing() -> None:
     FastAPIInstrumentor().instrument()
 
 
+
+def _init_otel_logs() -> None:
+    """Best-effort OTLP log export so Loki can query service logs (A1)."""
+    if not settings.otel_exporter_otlp_endpoint:
+        return
+    try:
+        import logging as _logging
+
+        from opentelemetry._logs import set_logger_provider
+        from opentelemetry.exporter.otlp.proto.grpc._log_exporter import OTLPLogExporter
+        from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler
+        from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
+        from opentelemetry.sdk.resources import Resource
+
+        provider = LoggerProvider(
+            resource=Resource.create(
+                {
+                    "service.name": settings.service_name,
+                    "deployment.environment": settings.environment,
+                }
+            )
+        )
+        provider.add_log_record_processor(
+            BatchLogRecordProcessor(
+                OTLPLogExporter(endpoint=settings.otel_exporter_otlp_endpoint, insecure=True)
+            )
+        )
+        set_logger_provider(provider)
+        handler = LoggingHandler(level=_logging.INFO, logger_provider=provider)
+        _logging.getLogger().addHandler(handler)
+    except Exception as exc:  # logs SDK is optional at runtime
+        logger.warning(f"otel log export unavailable: {exc}")
+
+
+
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     _init_tracing()
+    _init_otel_logs()
     logger.info("service starting", extra={"port": settings.service_port})
     yield
     logger.info("service stopped")
