@@ -9,3 +9,4 @@
 | 2026-09-28 | Planning docs clarification; Compose Tempo OTLP host-port fix; catalog uvicorn module launch | Unblocked `make infra-up`. |
 | 2026-10-08 | Port register + contract README marked LIVE for P2 services | Console port 3030 recorded. |
 | 2026-10-10 | P2 MVP integration: CI quality jobs, tracker, member work logs | Stack: one `make infra-up` starts app + platform + console. |
+| 2026-10-10 | Closed remaining P2 code gaps (live health, deploy seed, Loki logs, live console) | Gate review still 2026-10-31; process items remain manual. |
