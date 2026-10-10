@@ -12,7 +12,7 @@ classDiagram
     %% ═══════════════════════════════════════════════════════
     %% SERVICE LAYER
     %% ═══════════════════════════════════════════════════════
-    class ShopService {
+    class ShopService:::svc {
         <<abstract>>
         +str name
         +str version
@@ -20,31 +20,31 @@ classDiagram
         +health_check() dict
         +expose_metrics() dict
     }
-    class ApiGateway {
+    class ApiGateway:::svc {
         +route(path) Response
         +authenticate(token) bool
         +rate_limit(client) bool
     }
-    class CatalogService {
+    class CatalogService:::svc {
         -list~Product~ products
         +search(query) list~Product~
         +get_product(id) Product
         +add_product(product) void
         +update_product(product) void
     }
-    class CartService {
+    class CartService:::svc {
         -RedisClient redis
         +add_item(cart_id, item) Cart
         +update_item(cart_id, item) void
         +get_cart(cart_id) Cart
     }
-    class OrderService {
+    class OrderService:::svc {
         -PostgresClient db
         +place_order(cart) Order
         +get_order(id) Order
         +update_status(id, status) void
     }
-    class PaymentService {
+    class PaymentService:::svc {
         -PaymentGateway gateway
         +process_payment(order) Payment
         +refund(payment) void
@@ -53,38 +53,38 @@ classDiagram
     %% ═══════════════════════════════════════════════════════
     %% DOMAIN ENTITIES
     %% ═══════════════════════════════════════════════════════
-    class Product {
+    class Product:::entity {
         +str id
         +str name
         +float price
         +int stock
         +str category
     }
-    class Cart {
+    class Cart:::entity {
         +str id
         +list~CartItem~ items
         +add(item) void
         +update(item) void
         +total() float
     }
-    class CartItem {
+    class CartItem:::entity {
         +str product_id
         +int quantity
         +float price
     }
-    class Order {
+    class Order:::entity {
         +str id
         +str status
         +list~OrderItem~ items
         +float total
         +datetime created_at
     }
-    class OrderItem {
+    class OrderItem:::entity {
         +str product_id
         +int quantity
         +float price
     }
-    class Payment {
+    class Payment:::entity {
         +str id
         +str order_id
         +str status
@@ -95,22 +95,29 @@ classDiagram
     %% ═══════════════════════════════════════════════════════
     %% EXTERNAL & CHAOS INTERFACES
     %% ═══════════════════════════════════════════════════════
-    class PaymentGateway {
+    class PaymentGateway:::ext {
         <<external>>
         +charge(amount) Receipt
     }
-    class FaultHook {
+    class FaultHook:::chaos {
         <<interface>>
         +inject(fault_type) void
         +restore() void
     }
 
-    %% ── Inheritance ────────────────────────────────────────
-    ApiGateway <|-- ShopService
-    CatalogService <|-- ShopService
-    CartService <|-- ShopService
-    OrderService <|-- ShopService
-    PaymentService <|-- ShopService
+    class RedisClient:::ext {
+        <<external>>
+    }
+    class PostgresClient:::ext {
+        <<external>>
+    }
+
+    %% ── Inheritance (subclass points at ShopService) ───────
+    ShopService <|-- ApiGateway
+    ShopService <|-- CatalogService
+    ShopService <|-- CartService
+    ShopService <|-- OrderService
+    ShopService <|-- PaymentService
 
     %% ── Realization (chaos readiness) ──────────────────────
     CatalogService ..|> FaultHook
@@ -131,14 +138,10 @@ classDiagram
     %% ═══════════════════════════════════════════════════════
     %% COLOR CODING
     %% ═══════════════════════════════════════════════════════
-    classDef svc fill:#dbeafe,stroke:#2563eb,color:#1e3a8a;
-    classDef entity fill:#ecfdf5,stroke:#059669,color:#064e3b;
-    classDef ext fill:#f3f4f6,stroke:#6b7280,color:#374151;
-    classDef chaos fill:#fef3c7,stroke:#d97706,color:#78350f;
-    class ApiGateway,CatalogService,CartService,OrderService,PaymentService,ShopService svc;
-    class Product,Cart,CartItem,Order,OrderItem,Payment entity;
-    class PaymentGateway ext;
-    class FaultHook chaos;
+    classDef svc fill:#dbeafe,stroke:#2563eb,color:#1e3a8a
+    classDef entity fill:#ecfdf5,stroke:#059669,color:#064e3b
+    classDef ext fill:#f3f4f6,stroke:#6b7280,color:#374151
+    classDef chaos fill:#fef3c7,stroke:#d97706,color:#78350f
 ```
 
 ---
