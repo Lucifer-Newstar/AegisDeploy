@@ -8,3 +8,4 @@
 | 2026-09-19 | Command Center mock: health grid, incident feed, autonomy badge | Mock payloads follow A2 / A4 / DI-1 shapes. |
 | 2026-09-26 | Services, incidents, and deployments pages | Still mock; swap to live APIs without changing the layout. |
 | 2026-10-07 | Console Dockerfile (standalone) + CI `frontend-build` | `npm run build` is the merge gate. |
+| 2026-10-10 | Command Center / services / deployments read live APIs with mock fallback | `REGISTRY_URL` + `DEPLOYMENTS_URL` in Compose. |

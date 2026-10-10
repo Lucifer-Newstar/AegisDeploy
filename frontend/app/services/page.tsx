@@ -1,12 +1,17 @@
-import { MOCK_SERVICES } from "@/lib/mocks";
+import { loadServices } from "@/lib/data";
 
-export default function ServicesPage() {
+export const dynamic = "force-dynamic";
+
+export default async function ServicesPage() {
+  const { items: MOCK_SERVICES, source } = await loadServices();
   return (
     <>
       <div className="topbar">
         <div>
           <h1 style={{ margin: 0 }}>Services</h1>
-          <p className="muted">Registry shape from A2 contract · mock payload</p>
+          <p className="muted">
+            Registry A2 · {source === "live" ? "live API" : "mock payload"}
+          </p>
         </div>
       </div>
       <div className="card">

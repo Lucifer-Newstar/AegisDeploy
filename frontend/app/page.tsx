@@ -1,14 +1,18 @@
-import { MOCK_INCIDENTS, MOCK_SERVICES, MOCK_STATS } from "@/lib/mocks";
+import { loadServices } from "@/lib/data";
+import { MOCK_INCIDENTS, MOCK_STATS } from "@/lib/mocks";
 
-export default function CommandCenterPage() {
-  const healthy = MOCK_SERVICES.filter((s) => s.status === "healthy").length;
+export const dynamic = "force-dynamic";
+
+export default async function CommandCenterPage() {
+  const { items: services, source } = await loadServices();
+  const healthy = services.filter((s) => s.status === "healthy").length;
   return (
     <>
       <div className="topbar">
         <div>
           <h1 style={{ margin: 0 }}>Command Center</h1>
           <p className="muted">
-            Mock data until live APIs are wired
+            {source === "live" ? "Live registry" : "Mock data (registry unreachable)"}
             <span className="badge">P2 scaffold</span>
           </p>
         </div>
@@ -18,7 +22,7 @@ export default function CommandCenterPage() {
         <div className="card">
           <h3>Services healthy</h3>
           <div className="val">
-            {healthy}/{MOCK_SERVICES.length}
+            {healthy}/{services.length}
           </div>
         </div>
         <div className="card">
@@ -45,7 +49,7 @@ export default function CommandCenterPage() {
             </tr>
           </thead>
           <tbody>
-            {MOCK_SERVICES.map((svc) => (
+            {services.map((svc) => (
               <tr key={svc.id}>
                 <td>{svc.name}</td>
                 <td>

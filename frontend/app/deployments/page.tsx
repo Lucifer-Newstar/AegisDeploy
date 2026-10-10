@@ -1,12 +1,17 @@
-import { MOCK_DEPLOYMENTS } from "@/lib/mocks";
+import { loadDeployments } from "@/lib/data";
 
-export default function DeploymentsPage() {
+export const dynamic = "force-dynamic";
+
+export default async function DeploymentsPage() {
+  const { items: MOCK_DEPLOYMENTS, source } = await loadDeployments();
   return (
     <>
       <div className="topbar">
         <div>
           <h1 style={{ margin: 0 }}>Deployments</h1>
-          <p className="muted">DI-1 history shape · mock until live API is selected in the UI</p>
+          <p className="muted">
+            DI-1 history · {source === "live" ? "live API" : "mock payload"}
+          </p>
         </div>
       </div>
       <div className="card">
