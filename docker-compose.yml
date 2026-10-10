@@ -235,6 +235,7 @@ services:
       SERVICE_PORT: "8101"
       ENVIRONMENT: dev
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      REGISTRY_PROBE: "true"
     ports:
       - "8101:8101"
     depends_on:
@@ -264,10 +265,13 @@ services:
     container_name: aegisdeploy-console
     environment:
       PORT: "3030"
+      REGISTRY_URL: http://registry-service:8101
+      DEPLOYMENTS_URL: http://deployments-service:8701
     ports:
       - "3030:3030"
     depends_on:
       registry-service: { condition: service_started }
+      deployments-service: { condition: service_started }
     networks: [aegisdeploy]
     logging: *default-logging
 

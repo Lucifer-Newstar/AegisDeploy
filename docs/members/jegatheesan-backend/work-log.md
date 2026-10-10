@@ -10,3 +10,4 @@
 | 2026-09-22 | AegisShop `order-service` | Port 9003. Demo checkout for `user-01`; optional cart HTTP lookup. |
 | 2026-09-25 | AegisShop `payment-service` | Port 9004. Simulated charge; 402/404 hooks for tests. |
 | 2026-10-08 | Tests + OpenAPI alignment for all P2 services | Contract-drift check now loads live modules. |
+| 2026-10-10 | Live `/ready` probes in registry; DI-1 startup deploy seed | Probe is opt-in via `REGISTRY_PROBE`. |

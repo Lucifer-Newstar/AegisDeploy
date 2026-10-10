@@ -77,6 +77,38 @@ def _init_tracing() -> None:
     FastAPIInstrumentor().instrument()
 
 
+def _init_otel_logs() -> None:
+    """Best-effort OTLP log export so Loki can query catalog logs (A1)."""
+    if not settings.otel_exporter_otlp_endpoint:
+        return
+    try:
+        import logging as _logging
+
+        from opentelemetry._logs import set_logger_provider
+        from opentelemetry.exporter.otlp.proto.grpc._log_exporter import OTLPLogExporter
+        from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler
+        from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
+        from opentelemetry.sdk.resources import Resource
+
+        provider = LoggerProvider(
+            resource=Resource.create(
+                {
+                    "service.name": settings.service_name,
+                    "deployment.environment": settings.environment,
+                }
+            )
+        )
+        provider.add_log_record_processor(
+            BatchLogRecordProcessor(
+                OTLPLogExporter(endpoint=settings.otel_exporter_otlp_endpoint, insecure=True)
+            )
+        )
+        set_logger_provider(provider)
+        _logging.getLogger().addHandler(LoggingHandler(level=_logging.INFO, logger_provider=provider))
+    except Exception as exc:
+        logger.warning(f"otel log export unavailable: {exc}")
+
+
 # ── FaultHook stub (chaos readiness — implemented in A11) ────────────────────
 class FaultHook:
     """Demo-only interface for chaos-lab fault injection (A11).
@@ -101,6 +133,7 @@ fault_hook = FaultHook()
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     """Startup: wire tracing; seed catalog metrics."""
     _init_tracing()
+    _init_otel_logs()
     CATALOG_SIZE.labels(settings.service_name).inc(len(CATALOG))
     logger.info("catalog-service starting", extra={"products": len(CATALOG)})
     yield
